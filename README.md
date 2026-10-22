@@ -61,10 +61,18 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
 | `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Usa o destino configurado de Specs. |
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Usa o destino configurado de Tickets. |
-| `/implementar` | Implementa um ticket com TDD na Costura (Pest), Larastan e Pint. |
+| `/implementar` | Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) só com relatório, prova do fato de segurança e resumo de PR. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
+
+### Implementação com subagentes no Claude Code
+
+O agente principal coordena `/implementar` e delega cada fatia completa a um implementador **Sonnet 5.5 / medium**. Até dois implementadores podem trabalhar em paralelo quando os tickets são independentes e usam worktrees separados. Tickets com arquivos compartilhados seguem em sequência. O principal confere os diffs e valida o estado integrado antes da entrega ou commit autorizado.
+
+Depois de instalar a skill e as quatro disciplinas de modelo abaixo, copie [o template do implementador](skills/implementar/assets/implementador.md) para `.claude/agents/implementador.md` no projeto consumidor. Preserve customizações caso esse arquivo já exista. A instalação via `npx skills add` não registra o agente automaticamente. Consulte [a configuração no Claude Code](skills/implementar/references/claude-code.md) para conferir modelo, esforço e isolamento.
+
+Em outros ambientes, a skill usa subagentes e modelos autorizados disponíveis. Sem subagentes, executa o ciclo diretamente e informa a limitação.
 
 ## Skills de modelo
 
