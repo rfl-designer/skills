@@ -50,6 +50,8 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
 
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente.
 
+Use `/implmentar-em-par` no lugar de `/implementar` para revisar a implementação por componente. O agente explica RED e pausa antes da produção. Depois, implementa e explica um componente por vez, aguardando sua revisão. O teste pode continuar vermelho entre etapas; a Fatia Vertical termina com GREEN e verificação completa.
+
 ## Skills de usuário
 
 Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natural ao configurar o projeto.
@@ -62,6 +64,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Usa o destino configurado de Specs. |
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Usa o destino configurado de Tickets. |
 | `/implementar` | Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
+| `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
 | `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) só com relatório, prova do fato de segurança e resumo de PR. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
