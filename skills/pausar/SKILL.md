@@ -7,22 +7,26 @@ disable-model-invocation: true
 
 # Pausar e Passar o Trabalho (`/pausar`)
 
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
 ## 1. Objetivo
 Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, sem o histórico do chat, lê a nota e continua do ponto exato. Ele não refaz investigação, teste ou decisão já concluída.
 
 ## 2. Regras Inegociáveis
 - **Pare numa fronteira segura:** Termine o passo atômico atual ou desfaça-o. Não comece trabalho novo. Cancele os subagentes em execução.
 - **Não faça ação irreversível para pausar:** Sem commit, sem push e sem PR. Registre na nota que as alterações ficam sem commit no working tree.
-- **Aponte para os artefatos, não os copie:** Spec, tickets, ADRs, `GLOSSARY.md`, commits e diffs já guardam o conteúdo. Cite cada um por caminho ou URL.
+- **Preserve a configuração na retomada:** Cite o arquivo de configuração e o escopo da aplicação na nota. Specs e tickets podem estar em destinos diferentes.
+- **Aponte para os artefatos, não os copie:** Spec, tickets, ADRs, glossário configurado, commits e diffs já guardam o conteúdo. Cite cada um por caminho ou URL.
 - **Separe fato de suposição:** Cada afirmação sobre o estado leva o rótulo `[measured]`, `[inferred]` ou `[guess]`. Uma decisão do usuário só entra como decidida se ele a declarou nesta sessão ou se um artefato a registra.
 - **Remova dados sensíveis:** Tire da nota chaves de API, senhas, tokens, dados de `.env` e dados pessoais.
 - **Grave a nota fora do repositório:** Use o diretório temporário do sistema (`$TMPDIR`, senão `/tmp`).
 
 ## 3. Processo
 1. **Fronteira:** Conclua ou desfaça o passo atual. Remova a instrumentação temporária (`dd`, `dump`, `Log::debug`) ou registre na nota onde ela está.
-2. **Estado do repositório:** Execute `git status`, `git branch --show-current` e `git log --oneline -5`. Execute o portão de `laravel-verification` (Pest, Larastan e Pint) e anote o resultado de cada comando.
+2. **Estado do repositório:** Execute `git status`, `git branch --show-current` e `git log --oneline -5`. Aplique o modo pausa de `laravel-verification`: registre resultados existentes e o estado que cobrem; marque os invalidados como `desatualizado`. Não execute a suíte completa apenas para pausar.
 3. **Foco:** Se o usuário passou argumento, use-o como foco da próxima sessão e corte da nota o que não serve a esse foco.
-4. **Nota:** Grave `$TMPDIR/handoff-<branch>-<AAAA-MM-DD>.md` com estas seções, nesta ordem:
+4. **Nota:** Normalize a branch para um nome de arquivo (troque `/` e caracteres especiais por `-`). Grave `$TMPDIR/handoff-<branch>-<AAAA-MM-DD>.md` com estas seções, nesta ordem:
    - **Objetivo:** O que o usuário quer, em 1 a 3 frases.
    - **Feito:** O que está pronto e qual verificação provou isso (comando e resultado).
    - **Estado atual:** Branch, arquivos alterados sem commit e o resultado do portão de verificação.
@@ -42,14 +46,14 @@ Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, 
 ## 4. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
-| "Vou fazer um commit `wip:` para não perder as alterações." | **Proibido.** Commit exige pedido explícito do usuário. Registre na nota que as alterações estão sem commit. |
+| "Vou fazer um commit `wip:` para não perder as alterações." | **Proibido.** A pausa não autoriza um novo commit. Preserve commits já autorizados e registre as alterações restantes sem commit. |
 | "Vou copiar a Spec inteira na nota para o próximo agente ter tudo." | **Proibido.** A cópia envelhece e diverge da fonte. Cite o caminho. |
-| "Os testes passaram mais cedo, vou escrever que está tudo verde." | **Proibido.** Execute o portão agora. Um resultado antigo leva o rótulo `[inferred]`, não `[measured]`. |
+| "Os testes passaram mais cedo, vou escrever que está tudo verde." | Confira o estado coberto. Preserve `[measured]` se nada relevante mudou; caso contrário, marque `desatualizado` e registre o comando pendente. |
 | "O usuário pareceu concordar com a opção A, vou registrar como decidido." | **Proibido.** Registre como decisão só o que o usuário declarou. O resto vai para Pendências. |
 | "Vou começar o próximo ticket antes de pausar." | **Proibido.** Pausar significa parar na fronteira atual. |
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Saída de `git status` e da branch atual citada na nota.
-- `[measured]` Resultado de `./vendor/bin/pest`, `./vendor/bin/phpstan analyse` e `./vendor/bin/pint --test`, executados nesta pausa.
+- `[measured]` Últimos resultados com escopo e estado coberto, distinguindo válidos, desatualizados, não executados e não aplicáveis.
 - `[measured]` Caminho da nota gravada, com as 9 seções preenchidas ou marcadas como "nenhuma".
 - `[measured]` Nenhum segredo na nota: busca por `KEY`, `SECRET`, `PASSWORD` e `TOKEN` sem resultado.

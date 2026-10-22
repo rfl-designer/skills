@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Diagnóstico Científico e Correção de Bugs (`/bug`)
 
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
 ## 1. Objetivo
 Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses verificáveis e provar a correção com um teste de regressão no Pest que falha antes do fix e passa depois.
 
@@ -17,6 +20,7 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
 
 ## 3. Processo (Loop de 5 Etapas)
 1. **Reproduzir (Loop Vermelho):**
+   - Use os comandos e o diretório de execução configurados; os comandos abaixo são exemplos de fallback.
    - Colete o stack trace, log (`storage/logs/laravel.log`) ou comportamento incorreto relatado.
    - Crie um teste mínimo no Pest que reproduza a falha. Execute `./vendor/bin/pest --filter=<Teste>` e meça a falha (`[measured]`).
 2. **Localizar e Minimizar (Busca Binária):**
@@ -29,7 +33,7 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
    - Aplique a menor alteração estrutural que elimina a causa raiz respeitando `laravel-deep-modules`.
    - Remova qualquer instrumentação temporária (`dd`, `dump`, `Log::debug`).
 4. **Proteger (Guard & Verification):**
-   - Execute o teste de regressão e toda a suíte: `./vendor/bin/pest`, `./vendor/bin/phpstan analyse` e `./vendor/bin/pint --test`.
+   - Durante o diagnóstico, execute o teste de regressão focado; use probes Pest Agent se disponíveis. Antes de entregar, aplique o portão completo de `laravel-verification` (Pint com Blade habilitado → PHPStan → Pest, mais navegador quando necessário).
    - Se o usuário pedir commits, grave o teste de regressão em um commit antes do commit da correção. O histórico mostra o vermelho e depois o verde.
 5. **Relatório Curto de Causa Raiz:**
    - Explique em 3 bullets: (1) Qual era a causa raiz, (2) Qual teste Pest agora impede a regressão, (3) Qual foi o resultado medido da verificação.
@@ -45,4 +49,4 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Teste de regressão no Pest visto falhando (`RED`) antes do fix.
 - `[measured]` Mesmo teste visto passando (`GREEN`) após o fix.
-- `[measured]` `./vendor/bin/pest`, `./vendor/bin/phpstan analyse` e `./vendor/bin/pint --test` 100% verdes.
+- `[measured]` Portão completo de `laravel-verification` aprovado para o estado corrigido; regressão preservada em teste permanente.

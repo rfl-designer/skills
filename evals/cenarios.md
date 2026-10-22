@@ -1,0 +1,20 @@
+# Avaliação de comportamento das skills
+
+Execute em sandbox, sem produção nem credenciais reais. Dê ao agente apenas o pedido, as skills e os artefatos da coluna Entrada. Mantenha os critérios de avaliação fora do contexto dele até terminar.
+
+| Caso | Entrada e pedido | Critério observável |
+|---|---|---|
+| Setup com destinos distintos | Projeto com stack declarada, Spec local e tickets no GitLab. “/setup: altere só a pasta de Specs; preserve demais escolhas”. Repetir sem mudanças. | Mantém config/ponteiro e notas manuais; não migra documentos, publica issues ou instala dependências; reexecução sem duplicatas; `/especificar` e `/planejar` leem destinos distintos sem repetir perguntas |
+| Setup em monorepo | Dois apps com executores diferentes e escolhas de destino já fornecidas. “Configure ambos”. | Caminhos de artefatos relativos à raiz, diretório de execução por app, sem aplicar comandos de um app ao outro |
+| CRUD existente | Controller simples com Policy, FormRequest e teste HTTP. “Permita editar também o apelido do cliente.” | Reutiliza a fronteira, justifica a escolha e não cria Action/DTO sem complexidade a encapsular; mantém autorização e regressão |
+| Regra com transação | Aprovação de pedido altera saldo, estado e evento. “Implemente a aprovação.” | Encapsula invariantes/transação na Costura; cobre sucesso, estado inválido e autorização |
+| Feedback rápido | Suite leva 10 minutos; uma regra local mudou. “Continue esta fatia.” | Executa RED/GREEN focado durante edição; portão completo antes de commit/entrega, sem declarar teste focado como suíte completa |
+| Pausa | Provas completas verdes, arquivos cobertos inalterados. “/pausar”. Repetir com arquivo modificado após a prova. | Primeiro caso reutiliza provas medidas; segundo marca afetadas como desatualizadas. Não roda suíte completa só para pausar |
+| Blade e Pint antigo | Help sem `--blade`, configuração sem suporte. “Verifique a tela alterada.” | Não adiciona regra incompatível nem declara Blade coberto; usa formatador existente ou informa bloqueio |
+| Pest 5 sem Agent | Lock com Pest 5, help sem `--agent`. “Verifique esta alteração sem instalar dependências.” | Não invoca opção ausente, não altera Composer; usa testes existentes |
+| Pest com Agent | Help com `--agent`, configuração de teste e plugin Browser disponíveis. “Confira a página e registre prova reproduzível.” | Usa probe isolado, captura prova real, distingue UI de HTTP e preserva teste permanente para regressão |
+| Só documentação | Mudança de Markdown sem app PHP. “Valide e entregue.” | Valida o pacote, marca ferramentas PHP não aplicáveis e não instala framework |
+
+Para comparar versões, use o mesmo modelo, ferramentas, fixtures, pedido e orçamento, em contextos novos. Alterne a ordem das versões e use mais de uma execução quando possível. Registre commit/base, diff candidato, ações, comandos, resultados e artefatos; classifique cada critério como passou, falhou ou bloqueado. Não conte execução bloqueada como sucesso nem confunda análise de plano com execução real de aplicação.
+
+O validador estrutural cobre metadados e caminhos locais. Estes cenários cobrem decisões do agente. Só declare ganho de eficácia depois de uma comparação executada; nunca deduza melhoria apenas de texto ou número de regras.
