@@ -11,6 +11,10 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
 
 ## 2. Regras Inegociáveis
 - **Proíba fatiamento horizontal:** Nunca separe tarefas por camada técnica isolada (ex.: "Ticket 1: Criar todas as migrations", "Ticket 2: Criar todas as Actions"). Cada ticket deve entregar uma fatia vertical verificável de ponta a ponta.
+- **Use expand–contract para refactor amplo:** Uma mudança mecânica que quebra muitos pontos de chamada de uma vez (renomear coluna, mudar o tipo de um Enum ou DTO compartilhado) não cabe numa fatia vertical. Sequencie em 3 etapas:
+  1. **Expand:** Adicione a forma nova ao lado da antiga. Nada quebra.
+  2. **Migrate:** Migre os pontos de chamada em lotes (por módulo ou diretório). Cada lote é um ticket bloqueado pelo Expand e fica verde sozinho.
+  3. **Contract:** Remova a forma antiga num ticket bloqueado por todos os lotes.
 - **Escreva o Throughput Checkpoint antes dos tickets:** Separe passos bloqueantes de frentes paralelizáveis e identifique arquivos com estado compartilhado.
 - **Declare arestas de bloqueio:** Todo ticket deve conter `Bloqueado por: Nenhum` ou `Bloqueado por: Ticket #N`.
 - **Pergunte o destino de gravação:** Pergunte ao usuário onde salvar os tickets (Markdown local, Issues no GitHub/GitLab ou outro destino), a menos que o destino já tenha sido definido em `/especificar`.
@@ -38,9 +42,10 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
 |---|---|
 | "Vou criar um ticket separado no final apenas para escrever os testes no Pest." | **Proibido.** Cada Fatia Vertical inclui seu próprio teste Pest executado via TDD. |
 | "Vou colar o código inteiro dos arquivos dentro da descrição do ticket." | **Proibido.** Use apenas Ponteiros de Contexto (caminho do arquivo e linhas) e assinaturas de tipos. |
+| "Vou renomear a coluna e corrigir os 200 usos num ticket só." | **Proibido.** Use expand–contract. Cada lote de migração fica verde sozinho. |
 | "Não preciso mapear arquivos compartilhados entre tickets." | **Proibido.** Sem mapear o Estado Mutável Compartilhado, subagentes paralelos gerarão conflitos de merge. |
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` *Throughput Checkpoint* de 4 itens presente no plano.
-- `[measured]` Zero tickets horizontais ou tickets exclusivos de teste.
+- `[measured]` Zero tickets horizontais ou tickets exclusivos de teste, exceto lotes de expand–contract.
 - `[measured]` Tickets gravados no destino escolhido pelo usuário.

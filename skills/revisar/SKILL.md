@@ -11,8 +11,10 @@ Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolad
 
 ## 2. Regras Inegociáveis
 - **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (`git diff`, caminho da Spec e `GLOSSARY.md`). O agente que escreveu o código tem viés de confirmação.
-- **Passe o pente-fino anti-ruído:** Aplique `ste100-clean-code` para remover comentários óbvios, código morto e imports não utilizados.
-- **Classifique os achados por severidade:** Separe bloqueadores reais (`[BLOCKER]`) de melhorias opcionais (`[NIT]`).
+- **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/implementar` ou `/bug`.
+- **Passe o pente-fino anti-ruído:** Aponte comentários óbvios, código morto e imports não utilizados segundo `ste100-clean-code`.
+- **Mantenha os eixos separados:** Apresente Standards e Spec em seções próprias. Não junte nem reordene achados entre eixos. Um eixo aprovado não compensa o outro reprovado.
+- **Classifique os achados por severidade dentro de cada eixo:** Separe bloqueadores reais (`[BLOCKER]`) de melhorias opcionais (`[NIT]`).
 
 ## 3. Processo
 1. **Coleta do Diff e Verificação Base:**
@@ -28,11 +30,12 @@ Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolad
    - **Subagente 2 — Eixo Spec & Comportamento:**
      - Compara o `git diff` linha a linha com a Especificação gerada em `/especificar`.
      - Aponta requisitos faltantes, escopo extra não solicitado (*scope creep*) ou casos de borda não cobertos nos testes Pest.
-3. **Correção de Bloqueadores:** Se qualquer `[BLOCKER]` for encontrado, corrija-o e rode novamente a verificação antes de prosseguir.
-4. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
+3. **Relatório por Eixo:** Apresente os achados sob `## Standards` e `## Spec`, cada um com seus `[BLOCKER]` e `[NIT]`. Termine com 1 linha: total por eixo e o pior achado de cada eixo. Se houver `[BLOCKER]`, pare aqui e pergunte ao usuário como seguir.
+4. **Prova do Fato de Segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove esse fato com um teste Pest ou um script que executa o código real. Se não conseguir provar, escreva `não provado`.
+5. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
    - **Por que (Why):** 1 a 2 frases explicando o problema resolvido.
    - **O que mudou (What changed):** Bullets curtos focados nas Fronteiras (`Livewire`/HTTP) e Costuras (`Actions`/DTOs).
-   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo) e liste exatamente quais rotas/componentes podem ser afetados.
+   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo) e liste exatamente quais rotas/componentes podem ser afetados. Inclua o fato de segurança da etapa 4 com a prova ou o rótulo `não provado`.
    - **Prova de Execução (`[measured]`):** Resumo dos resultados do Pest, Larastan e Pint.
 
 ## 4. Racionalizações Proibidas (Anti-Atalho)
@@ -41,8 +44,12 @@ Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolad
 | "Eu mesmo acabei de escrever o código, posso apenas olhar rápido sem seguir os 2 eixos." | **Proibido.** A Revisão Adversarial exige checagem independente de Standards (Segurança/N+1/Livewire) e Spec. |
 | "Não há impacto nenhum no Raio de Explosão." | **Proibido.** Toda alteração toca alguma rota, tabela ou componente. Nomeie os pontos afetados explicitamente. |
 | "Vou escrever um PR de 200 linhas listando cada arquivo modificado." | **Proibido.** O Git já mostra os arquivos. O briefing de PR deve ter no máximo 40 linhas de alto sinal. |
+| "O `[BLOCKER]` é simples, eu mesmo corrijo durante a revisão." | **Proibido.** A revisão só reporta. Corrigir no meio mistura autor e revisor e esconde a decisão do usuário. |
+| "Vou juntar os achados dos 2 eixos numa lista única por prioridade." | **Proibido.** Reordenar entre eixos deixa um eixo mascarar o outro. |
+| "O raio de explosão está bem descrito, não preciso rodar nada." | **Proibido.** Texto convincente não prova nada. Execute código que prove o fato de segurança. |
 
 ## 5. Prova de Execução (Critério de Saída)
-- `[measured]` Relatório dos 2 eixos (Standards + Spec) concluído com zero `[BLOCKER]` pendente.
+- `[measured]` Relatório dos 2 eixos (Standards + Spec) entregue em seções separadas, sem edição de código.
+- `[measured]` Fato de segurança provado por execução, ou rotulado `não provado`.
 - `[measured]` Tríade final (`./vendor/bin/pest`, `./vendor/bin/phpstan analyse`, `./vendor/bin/pint --test`) executada e verde.
 - `[measured]` Briefing de PR com seção de Raio de Explosão entregue ao usuário.

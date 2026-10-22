@@ -43,10 +43,12 @@ npx skills add rfl-designer/skills --list
 As skills de usuário formam um pipeline. Cada etapa produz a entrada da próxima.
 
 ```
-/alinhar → /especificar → /planejar → /implementar → /revisar
-                                            ↑
-                                          /bug
+/alinhar → /prototipar → /especificar → /planejar → /implementar → /revisar
+                                                            ↑
+                                                          /bug
 ```
+
+`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente.
 
 ## Skills de usuário
 
@@ -54,12 +56,14 @@ O usuário chama estas skills pelo comando.
 
 | Skill | Função |
 | --- | --- |
-| `/alinhar` | Entrevista antes do código, uma pergunta por vez. Atualiza o `GLOSSARY.md`. |
-| `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras. Pergunta onde salvar. |
-| `/planejar` | Divide a Especificação em fatias verticais. Pergunta onde salvar os tickets. |
+| `/alinhar` | Entrevista antes do código, uma pergunta por vez. Atualiza o `GLOSSARY.md` e registra ADRs. |
+| `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
+| `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Pergunta onde salvar. |
+| `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Pergunta onde salvar os tickets. |
 | `/implementar` | Implementa um ticket com TDD na Costura (Pest), Larastan e Pint. |
-| `/bug` | Reproduz o bug no Pest, localiza a causa e corrige na raiz. |
-| `/revisar` | Revisão adversarial (Standards, Spec e segurança) e resumo de PR. |
+| `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
+| `/revisar` | Revisão adversarial (Standards, Spec e segurança) só com relatório, prova do fato de segurança e resumo de PR. |
+| `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 
 ## Skills de modelo
 
@@ -69,7 +73,7 @@ O agente carrega estas skills quando a tarefa exige.
 | --- | --- |
 | `laravel-deep-modules` | Módulos profundos: Actions, DTOs `readonly`, Livewire na fronteira. |
 | `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. |
-| `laravel-verification` | Portão de prova de execução: Pest, Larastan e Pint (`.php` e `.blade.php`). |
+| `laravel-verification` | Portão de prova de execução: Pest, Larastan e Pint (`.php` e `.blade.php`), mais navegador quando o diff toca a tela. |
 | `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. |
 
 ## Requisitos do projeto
@@ -77,3 +81,4 @@ O agente carrega estas skills quando a tarefa exige.
 - Pest
 - Larastan / PHPStan
 - Laravel Pint
+- Recomendado: `pestphp/pest-plugin-browser` (Pest 4) e Playwright (`npm install playwright@latest` e `npx playwright install`) para a verificação no navegador
