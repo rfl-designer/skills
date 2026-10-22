@@ -6,6 +6,9 @@ disable-model-invocation: true
 
 # Protótipo Descartável (`/prototipar`)
 
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
 ## 1. Objetivo
 Responder uma pergunta de design com o menor custo possível, antes de `/especificar`. O protótipo é um instrumento descartável. O resultado é a decisão, não o código.
 
@@ -26,7 +29,7 @@ Responder uma pergunta de design com o menor custo possível, antes de `/especif
 2. **Construção, ramo Lógica:**
    - Escreva a regra num módulo puro (reducer `(estado, acao) => estado`, máquina de estados ou funções puras), num único `<script>`, sem acesso ao DOM.
    - Na página, mostre de cima para baixo: título e pergunta, painel do estado atual com rótulos legíveis, um botão por ação e abas com cenários guiados (caminho feliz, caso de borda, ação que deve ser ilegal). Cada cenário começa do mesmo estado inicial.
-   - Escreva rótulos e botões na linguagem do domínio (`GLOSSARY.md`), não nos nomes do código.
+   - Escreva rótulos e botões na linguagem do domínio (glossário configurado), não nos nomes do código.
 3. **Construção, ramo Tela:**
    - Crie de 3 a 5 variantes como views Blade ou componentes Livewire (`VariantA`, `VariantB`, ...) na página real, com os dados reais da página.
    - Faça variantes estruturalmente diferentes: layout, hierarquia de informação e ação principal. Variantes que só mudam cor ou texto não contam.
@@ -36,7 +39,7 @@ Responder uma pergunta de design com o menor custo possível, antes de `/especif
 5. **Entrega:** Mostre ao usuário as variantes ou cenários, a evidência, as vantagens e desvantagens de cada um e sua recomendação. Informe o caminho ou a URL do protótipo.
 6. **Captura da decisão:** Depois que o usuário escolher:
    - Grave a decisão e a pergunta que ela respondeu no lugar que o usuário indicar (ticket, ADR via `/alinhar` ou nota da Spec).
-   - Converta cada cenário validado do ramo Lógica num caso de teste para a Costura da `Action`. Esses casos entram na Especificação.
+   - Converta cada cenário validado do ramo Lógica num caso de teste para a Costura pública escolhida. Esses casos entram na Especificação.
    - Remova do código de produção as variantes perdedoras, a barra e as rotas de protótipo. A variante vencedora é reescrita do zero em `/implementar`, com TDD.
    - Instrua o usuário a rodar `/especificar`.
 

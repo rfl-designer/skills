@@ -1,67 +1,62 @@
 ---
 name: laravel-verification
-description: Portão obrigatório de Prova de Execução para PHP, Laravel e Livewire (Pest, Larastan/PHPStan e Laravel Pint em .php e .blade.php), mais verificação no navegador quando o diff toca Blade, Livewire ou JavaScript. Use antes de qualquer commit, PR ou encerramento de tarefa.
+description: Verifica mudanças Laravel com feedback rápido durante a edição e portão completo antes de commit, PR ou entrega. Inclui Blade no Pint, navegador e probes Pest --agent quando disponíveis. Use também ao registrar evidências para uma pausa.
 ---
 
-# Portão de Prova de Execução Laravel (`laravel-verification`)
+# Verificação Proporcional Laravel (`laravel-verification`)
 
-## 1. Objetivo
-Impedir que qualquer código seja considerado pronto sem evidência real medida no terminal através da tríade obrigatória: **Pest**, **Larastan/PHPStan** e **Laravel Pint** (para `.php` e `.blade.php`).
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
-## 2. Regras Inegociáveis
-- **Zero confiança em inspeção visual:** "Parece correto" ou "deve passar" nunca é aceito. Execute os comandos reais no terminal.
-- **Rotule cada evidência honestamente:** Use `[measured]` apenas para comandos executados nesta sessão após a última edição de arquivo. Se um comando não pôde rodar, rotule como `[inferred]` ou `[guess]` e explique o bloqueio.
-- **Proíba sabotagem de verificadores (Floor Guard):** Nunca adicione `@phpstan-ignore`, `phpstan-baseline` falso, `pint.json` permissivo ou `->skip()` em testes para forçar o painel a ficar verde.
+## 1. Preparar o projeto
+Leia os manifests, lockfiles, testes e scripts existentes no escopo escolhido. `composer.lock`, `tests/Pest.php` e `phpunit.xml` são referências para projetos PHP; não invente arquivo ou ferramenta ausente. Respeite o executor existente (por exemplo, Sail). Confira `./vendor/bin/pint --help` e `./vendor/bin/pest --help` antes de usar opções condicionais.
 
-## 3. Os 3 Comandos Obrigatórios do Portão
-Execute sempre nesta ordem após qualquer alteração de código:
+Para habilitar Blade, mescle esta linha no objeto `rules` do `pint.json` do projeto, preservando as demais regras:
 
-1. **Formatação Estrita (`.php` e `.blade.php`):**
-   ```bash
-   ./vendor/bin/pint --test
-   ```
-   *(Se falhar, execute `./vendor/bin/pint` para corrigir arquivos `.php` e templates `.blade.php`, e rode `--test` novamente).*
+```json
+{
+    "rules": {
+        "Pint/laravel_blade": true
+    }
+}
+```
 
-2. **Análise Estática de Tipos e Domínio:**
-   ```bash
-   ./vendor/bin/phpstan analyse --memory-limit=2G
-   ```
+Essa configuração exige Pint com suporte a Blade e suas dependências Node/Prettier. Use `--blade` em uma execução isolada como alternativa. Se a versão não suporta Blade, use o formatador Blade já configurado ou registre o bloqueio; não declare cobertura inexistente. Não atualize dependências incompatíveis como parte de uma verificação.
 
-3. **Suíte de Testes Comportamentais e Arquiteturais:**
-   ```bash
-   ./vendor/bin/pest
-   ```
+## 2. Escolher o alcance
+- **Durante a edição:** rode o teste da Costura ou Fronteira afetada. Em PHP/Blade, use `./vendor/bin/pint --dirty --test` com Blade habilitado. Rode análise estática focada conforme os scripts do projeto; amplie se mudar contratos compartilhados.
+- **Antes de commit, PR ou entrega de código:** execute o portão completo abaixo. Uma fatia pode ter várias edições sem repetir toda a suíte entre elas.
+- **Só documentação:** valide links, exemplos e regras do pacote; marque ferramentas PHP como `não aplicável`. Se a mudança afeta configuração executável, rode também os verificadores afetados.
+- **Ao pausar:** registre o último resultado, seu escopo e o estado verificado. Reutilize evidência se os arquivos e dependências cobertos não mudaram. Caso contrário, marque `desatualizado` e deixe o comando pendente na retomada. Não rode a suíte completa apenas para pausar.
 
-## 4. Portão Condicional: Superfície no Navegador
-`Livewire::test()` não executa o navegador. Ele não detecta erro de Alpine, `wire:model` quebrado, erro de JavaScript nem elemento invisível. Aplique este portão quando o diff altera `.blade.php`, componente Livewire, Alpine ou JavaScript.
+## 3. Portão completo
+Use os comandos completos da configuração para o app afetado, no diretório de execução registrado. Respeite wrappers e scripts existentes também no ciclo RED/GREEN; não os some novamente aos comandos já completos. Se faltarem, use os padrões abaixo. Com Blade habilitado, a ordem é formatação → análise estática → testes:
 
-1. **Teste de navegador no Pest (preferido):** Se o projeto tem `pestphp/pest-plugin-browser`, escreva um teste em `tests/Browser` que percorre o caminho real do usuário:
-   ```php
-   it('aprova o pedido pela tela', function (): void {
-       $this->actingAs(User::factory()->create());
-       $order = Order::factory()->pending()->create();
+```bash
+./vendor/bin/pint --test
+./vendor/bin/phpstan analyse --memory-limit=2G
+./vendor/bin/pest
+```
 
-       visit("/orders/{$order->id}")
-           ->click('Aprovar')
-           ->assertSee('Aprovado')
-           ->assertNoJavaScriptErrors();
-   });
-   ```
-   O comando `./vendor/bin/pest` da tríade já executa este teste.
-2. **Condução manual (alternativa):** Se o plugin não existe, conduza o app real com a ferramenta de navegador do agente. Execute a ação do usuário, capture um screenshot e leia o console. Verifique também o efeito colateral (linha gravada, e-mail enviado).
-3. **Sem navegador disponível:** Rotule a superfície como `[inferred]` e declare o bloqueio. Nunca rotule `Livewire::test()` como prova de navegador.
+Se Pint falhar, formate o escopo alterado e repita os checks que a edição invalidou. PHPStan/Pest que já passaram continuam válidos enquanto seu código, configuração e dependências relevantes permanecem iguais. Não repita checks apenas para mudar de etapa.
 
-## 5. Racionalizações Proibidas (Anti-Atalho)
-| Desculpa do Agente | Regra Correta |
-|---|---|
-| "Alterei apenas um template `.blade.php`, não preciso rodar o Pint nem o Pest." | **Proibido.** O Pint formata `.blade.php` e mudanças no Blade podem quebrar componentes Livewire no Pest. |
-| "Rodei os testes há 5 minutos e só mudei uma linha depois disso." | **Proibido.** Qualquer edição invalida a medição anterior. Rode a tríade novamente. |
-| "Vou colocar `@phpstan-ignore-next-line` porque o relacionamento Eloquent deu aviso." | **Proibido.** Declare os generics/PHPDocs corretos no Model ou use tipos explícitos. |
-| "O `Livewire::test()` passou, então a tela funciona." | **Proibido.** `Livewire::test()` não executa Alpine nem JavaScript. Prove a superfície no navegador. |
+Nunca enfraqueça testes, tipos ou configuração para obter verde. Se uma ferramenta não pode executar, registre o comando, o erro e a cobertura ausente. Não declare o portão completo como aprovado.
 
-## 6. Prova de Execução (Critério de Saída)
-Reporte no resumo final da tarefa:
-- `[measured]` `./vendor/bin/pint --test` → PASS (arquivos `.php` e `.blade.php`).
-- `[measured]` `./vendor/bin/phpstan analyse` → 0 erros.
-- `[measured]` `./vendor/bin/pest` → Todos os testes verdes.
-- `[measured]` Superfície no navegador provada (teste em `tests/Browser` ou screenshot com console limpo), quando o diff toca Blade, Livewire ou JavaScript. Caso contrário, `[inferred]` com o bloqueio.
+## 4. Provar comportamento real
+Quando o diff toca Blade, Livewire, Alpine, CSS ou JavaScript, prove o caminho real no navegador e o efeito esperado. `Livewire::test()` comprova a fronteira no servidor; não executa o navegador.
+
+- **Probe Pest Agent:** leia [references/pest-agent.md](references/pest-agent.md) se `--agent` aparece no help. Use para exploração, screenshots e verificações pontuais.
+- **Regressão permanente:** use testes em `tests/Feature` ou `tests/Browser`. Um probe não substitui o teste de regressão nem a suíte final. Confirme que a configuração do Pest inclui os testes de navegador; se não, execute-os separadamente.
+- **Sem plugin de navegador:** conduza o app com a ferramenta de navegador disponível, registre ação, resultado, console e efeito persistido.
+- **Sem navegador:** registre a superfície como `não verificada` e explique o bloqueio. Não converta evidência de servidor em evidência de UI.
+
+Se a feature exigir verificação recorrente, leia [references/protocolo-do-app.md](references/protocolo-do-app.md) para registrar um protocolo reutilizável no projeto.
+
+## 5. Evidência de saída
+Reporte comando, alcance, resultado, estado verificado (commit ou arquivos/diff) e caminho dos artefatos.
+
+- `[measured]`: executado sobre o estado coberto; pode ser reutilizado enquanto esse estado não mudou.
+- `[inferred]` ou `[guess]`: conclusão sem execução; explique sua base e limite.
+- `desatualizado`, `não verificado` e `não aplicável`: use explicitamente quando corresponderem ao caso.
+
+Diga se o resultado veio de teste focado, probe ou suíte completa. Para UI, cite o fluxo exercitado e a prova de efeito. Guarde screenshots e logs sem segredos em um destino que sobreviva à limpeza.

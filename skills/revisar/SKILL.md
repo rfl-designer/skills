@@ -6,11 +6,14 @@ disable-model-invocation: true
 
 # Revisão Adversarial e Briefing de Entrega (`/revisar`)
 
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
 ## 1. Objetivo
 Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolados (Padrões Laravel/Livewire vs. Especificação) e gerar um briefing de Pull Request conciso com análise de Raio de Explosão.
 
 ## 2. Regras Inegociáveis
-- **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (`git diff`, caminho da Spec e `GLOSSARY.md`). O agente que escreveu o código tem viés de confirmação.
+- **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (`git diff`, caminho da Spec, glossário e configuração do projeto). O agente que escreveu o código tem viés de confirmação.
 - **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/implementar` ou `/bug`.
 - **Passe o pente-fino anti-ruído:** Aponte comentários óbvios, código morto e imports não utilizados segundo `ste100-clean-code`.
 - **Mantenha os eixos separados:** Apresente Standards e Spec em seções próprias. Não junte nem reordene achados entre eixos. Um eixo aprovado não compensa o outro reprovado.
@@ -19,13 +22,13 @@ Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolad
 ## 3. Processo
 1. **Coleta do Diff e Verificação Base:**
    - Inspecione `git status` e `git diff` contra a branch base.
-   - Execute `laravel-verification` (`pest`, `phpstan`, `pint --test`) para garantir que o código já compila e passa nos testes.
+   - Aplique o portão completo de `laravel-verification` ou reutilize evidência ainda válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
 2. **Revisão Adversarial em 2 Eixos (Subagentes Paralelos):**
    - **Subagente 1 — Eixo Standards & Laravel/Livewire Security:**
      - Caça N+1 queries Eloquent (falta de `with()` ou `preventLazyLoading`).
      - Verifica se propriedades sensíveis/IDs em componentes `Livewire` possuem `#[Locked]`.
      - Verifica se toda ação mutável chama `$this->authorize()` / `Policy`.
-     - Verifica se há lógica de negócio vazando para fora das `Actions` ou ausência de `declare(strict_types=1);`.
+     - Verifica regras e coordenação sem encapsulamento, abstrações sem benefício e ausência de `declare(strict_types=1);`. Aceita CRUD simples e Costuras existentes conforme `laravel-deep-modules`.
      - Verifica comentários desnecessários (`ste100-clean-code`).
    - **Subagente 2 — Eixo Spec & Comportamento:**
      - Compara o `git diff` linha a linha com a Especificação gerada em `/especificar`.
@@ -51,5 +54,5 @@ Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolad
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Relatório dos 2 eixos (Standards + Spec) entregue em seções separadas, sem edição de código.
 - `[measured]` Fato de segurança provado por execução, ou rotulado `não provado`.
-- `[measured]` Tríade final (`./vendor/bin/pest`, `./vendor/bin/phpstan analyse`, `./vendor/bin/pint --test`) executada e verde.
+- `[measured]` Portão completo de `laravel-verification` aprovado para o estado revisado, com comandos, escopos e resultados citados.
 - `[measured]` Briefing de PR com seção de Raio de Explosão entregue ao usuário.

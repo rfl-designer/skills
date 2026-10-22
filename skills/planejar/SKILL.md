@@ -1,10 +1,13 @@
 ---
 name: planejar
-description: Decompõe uma Especificação (Spec) aprovada em um grafo de Fatias Verticais com Throughput Checkpoint, perguntando onde salvar os tickets. Use quando o usuário digitar /planejar.
+description: Decompõe uma Especificação (Spec) aprovada em um grafo de Fatias Verticais com Throughput Checkpoint, usando o destino de tickets configurado e perguntando apenas se faltar. Use quando o usuário digitar /planejar.
 disable-model-invocation: true
 ---
 
 # Planejar Grafo de Fatias Verticais (`/planejar`)
+
+## Configuração do projeto
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Verticais (*Tracer Bullets*) com relações de bloqueio explícitas e um *Throughput Checkpoint* antes da execução.
@@ -17,12 +20,12 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
   3. **Contract:** Remova a forma antiga num ticket bloqueado por todos os lotes.
 - **Escreva o Throughput Checkpoint antes dos tickets:** Separe passos bloqueantes de frentes paralelizáveis e identifique arquivos com estado compartilhado.
 - **Declare arestas de bloqueio:** Todo ticket deve conter `Bloqueado por: Nenhum` ou `Bloqueado por: Ticket #N`.
-- **Pergunte o destino de gravação:** Pergunte ao usuário onde salvar os tickets (Markdown local, Issues no GitHub/GitLab ou outro destino), a menos que o destino já tenha sido definido em `/especificar`.
+- **Use o destino de Tickets:** Leia sua escolha própria na configuração ou sessão. O destino da Spec não determina o dos tickets. Pergunte somente se a escolha estiver ausente ou conflitante.
 
 ## 3. Processo
-1. **Leitura da Spec:** Leia a Especificação gerada por `/especificar` e inspecione os arquivos que serão tocados.
+1. **Leitura da Spec:** Leia a Spec indicada; sem indicação, localize-a no destino de Specs configurado. Se houver candidatas ambíguas, peça apenas a identificação. Inspecione os arquivos afetados.
 2. **Throughput Checkpoint (4 itens obrigatórios):**
-   - **1. Fundação Bloqueante:** O que precisa existir antes de qualquer paralelismo (ex.: Migration base + Enum + DTO `readonly` + assinatura da Costura da `Action`).
+   - **1. Fundação Bloqueante:** O que precisa existir antes de qualquer paralelismo (ex.: contrato compartilhado ou migration, somente quando necessários).
    - **2. Frentes Paralelizáveis:** Quais fatias verticais não disputam os mesmos arquivos e podem ser delegadas em paralelo.
    - **3. Estado Mutável Compartilhado:** Arquivos que múltiplos tickets poderiam tocar (ex.: `routes/web.php`, componente Livewire pai) e como serializar a edição.
    - **4. Menor Decomposição Segura:** Quantidade mínima de tickets/commits verificáveis (~100 linhas por fatia).
@@ -30,9 +33,9 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
    - **Título e Objetivo Observável** (1 frase em voz ativa).
    - **Bloqueado por:** `#ID` ou `Nenhum`.
    - **Ponteiros de Contexto:** Caminhos exatos dos arquivos a criar ou modificar.
-   - **Critério de Aceite no Pest:** Qual teste de Costura (`Action`) e de Fronteira (`Livewire::test()` ou HTTP) comprovará a fatia.
-4. **Pergunta de Destino e Gravação:** Confirme com o usuário se os tickets devem ser salvos em:
-   - **Opção 1:** Arquivo Markdown no repositório (ex.: `docs/specs/NNNN-slug-tickets.md`).
+   - **Critério de Aceite no Pest:** Qual teste da Costura escolhida e da Fronteira (`Livewire::test()` ou HTTP) comprovará a fatia.
+4. **Destino e Gravação:** Use o destino de Tickets registrado, mantendo o vínculo com a Spec mesmo em sistemas diferentes. Só quando faltar escolha, pergunte entre:
+   - **Opção 1:** Markdown local (ex.: `docs/tickets/<spec>/NN-slug.md`).
    - **Opção 2:** Issues no GitHub (`gh issue create`) ou GitLab (`glab issue create`) com links de bloqueio.
    - **Opção 3:** Outro destino informado.
 5. **Fechamento:** Exiba o resumo do grafo e oriente o usuário a executar `/implementar`.
