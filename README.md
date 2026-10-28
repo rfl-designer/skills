@@ -93,7 +93,7 @@ Copie [o template do ajustador](skills/ajustar/assets/ajustador.md) para `.claud
 
 `/especificar` e `/planejar` delegam cada leitura a um Leitor novo, com `model: inherit` e só as ferramentas `Read, Grep, Glob`. O Leitor lê nas condições do implementador: sem o histórico do chat, com as instruções do projeto. Cada leitura usa um Leitor novo, nunca um `fork`.
 
-Copie [o template do leitor](skills/leitura-independente/assets/leitor.md) para `.claude/agents/leitor.md` no projeto consumidor e instale `leitura-independente` e `ste100-clean-code`. Sem o agente registrado, as skills usam o subagente geral, que tem todas as ferramentas; a regra "só lê" fica só na instrução. Sem subagentes, a leitura fica `não executada`; o autor não lê o próprio rascunho no lugar do Leitor.
+Copie [o template do leitor](skills/leitura-independente/assets/leitor.md) para `.claude/agents/leitor.md` no projeto consumidor e instale `leitura-independente` e `ste100-clean-code`. Sem o agente registrado, as skills usam o subagente geral, que tem todas as ferramentas; a regra "só lê" fica só na instrução. Sem subagentes, o autor não lê o próprio rascunho no lugar do Leitor. Antes de gravar, ele pergunta: leitura numa sessão nova, ou gravação com `não executada`.
 
 ### Revisores no Claude Code
 

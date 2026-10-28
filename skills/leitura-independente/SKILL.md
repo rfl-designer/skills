@@ -24,7 +24,7 @@ O implementador lê a Spec e o ticket sem o histórico do chat. Uma suposição 
 - **Passe só ponteiros:** Envie o modo, o caminho do rascunho, a Spec aprovada (modo Tickets), o glossário, a pasta de ADRs e a configuração do projeto. Não envie o histórico do chat, sua opinião sobre o rascunho ou o motivo das escolhas. A leitura procura justamente o motivo que o documento não escreve.
 - **Grave o rascunho fora do repositório:** Use um arquivo temporário, como `$TMPDIR/leitura-<slug>-<AAAA-MM-DD>.md`. Assim, a leitura vale para todo destino: Markdown, Issue do GitHub ou do GitLab.
 - **O Leitor só lê:** Ele não edita arquivos, não executa comandos e não cria subagentes.
-- **Não leia no mesmo contexto:** O Autor lê o que quis dizer, não o que escreveu. Sem subagentes, não faça a leitura você mesmo. Escreva `Leitura Independente: não executada (sem subagentes)` no fechamento. Ofereça a leitura numa sessão nova: uma sessão sem o histórico também lê sem contexto.
+- **Não leia no mesmo contexto:** O Autor lê o que quis dizer, não o que escreveu. Sem subagentes, não faça a leitura você mesmo. Antes de gravar, faça uma pergunta ao usuário: fazer a leitura numa sessão nova, com o rascunho guardado, ou gravar agora com `Leitura Independente: não executada (sem subagentes)`. Uma sessão sem o histórico também lê sem contexto.
 - **Mostre a Paráfrase sem alteração:** Só o usuário conhece a intenção. Uma Paráfrase errada é um achado, mesmo sem outro achado.
 - **Grave o documento só depois da resposta do usuário.**
 - **Faça no máximo 2 leituras por documento:** Cada Leitor novo acha coisas diferentes. Zero achados não é o alvo.
@@ -130,11 +130,13 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 | "Foi intencional; contesto." | **Proibido.** Cite a prova que o Leitor podia ler, ou pergunte ao usuário. |
 | "Só um agente sem contexto precisa desse detalhe." | **Proibido.** O implementador também lê sem contexto. Escreva o detalhe, ou mova-o para os tickets se ele é caminho ou código. |
 | "Faço leituras até não ter achados." | **Proibido.** Faça no máximo 2 leituras. Depois, leve os achados abertos ao usuário. |
-| "Sem subagente, faço a leitura aqui mesmo." | **Proibido.** Registre `não executada (sem subagentes)` e ofereça a leitura numa sessão nova. |
+| "Sem subagente, faço a leitura aqui mesmo." | **Proibido.** Pergunte antes de gravar: leitura numa sessão nova, ou gravação com `não executada (sem subagentes)`. |
+| "Sem subagente, gravo agora e ofereço a leitura depois." | **Proibido.** Num destino como uma Issue, gravar e corrigir depois custa mais que uma pergunta. Pergunte antes de gravar. |
 
 ## 8. Prova de Execução (Critério de Saída)
 - `[measured]` Leitor novo, só com ponteiros e sem histórico. Tipo de agente informado: `leitor` registrado ou subagente geral.
 - `[measured]` Paráfrase mostrada ao usuário sem alteração, antes da gravação.
 - `[measured]` Cada achado com classe. Contestação com prova que o Leitor podia ler. Resposta de cada pergunta escrita no documento, no glossário ou num ADR.
 - `[measured]` No máximo 2 leituras.
+- `[measured]` Sem subagentes: pergunta ao usuário antes da gravação, sem leitura no mesmo contexto.
 - `[measured]` Linha `Leitura Independente:` na mensagem de fechamento.
