@@ -50,6 +50,8 @@ Quando o diff toca Blade, Livewire, Alpine, CSS ou JavaScript, prove o caminho r
 - **Sem plugin de navegador:** conduza o app com a ferramenta de navegador disponível, registre ação, resultado, console e efeito persistido.
 - **Sem navegador:** registre a superfície como `não verificada` e explique o bloqueio. Não converta evidência de servidor em evidência de UI.
 
+Se a configuração registra um Mapa de Features, leia o Arquivo de Feature afetado antes de provar. Exercite as entradas e os caminhos que a mudança afeta. Se o comportamento visível mudou, atualize o arquivo no mesmo diff, segundo a seção `Manutenção` do índice do mapa. Sem mapa, `/mapear` cria um.
+
 Se a feature exigir verificação recorrente, leia [references/protocolo-do-app.md](references/protocolo-do-app.md) para registrar um protocolo reutilizável no projeto.
 
 ## 5. Evidência de saída
