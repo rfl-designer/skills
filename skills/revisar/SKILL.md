@@ -10,14 +10,17 @@ disable-model-invocation: true
 Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
-Submeter o `git diff` da entrega a uma Revisão Adversarial em dois eixos isolados (Padrões Laravel/Livewire vs. Especificação) e gerar um briefing de Pull Request conciso com análise de Raio de Explosão.
+Submeter o `git diff` da entrega a uma Revisão Adversarial completa, numa só rodada, em dois eixos isolados (Padrões Laravel/Livewire vs. Especificação) e gerar um briefing de Pull Request conciso com análise de Raio de Explosão.
 
 Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro de cada eixo, priorize nesta ordem: correto, seguro, aguenta a carga esperada, testado, rápido, enxuto.
 
 ## 2. Regras Inegociáveis
-- **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (referência do diff da etapa 1, caminho da Spec, glossário e configuração do projeto). O agente que escreveu o código tem viés de confirmação.
+- **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (referência do diff da etapa 1, Mapa de Fluxos da etapa 2, caminho da Spec, glossário e configuração do projeto). O agente que escreveu o código tem viés de confirmação.
 - **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/implementar` ou `/bug`.
 - **Leia o código conectado, não só o diff:** Leia os chamadores das funções alteradas, as funções chamadas, os testes e o README. Quando uma assinatura, um retorno ou um comportamento muda, busque todos os chamadores com `rg`.
+- **Siga cada valor de ponta a ponta:** Um Fluxo é o caminho de um valor que o diff altera (chave, ID, coluna, status, flag, regra ou formato de retorno), da entrada até cada consumidor: consulta, lista, detalhe, texto exibido, regra, decisão, documento gerado, export, job, notificação e API. A verificação de um consumidor não prova os outros. Exemplo: a lista elimina chaves repetidas, mas o detalhe, os termos, a decisão de exigir assinatura e o PDF também leem a mesma chave. Confira cada um.
+- **Entregue a revisão completa numa rodada:** A rodada termina só no Critério de Fim da etapa 5. Um `[BLOCKER]` não encerra a busca: registre-o e continue. Assim, o usuário corrige todos os achados de uma vez.
+- **Pese a evidência pelo que ela cobre:** Um teste verde prova só os caminhos que ele executa. A aprovação de um subagente prova só o código que ele leu. Nenhum dos dois substitui o rastreio dos Fluxos.
 - **Passe o pente-fino anti-ruído:** Aponte comentários óbvios, código morto e imports não utilizados segundo `ste100-clean-code`.
 - **Mantenha os eixos separados:** Apresente Standards e Spec em seções próprias. Não junte nem reordene achados entre eixos. Um eixo aprovado não compensa o outro reprovado.
 - **Classifique os achados por severidade dentro de cada eixo:**
@@ -30,8 +33,16 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 1. **Coleta do Diff e Verificação Base:**
    - Use o alvo que o usuário indicar: mudanças locais, staged, branch, PR ou arquivos. Sem alvo, use o diff contra a branch base, com as mudanças locais. Sem diferença, use o último commit.
    - Inspecione `git status` e o diff do alvo. Registre a referência exata (ex.: `main...HEAD`) e passe a mesma referência aos dois subagentes.
+   - **Rodada seguinte:** Com um relatório anterior de `/revisar` para o mesmo alvo, na conversa ou no handoff, esta é uma rodada seguinte. Use o diff completo do alvo, não só o delta da correção. Liste os achados anteriores para a etapa 6.
    - Aplique o portão completo de `laravel-verification` ou reutilize evidência ainda válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
-2. **Revisão Adversarial em 2 Eixos (Subagentes Paralelos):** Cada subagente lê o código conectado e ordena seus achados pela prioridade da seção 1.
+2. **Mapa de Fluxos:** Antes de disparar os subagentes:
+   - Liste os valores que o diff altera. Na rodada seguinte, inclua os valores que cada correção alterou.
+   - Para cada valor, busque com `rg` todos os pontos que o leem ou gravam, também fora do diff: Models, Actions, componentes Livewire, views Blade, Policies, jobs, listeners, exports, templates de PDF ou e-mail, rotas de API e testes. A lista vem da busca, não da memória de quem escreveu o código.
+   - Registre cada Fluxo como `valor: entrada → consumidor → saída`, com `arquivo:linha` de cada ponto.
+3. **Revisão Adversarial em 2 Eixos (Subagentes Paralelos):** Cada subagente lê o código conectado e ordena seus achados pela prioridade da seção 1. Cada subagente também:
+   - Completa o Mapa com os consumidores que achar e rastreia cada Fluxo até a saída.
+   - Devolve o status de cada arquivo do diff e de cada Fluxo no seu eixo: `verificado`, `achado` (com o título) ou `não verificado` (com o motivo).
+   - Termina só quando todos os arquivos e Fluxos têm status. Um `[BLOCKER]` não encerra o trabalho do subagente.
    - **Subagente 1 — Eixo Standards & Laravel/Livewire Security:**
      - **Carga esperada:** Procura a carga no repositório (README, filas, Horizon, Octane, scheduler, deploy). Declara a carga presumida.
      - **Segurança:** Verifica se propriedades sensíveis/IDs em componentes `Livewire` possuem `#[Locked]`. Verifica se toda ação mutável chama `$this->authorize()` / `Policy`.
@@ -58,14 +69,21 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      - **Bug:** Caça resultado errado e erro em casos de borda (vazio, zero, último item, arredondamento, fuso horário). Caça chamador quebrado pela mudança. Caça correção feita num só chamador, com a função compartilhada ainda errada.
      - **Teste ausente:** Aponta lógica de risco sem um teste Pest que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Pede um teste bom, não cobertura.
      - **Mapa desatualizado:** Com Mapa de Features configurado, aponta comportamento visível alterado sem atualização do Arquivo de Feature no mesmo diff.
-3. **Confirmação dos Achados:** Antes de reportar, cada subagente:
+4. **Confirmação dos Achados:** Antes de reportar, cada subagente:
    1. Escreve o caso concreto de cada achado.
    2. Relê as linhas e confirma o fato: o chamador existe, o valor pode ser vazio, o código não tem uso.
    3. Trata como decisão, não como achado, o atalho com limite documentado em ADR, Spec ou comentário de porquê. Reporta o atalho só se a carga esperada já passa desse limite.
    4. Propõe a menor correção que funciona. Prefere a correção que apaga código. Não adiciona camadas, pacotes ou configuração que o problema não exige.
    5. Descarta gosto de estilo, "considere..." e preocupação vaga.
-4. **Relatório por Eixo:**
+5. **Consolidação (agente principal):** Com os retornos dos dois eixos, antes do relatório:
+   1. **Cobertura:** Confira se cada arquivo do diff e cada Fluxo têm status nos dois eixos. Devolva cada lacuna a um subagente do mesmo eixo, com contexto limpo. Sem subagentes, cubra a lacuna você mesmo.
+   2. **Propagação:** Para cada achado, siga o mesmo valor em todos os consumidores do Mapa. Inclua no achado cada local com o mesmo defeito. Quando a correção difere, abra um achado próprio.
+   3. **Divergência:** Investigue até resolver: os eixos afirmam fatos opostos sobre o mesmo trecho (ex.: um diz que o valor nunca é vazio, o outro diz que é); um consumidor aparece no retorno de um eixo e falta no outro; o teste citado como prova não executa o consumidor em questão.
+   4. **Achados novos:** Aplique a etapa 4 a cada achado novo da Consolidação. Coloque-o no eixo do seu tema. Na rodada seguinte, marque com `(perdido na rodada anterior)` o achado em código que a rodada anterior já revisava, e rastreie de novo o Fluxo inteiro desse valor.
+   - **Critério de Fim:** Todos os arquivos e Fluxos têm status nos dois eixos, sem lacuna nem divergência aberta. Só então escreva o relatório.
+6. **Relatório por Eixo:**
    - Comece com `O que a mudança faz:` em 2 ou 3 frases.
+   - Na rodada seguinte, escreva em seguida `Achados anteriores:`, com 1 linha por achado: `corrigido`, `corrigido em parte` ou `não corrigido`, e a prova.
    - Apresente os achados sob `## Standards` e `## Spec`, cada um com seus `[BLOCKER]`, `[IMPORTANTE]` e `[NIT]`. Omita o nível sem achados.
    - Numere os achados em sequência contínua de um eixo para o outro, sem reordenar. Assim, o usuário pode responder "corrija 2 e 5".
    - Explique cada termo técnico na primeira vez que ele aparecer. O leitor pode não conhecer o código.
@@ -79,23 +97,28 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      ```
    - Termine com:
      - 1 linha por eixo: total por nível e o pior achado.
+     - `Fluxos rastreados:` 1 linha por Fluxo, com os consumidores e o status.
      - `Carga presumida:` a carga usada no eixo Standards.
      - Sem `[BLOCKER]` nem `[IMPORTANTE]`: `Veredito: pode entregar.` Caso contrário: `Veredito: corrija 1 e 3 antes.`, com os números desses achados.
      - `Enxuto: -N linhas possíveis.` quando houver achado de Enxuto.
      - `Não verificado:` em 1 linha, quando algo importante não pôde ser verificado.
-   - Sem achados nos dois eixos: escreva `O que a mudança faz:`, depois `Sem achados. Pode entregar.` e 1 linha com o que foi verificado.
-   - Se houver `[BLOCKER]`, pare aqui e pergunte ao usuário como seguir.
-5. **Prova do Fato de Segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove esse fato com um teste Pest ou um script que executa o código real. Se não conseguir provar, escreva `não provado`.
-6. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
+   - Sem achados nos dois eixos: escreva `O que a mudança faz:`, depois `Sem achados. Pode entregar.`, `Fluxos rastreados:` e 1 linha com o que foi verificado.
+   - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir.
+7. **Prova do Fato de Segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove esse fato com um teste Pest ou um script que executa o código real. Se não conseguir provar, escreva `não provado`.
+8. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
    - **Por que (Why):** 1 a 2 frases explicando o problema resolvido.
    - **O que mudou (What changed):** Bullets curtos focados nas Fronteiras (`Livewire`/HTTP) e Costuras (`Actions`/DTOs).
-   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo) e liste exatamente quais rotas/componentes podem ser afetados. Inclua o fato de segurança da etapa 5 com a prova ou o rótulo `não provado`.
+   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo) e liste exatamente quais rotas/componentes podem ser afetados. Inclua o fato de segurança da etapa 7 com a prova ou o rótulo `não provado`.
    - **Prova de Execução (`[measured]`):** Resumo dos resultados do Pest, Larastan e Pint.
 
 ## 4. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
 | "Eu mesmo acabei de escrever o código, posso apenas olhar rápido sem seguir os 2 eixos." | **Proibido.** A Revisão Adversarial exige checagem independente de Standards (Segurança/N+1/Livewire) e Spec. |
+| "Achei um `[BLOCKER]`; posso parar e reportar agora." | **Proibido.** O `[BLOCKER]` não encerra a rodada. Conclua os dois eixos e a Consolidação e reporte todos os achados juntos. |
+| "Os dois revisores aprovaram e os testes passam; a revisão acabou." | **Proibido.** Teste e revisor provam só o que executam ou leem. A revisão acaba no Critério de Fim da Consolidação. |
+| "Conferi que a lista elimina chaves repetidas; a chave está certa." | **Proibido.** Um consumidor não prova os outros. Siga a mesma chave no detalhe, nos termos, nas decisões e nos documentos gerados. |
+| "Nesta rodada, basta revisar o delta da correção." | **Proibido.** A correção pode quebrar outro consumidor, e a rodada anterior pode ter perdido um achado. Revise o diff completo e os Fluxos que a correção toca. |
 | "Não há impacto nenhum no Raio de Explosão." | **Proibido.** Toda alteração toca alguma rota, tabela ou componente. Nomeie os pontos afetados explicitamente. |
 | "Vou escrever um PR de 200 linhas listando cada arquivo modificado." | **Proibido.** O Git já mostra os arquivos. O briefing de PR deve ter no máximo 40 linhas de alto sinal. |
 | "O `[BLOCKER]` é simples, eu mesmo corrijo durante a revisão." | **Proibido.** A revisão só reporta. Corrigir no meio mistura autor e revisor e esconde a decisão do usuário. |
@@ -107,6 +130,10 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Relatório dos 2 eixos (Standards + Spec) entregue em seções separadas, sem edição de código.
+- `[measured]` Mapa de Fluxos montado por busca, com status de cada arquivo do diff e de cada Fluxo nos dois eixos.
+- `[measured]` Consolidação concluída antes do relatório: lacunas devolvidas, achados propagados aos consumidores do mesmo valor e divergências resolvidas.
+- `[measured]` Um só relatório com todos os achados confirmados da rodada, também quando há `[BLOCKER]`.
+- `[measured]` Na rodada seguinte: diff completo revisado, status de cada achado anterior e Fluxos das correções rastreados.
 - `[measured]` Cada achado com caso concreto, `arquivo:linha` e as 4 partes (O que é, Problema, Correção, Se não corrigir).
 - `[measured]` Busca de chamadores citada para cada assinatura, retorno ou comportamento alterado.
 - `[measured]` Carga presumida declarada no relatório.
