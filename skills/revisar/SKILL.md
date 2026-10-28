@@ -16,7 +16,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 
 ## 2. Regras Inegociáveis
 - **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (referência do diff da etapa 1, Mapa de Fluxos da etapa 2, caminho da Spec, glossário e configuração do projeto). O agente que escreveu o código tem viés de confirmação.
-- **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/implementar` ou `/bug`.
+- **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/ajustar`, `/implementar` ou `/bug`.
 - **Leia o código conectado, não só o diff:** Leia os chamadores das funções alteradas, as funções chamadas, os testes e o README. Quando uma assinatura, um retorno ou um comportamento muda, busque todos os chamadores com `rg`.
 - **Siga cada valor de ponta a ponta:** Um Fluxo é o caminho de um valor que o diff altera (chave, ID, coluna, status, flag, regra ou formato de retorno), da entrada até cada consumidor: consulta, lista, detalhe, texto exibido, regra, decisão, documento gerado, export, job, notificação e API. A verificação de um consumidor não prova os outros. Exemplo: a lista elimina chaves repetidas, mas o detalhe, os termos, a decisão de exigir assinatura e o PDF também leem a mesma chave. Confira cada um.
 - **Entregue a revisão completa numa rodada:** A rodada termina só no Critério de Fim da etapa 5. Um `[BLOCKER]` não encerra a busca: registre-o e continue. Assim, o usuário corrige todos os achados de uma vez.
@@ -36,7 +36,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
    - **Rodada seguinte:** Com um relatório anterior de `/revisar` para o mesmo alvo, na conversa ou no handoff, esta é uma rodada seguinte. Use o diff completo do alvo, não só o delta da correção. Liste os achados anteriores para a etapa 6.
    - Aplique o portão completo de `laravel-verification` ou reutilize evidência ainda válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
 2. **Mapa de Fluxos:** Antes de disparar os subagentes:
-   - Liste os valores que o diff altera. Na rodada seguinte, inclua os valores que cada correção alterou.
+   - Liste os valores que o diff altera. Na rodada seguinte, inclua os valores que cada correção alterou. O relatório de `/ajustar` lista esses valores em `Valores alterados:`.
    - Para cada valor, busque com `rg` todos os pontos que o leem ou gravam, também fora do diff: Models, Actions, componentes Livewire, views Blade, Policies, jobs, listeners, exports, templates de PDF ou e-mail, rotas de API e testes. A lista vem da busca, não da memória de quem escreveu o código.
    - Registre cada Fluxo como `valor: entrada → consumidor → saída`, com `arquivo:linha` de cada ponto.
 3. **Revisão Adversarial em 2 Eixos (Subagentes Paralelos):** Cada subagente lê o código conectado e ordena seus achados pela prioridade da seção 1. Cada subagente também:
@@ -103,7 +103,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      - `Enxuto: -N linhas possíveis.` quando houver achado de Enxuto.
      - `Não verificado:` em 1 linha, quando algo importante não pôde ser verificado.
    - Sem achados nos dois eixos: escreva `O que a mudança faz:`, depois `Sem achados. Pode entregar.`, `Fluxos rastreados:` e 1 linha com o que foi verificado.
-   - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir.
+   - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir. Ofereça `/ajustar` com os números do veredito.
 7. **Prova do Fato de Segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove esse fato com um teste Pest ou um script que executa o código real. Se não conseguir provar, escreva `não provado`.
 8. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
    - **Por que (Why):** 1 a 2 frases explicando o problema resolvido.
