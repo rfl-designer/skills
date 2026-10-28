@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lição {{NNNN}}: {{Nome}}</title>
+<style>
+:root {
+  --fundo: #fbfaf7;
+  --texto: #1f2328;
+  --suave: #5c6570;
+  --linha: #d9d6cf;
+  --caixa: #f1efe9;
+  --destaque: #0b5cad;
+  --certo: #1a7f37;
+  --errado: #b42318;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #15171a;
+    --texto: #e6e3dc;
+    --suave: #a3a9b1;
+    --linha: #3a3f46;
+    --caixa: #1f2226;
+    --destaque: #7cb7ff;
+    --certo: #57c27a;
+    --errado: #ff8a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #15171a;
+  --texto: #e6e3dc;
+  --suave: #a3a9b1;
+  --linha: #3a3f46;
+  --caixa: #1f2226;
+  --destaque: #7cb7ff;
+  --certo: #57c27a;
+  --errado: #ff8a80;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 18px/1.65 Charter, "Iowan Old Style", Georgia, serif;
+}
+main { max-width: 40rem; margin: 0 auto; padding: 2.5rem 16px 4rem; }
+.rotulo, h2, figcaption, legend, .retorno, .nota, summary {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.rotulo { margin: 0; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+h1 { margin: .3rem 0 1rem; font-size: 2rem; line-height: 1.2; }
+h2 { margin: 2.5rem 0 .5rem; font-size: 1.05rem; }
+.pergunta { font-size: 1.15rem; color: var(--suave); }
+a { color: var(--destaque); }
+code, pre { font: .85em/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--caixa); }
+code { padding: .1em .3em; border-radius: 3px; }
+pre { margin: 0; padding: 1rem; overflow-x: auto; border-radius: 4px; }
+pre code { padding: 0; }
+figure { margin: 1.5rem 0; }
+figcaption, .nota { margin-top: .4rem; font-size: .85rem; color: var(--suave); }
+svg { display: block; width: 100%; height: auto; }
+.diagrama { overflow-x: auto; }
+.diagrama svg { min-width: 520px; }
+.defs { position: absolute; width: 0; height: 0; color: var(--suave); }
+.no rect { fill: var(--caixa); stroke: var(--linha); stroke-width: 1.5; }
+.no.novo rect { stroke: var(--destaque); stroke-width: 2.5; }
+.no text { fill: var(--texto); font: 17px system-ui, sans-serif; }
+.seta { fill: none; stroke: var(--suave); stroke-width: 1.5; marker-end: url(#ponta); }
+fieldset { margin: 1rem 0; padding: 1rem; border: 1px solid var(--linha); border-radius: 4px; }
+legend { padding: 0 .3rem; font-weight: 600; }
+label { display: block; padding: .3rem 0; cursor: pointer; }
+.retorno { min-height: 1.5em; margin: .5rem 0 0; font-size: .95rem; }
+.retorno[data-estado="certo"] { color: var(--certo); }
+.retorno[data-estado="errado"] { color: var(--errado); }
+textarea { width: 100%; min-height: 4.5rem; padding: .5rem; font: inherit; color: inherit; background: var(--fundo); border: 1px solid var(--linha); border-radius: 4px; }
+details { margin-top: .5rem; }
+summary { cursor: pointer; color: var(--destaque); }
+ol.fontes { padding-left: 1.4rem; font-size: .95rem; }
+@media print {
+  :root { --fundo: #fff; --texto: #000; --caixa: #f3f3f3; }
+  main { max-width: none; padding: 0; }
+  textarea, .retorno:empty { display: none; }
+}
+</style>
+</head>
+<body>
+<svg class="defs" aria-hidden="true">
+  <defs>
+    <marker id="ponta" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+  </defs>
+</svg>
+<main>
+  <header>
+    <p class="rotulo">Lição {{NNNN}} · {{Tema}}</p>
+    <h1>{{Nome}}</h1>
+    <p class="pergunta">{{Pergunta que a Lição responde e por que ela importa ao usuário, em até 2 frases.}}</p>
+  </header>
+
+  <section>
+    <h2>Definição</h2>
+    <p>{{Nome comum da ideia e o que ela é em termos gerais.}} <a href="#f1">[1]</a></p>
+    <p>{{Onde a ideia aparece neste projeto.}}</p>
+  </section>
+
+  <section>
+    <h2>Mecanismo</h2>
+    <p>{{O problema que a ideia resolve.}}</p>
+    <figure class="diagrama">
+      <svg viewBox="0 0 640 110" role="img" aria-labelledby="figura-1">
+        <title id="figura-1">{{Descrição da figura 1}}</title>
+        <g class="no"><rect x="10" y="30" width="170" height="50" rx="6"/><text x="95" y="60" text-anchor="middle">{{Parte A}}</text></g>
+        <g class="no novo"><rect x="235" y="30" width="170" height="50" rx="6"/><text x="320" y="60" text-anchor="middle">{{Parte B}}</text></g>
+        <path class="seta" d="M180,55 H233"/>
+      </svg>
+      <figcaption>Figura 1. {{A parte A envia o dado para a parte B.}}</figcaption>
+    </figure>
+    <p>{{A próxima camada do mecanismo.}}</p>
+    <figure class="diagrama">
+      <svg viewBox="0 0 640 110" role="img" aria-labelledby="figura-2">
+        <title id="figura-2">{{Descrição da figura 2}}</title>
+        <g class="no"><rect x="10" y="30" width="170" height="50" rx="6"/><text x="95" y="60" text-anchor="middle">{{Parte A}}</text></g>
+        <g class="no"><rect x="235" y="30" width="170" height="50" rx="6"/><text x="320" y="60" text-anchor="middle">{{Parte B}}</text></g>
+        <g class="no novo"><rect x="460" y="30" width="170" height="50" rx="6"/><text x="545" y="60" text-anchor="middle">{{Parte C}}</text></g>
+        <path class="seta" d="M180,55 H233"/>
+        <path class="seta" d="M405,55 H458"/>
+      </svg>
+      <figcaption>Figura 2. {{A figura 1 com a parte C.}}</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>No projeto</h2>
+    <figure>
+      <pre><code>{{Trecho real do código}}</code></pre>
+      <figcaption><code>{{app/Caminho/Arquivo.php:12}}</code> · commit <code>{{abc1234}}</code></figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <h2>Prática</h2>
+    <fieldset class="questao" data-correta="b">
+      <legend>1. {{Pergunta de múltipla escolha}}</legend>
+      <label><input type="radio" name="q1" value="a"> {{Opção com N palavras}}</label>
+      <label><input type="radio" name="q1" value="b"> {{Opção com N palavras}}</label>
+      <label><input type="radio" name="q1" value="c"> {{Opção com N palavras}}</label>
+      <p class="retorno" aria-live="polite" data-certo="{{Por que esta opção está certa.}}" data-errado="{{Pista que leva ao mecanismo, sem a resposta.}}"></p>
+    </fieldset>
+    <fieldset>
+      <legend>2. {{Pergunta de recordação}}</legend>
+      <p class="nota">Responda de memória antes de abrir a resposta.</p>
+      <textarea aria-label="Sua resposta"></textarea>
+      <details>
+        <summary>Ver resposta</summary>
+        <p>{{Resposta modelo.}}</p>
+      </details>
+    </fieldset>
+  </section>
+
+  <section>
+    <h2>Leia a seguir</h2>
+    <p><a href="{{URL da fonte primária}}">{{Título da fonte primária}}</a>. {{O que ler ou assistir nela e por quê.}}</p>
+    <ol class="fontes">
+      <li id="f1"><a href="{{URL}}">{{Fonte citada, com versão}}</a></li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>Próximo passo</h2>
+    <p>{{Link para a Lição anterior ou a próxima.}}</p>
+    <p class="nota">Ficou alguma dúvida? Pergunte ao agente na conversa.</p>
+  </section>
+</main>
+<script>
+document.querySelectorAll('.questao[data-correta]').forEach(function (questao) {
+  var retorno = questao.querySelector('.retorno');
+  questao.addEventListener('change', function (evento) {
+    var certo = evento.target.value === questao.dataset.correta;
+    retorno.dataset.estado = certo ? 'certo' : 'errado';
+    retorno.textContent = certo ? 'Certo. ' + retorno.dataset.certo : 'Ainda não. ' + retorno.dataset.errado;
+  });
+});
+</script>
+</body>
+</html>
