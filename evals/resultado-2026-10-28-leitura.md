@@ -14,15 +14,16 @@ Cada execução recebeu uma cópia do projeto, do rascunho e das skills numa pas
 |---|---|---|
 | Lacuna | `spec-aprovar-pedido.md` | A Spec debita o Saldo na Aprovação. O glossário e `FecharDia` já debitam o Saldo dos Pedidos aprovados no Fechamento do Dia. A Spec não cita o Fechamento do Dia. Resultado: débito em dobro. Todos os termos estão definidos. |
 | Tickets | `tickets-aplicar-cupom.md`, com a Spec aprovada `spec-aplicar-cupom.md` | Ticket 1 deixa ao implementador as colunas, os tipos, a chave estrangeira e o valor vazio do Cupom e do Desconto. Ticket 2 manda modificar `app/Livewire/Pedidos/Detalhe.php` e a view de detalhe, que não existem. |
-| Controle | `spec-cancelar-pedido.md` | Nenhuma. A Spec responde a quem cancela, em que status, o efeito no Saldo, a condição de corrida, as mensagens e o fora de escopo. |
+| Controle | `spec-cancelar-pedido.md` | Nenhuma. A Spec responde a quem cancela, em que status, o efeito no Saldo, a disputa com o comando de aprovação, as mensagens e o fora de escopo. O arquivo guarda a versão 2; a versão 1 está descrita no resultado. |
 | Sem subagentes | `spec-aprovar-pedido.md` | O executor de `/especificar` não pode criar subagentes. |
 
 ## Método
 
-- **Leitor:** 2 execuções por caso, com o prompt que a seção 6 da skill prevê sem o agente `leitor` registrado: o template, o SKILL.md, o modo e os ponteiros. Ferramentas pedidas: Read, Grep e Glob.
+- **Leitor:** 2 execuções por caso, com o prompt que a seção 6 da skill prevê sem o agente `leitor` registrado: o template, o SKILL.md, o modo e os ponteiros. Ferramentas pedidas: Read, Grep e Glob. O controle teve 2 versões, com 2 execuções cada.
 - **Autor com subagentes:** 1 executor de `/especificar`, a partir da etapa 3, com o rascunho do caso Lacuna. O usuário não responde; o executor termina com a mensagem ao usuário e um anexo com as ferramentas usadas, o prompt enviado ao Leitor e o retorno bruto dele.
-- **Autor sem subagentes:** 1 executor igual, com a instrução de não usar ferramentas de subagente.
-- Modelo: o subagente herdou o modelo da sessão principal.
+- **Autor com o retorno do Leitor:** 1 executor recebe o retorno real de Lacuna A e continua a partir da Conferência (etapa 3 do Processo do Autor).
+- **Autor sem subagentes:** 1 executor com a instrução de não usar ferramentas de subagente, na versão `0558e08`. Depois da correção, 1 executor igual na versão `1e72ab3`.
+- Modelo: os subagentes herdaram o modelo da sessão principal.
 
 ## Resultado: Leitor
 
@@ -53,4 +54,32 @@ Conferi cada achado no fixture. "Real" quer dizer: a pergunta não tem resposta 
 |---|---|---|
 | Com subagentes | Neste ambiente, um subagente não cria outro. O executor não leu o rascunho no mesmo contexto. Ele ofereceu uma sessão nova, com o pedido pronto, e perguntou antes de gravar. | O caso com subagentes não rodou de ponta a ponta. O comportamento sem subagentes foi correto. |
 | Sem subagentes, versão `0558e08` | Não leu o rascunho no mesmo contexto. Gravou a Spec com `não executada` e ofereceu a sessão nova depois da gravação. | Divergiu da execução anterior: a regra tinha duas leituras. Corrigida em `1e72ab3`. |
+| Sem subagentes, versão `1e72ab3` | Não leu o rascunho no mesmo contexto. Antes de gravar, perguntou: leitura numa sessão nova, com o pedido pronto, ou gravação com `não executada`. Não gravou nada. | Passou. |
 | Autor com o retorno do Leitor | Recebeu o retorno real de Lacuna A. Mostrou a Paráfrase idêntica ao retorno (comparação de texto). Deu 4 `perguntar` e 1 `corrigir`; a correção espera a confirmação, porque muda a entrada da Costura. Não contestou nenhum achado e não mudou nenhuma severidade. Fez só a pergunta da Paráfrase e anunciou as outras. Não gravou a Spec nem alterou o rascunho. Avisou que o Leitor era um subagente geral. Anunciou a 2ª leitura, porque houve `[BLOCKER]`. | Passou. |
+
+## Critérios de `cenarios.md`
+
+| Cenário | Resultado |
+|---|---|
+| Leitura: lacuna plantada | Passou. Leitor: 2 de 2. Autor com o retorno: 1 de 1. |
+| Leitura: decisão aberta no ticket | Passou: 2 de 2. Nenhum Leitor escolheu o schema nem editou arquivos. |
+| Leitura: Spec sem lacuna (controle) | Versão 1: o fixture tinha 2 lacunas reais, e os 2 Leitores as acharam. Versão 2: passou, 2 de 2, com 1 achado contestável. |
+| Leitura sem subagentes | Versão `0558e08`: 1 de 2. Versão `1e72ab3`: 1 de 1. |
+
+## Mudanças depois da execução
+
+- Sem subagentes, o Autor pergunta antes de gravar (`1e72ab3`).
+- O rascunho de controle passou à versão 2.
+
+## Limites
+
+- O autor da skill escreveu os fixtures, executou e avaliou. Os agentes avaliados não viram a rubrica, mas a avaliação não é independente.
+- O caso "o Autor dispara o Leitor" não rodou de ponta a ponta: neste ambiente, um subagente não cria outro. O Autor foi testado em duas partes: sem subagentes, e com um retorno real entregue.
+- Os Leitores eram subagentes gerais. A regra "só lê" ficou só na instrução; o template `leitor` com `tools: Read, Grep, Glob` não foi testado.
+- No modo Tickets, cada Leitor devolveu 10 achados. Todos eram reais, mas o volume pesa para o usuário. O nível 2 deve medir se o usuário responde aos achados ou pula a etapa.
+- A severidade variou entre execuções do mesmo caso. Duas leituras do mesmo rascunho podem dar vereditos diferentes.
+- 2 execuções por caso, com um só modelo. A amostra é pequena.
+
+## Pendente: nível 2
+
+Rodar `/implementar` num app Laravel de teste com a mesma Spec, com e sem a Leitura Independente. Contar as decisões silenciosas do implementador e os achados de `/revisar`. Repetir as execuções e alternar a ordem das versões.
