@@ -33,7 +33,7 @@ Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, 
    - **Próximo passo:** A primeira ação concreta na retomada.
    - **Pendências:** Perguntas abertas, riscos e aprovações que o usuário ainda não deu.
    - **Armadilhas:** O que o agente novo não descobre lendo o código: hipóteses refutadas, caminhos sem saída, convenções não escritas.
-   - **Artefatos:** Caminhos e URLs da Spec, dos tickets, dos ADRs e de outros arquivos-chave. Um relatório de `/revisar` ou `/ajustar` que existe só no chat vai sem alteração para `$TMPDIR/relatorio-<skill>-<branch>-<AAAA-MM-DD>.md`; cite o caminho aqui.
+   - **Artefatos:** Caminhos e URLs da Spec, dos tickets, dos ADRs e de outros arquivos-chave. Um relatório de `/revisar` ou `/ajustar` que existe só no chat vai sem alteração para `$TMPDIR/relatorio-<skill>-<branch>-<AAAA-MM-DD>.md`; cite o caminho aqui. Cite também o rascunho de `leitura-independente` ainda não gravado no destino.
    - **Skills sugeridas:** As skills que o agente novo deve carregar (por exemplo `/implementar` e `laravel-verification`).
    - **Para retomar:** Copie as 4 instruções do passo 5.
 5. **Instruções de retomada (vão dentro da nota):**

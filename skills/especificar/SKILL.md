@@ -1,6 +1,6 @@
 ---
 name: especificar
-description: Sintetiza o alinhamento em uma Especificação (Spec) com fronteiras Livewire/HTTP e contratos nas Costuras existentes ou propostas, usando o destino configurado e perguntando apenas se faltar. Use quando o usuário digitar /especificar.
+description: Sintetiza o alinhamento em uma Especificação (Spec) com fronteiras Livewire/HTTP e contratos nas Costuras existentes ou propostas, usando o destino configurado e perguntando apenas se faltar. Antes de gravar, um Leitor novo lê o rascunho. Use quando o usuário digitar /especificar.
 disable-model-invocation: true
 ---
 
@@ -19,6 +19,7 @@ Congelar as decisões de produto e os contratos técnicos (Fronteira Livewire/HT
 - **Use os termos do glossário configurado (`GLOSSARY.md` como fallback):** Nomes de classes, métodos, tabelas e propriedades devem refletir o glossário do projeto.
 - **Use o destino acordado:** Leia o destino de Specs da configuração ou da sessão. Pergunte apenas se faltar ou houver conflito. Não troque de destino por falha de acesso; registre o bloqueio.
 - **Declare o que fica fora de escopo:** Toda Spec deve listar explicitamente o que não será feito nesta entrega.
+- **Passe o rascunho por um Leitor novo antes de gravar:** O implementador lê a Spec sem o histórico do chat. Aplique `leitura-independente` no modo Spec: um subagente novo lê o rascunho nas mesmas condições.
 
 ## 3. Processo
 1. **Revisão de Contexto:** Releia as decisões tomadas em `/alinhar` e os arquivos-alvo do projeto.
@@ -29,11 +30,12 @@ Congelar as decisões de produto e os contratos técnicos (Fronteira Livewire/HT
    - **4. Módulo Profundo e Costura (Seam):** Costura pública existente ou proposta, dados de entrada, retorno e invariantes. Justifique Action/DTO novos ou o uso de CRUD simples na Fronteira. Escreva em lista, não em PHP.
    - **5. Plano de Testes na Costura (Pest):** Cenários testados na Costura escolhida e na Fronteira Livewire/HTTP; navegador quando houver comportamento de UI.
    - **6. Fora de Escopo:** Itens excluídos desta entrega.
-3. **Resolver o Destino:** Use a configuração de Specs sem repetir a pergunta. Se não houver escolha registrada, apresente a prévia e pergunte:
+3. **Leitura Independente:** Aplique `leitura-independente` no modo Spec. Grave o rascunho num arquivo temporário fora do repositório e delegue a leitura a um Leitor novo. Mostre a Paráfrase e os achados ao usuário. Continue só depois da resposta dele.
+4. **Resolver o Destino:** Use a configuração de Specs sem repetir a pergunta. Se não houver escolha registrada, apresente a prévia e pergunte:
    - **Opção 1:** Salvar em arquivo Markdown no repositório (ex.: `docs/specs/NNNN-slug.md`).
    - **Opção 2:** Publicar como Issue no GitHub (`gh issue create`) ou GitLab (`glab issue create`).
    - **Opção 3:** Salvar em outro destino ou formato específico.
-4. **Gravação e Fechamento:** Grave a Spec no destino escolhido, informe o caminho ou link gerado e oriente o usuário a executar `/planejar`.
+5. **Gravação e Fechamento:** Grave a Spec no destino escolhido e apague o rascunho temporário. Informe o caminho ou link gerado e a linha `Leitura Independente:`. Envie os achados `mover para tickets` com a orientação de executar `/planejar`.
 
 ## 4. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
@@ -42,8 +44,10 @@ Congelar as decisões de produto e os contratos técnicos (Fronteira Livewire/HT
 | "Vou colar a classe `final readonly` do DTO e o caminho `app/Actions/...` para ficar preciso." | **Proibido.** Liste os campos e nomeie a Costura. O código e os caminhos nascem em `/implementar`. |
 | "Vou salvar direto em `docs/specs/` sem perguntar ao usuário." | Use o destino de Specs já acordado na configuração ou sessão. Pergunte apenas quando ele não estiver definido. |
 | "Não preciso especificar propriedades `#[Locked]` do Livewire agora." | **Proibido.** Fronteiras de segurança do Livewire e Policies fazem parte do contrato da Spec. |
+| "A Spec está clara para mim; gravo sem a Leitura Independente." | **Proibido.** O autor lê o que quis dizer, não o que escreveu. Um Leitor novo lê o que o implementador vai ler. |
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Costura, dados de entrada e Fronteira Livewire/HTTP nomeados sem ambiguidade e confirmados pelo usuário.
 - `[measured]` Zero caminhos de arquivo e zero trechos de código na Spec, exceto formatos de protótipo marcados.
+- `[measured]` Paráfrase do Leitor mostrada ao usuário antes da gravação, e linha `Leitura Independente:` no fechamento.
 - `[measured]` Destino confirmado na configuração ou sessão e Spec gravada com sucesso (caminho do arquivo ou URL da Issue exibido).

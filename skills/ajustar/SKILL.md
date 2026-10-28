@@ -23,6 +23,8 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 ## 3. Regras Inegociáveis
 - **Carregue as disciplinas de modelo:** Aplique `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification` e `ste100-clean-code`.
 - **Corrija os achados escolhidos:** O argumento ou a mensagem do usuário escolhe os achados ("corrija 2 e 5"). Sem escolha, use os achados do `Veredito:` do relatório: todos os `[BLOCKER]` e `[IMPORTANTE]`. Um `[NIT]` entra só quando o usuário o escolhe.
+- **Registre os achados aceitos:** Quando o usuário decide não corrigir um achado, ele o aceita. Registre o achado em `Aceitos:`, com o motivo do usuário. Sem motivo, pergunte o motivo. Um achado que o usuário não escolheu não está aceito: ele continua aberto.
+- **Leve o vaivém ao usuário:** Um achado com `(vaivém do achado N)` não entra num Lote antes da resposta do usuário. A Correção dele traz as duas direções e a pergunta.
 - **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Action ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/bug`. Esses achados ficam fora dos Lotes.
 - **Use o relatório como contrato:** A Correção do achado é o ponto de partida. O Ajustador pode aplicar uma correção menor que resolve o mesmo caso concreto. Uma correção que muda a Spec, muda um contrato externo ou exige escolha entre opções recebe o status `bloqueado`, com a pergunta para o usuário.
 - **Prove cada correção pelo tipo do achado:**
@@ -48,6 +50,7 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
    - Número que o relatório não tem: informe e não o delegue.
    - Pedido sem achado no relatório: ofereça `/bug` ou `/revisar`.
    - Pedido ambíguo: pergunte e espere a resposta.
+   - Achado com `(vaivém do achado N)`: faça a pergunta da Correção antes de delegar. Com a direção escolhida, ele entra num Lote. Com a decisão de manter o código, ele vira `aceito`.
 3. **Estado:** Confira `git status` e a linha `Alvo:` do relatório. Com outra branch no checkout, pare e pergunte. Releia o `arquivo:linha` de cada achado; com código alterado depois do relatório, localize o trecho de novo. Sem o trecho, marque o achado `desatualizado` e não o delegue.
 4. **Lotes:** Coloque no mesmo Lote os achados que tocam o mesmo valor, o mesmo Fluxo ou os mesmos arquivos. Assim, um só Ajustador corrige o valor em todos os consumidores. Coloque achados sem nada em comum em Lotes separados. Delegue primeiro os Lotes com `[BLOCKER]`. Um Lote que depende de outro espera a integração desse outro.
 5. **Agente:** No Claude Code, siga a seção 7. Em outros ambientes, use o mecanismo e os modelos autorizados disponíveis; não traduza IDs da Anthropic para outro provedor. Sem subagentes, corrija um Lote por vez no agente principal e informe a limitação.
@@ -84,7 +87,7 @@ Pendências: achado 6.
 
 ## 6. Integrar e verificar (agente principal)
 1. **Conferência:** Cada achado do Lote tem status (`corrigido`, `não reproduz` ou `bloqueado`) e a prova do seu tipo, da seção 3. Com prova faltante, retome o mesmo Ajustador com a pendência e preserve o trabalho válido.
-2. **Bloqueados:** Termine os outros Lotes. Faça as perguntas dos achados `bloqueado` no relatório, sem parar a rodada.
+2. **Bloqueados:** Termine os outros Lotes. Faça as perguntas dos achados `bloqueado` no relatório, sem parar a rodada. A resposta "fica como está", com o motivo, torna o achado `aceito`.
 3. **Integração:** Integre um Lote por vez, só com o delta do Lote. Um conflito que muda comportamento volta ao ciclo de prova do Lote afetado.
 4. **Regressões:** Junte os `Valores alterados` de todos os Lotes. No estado integrado, busque de novo com `rg` os consumidores de cada valor e confira cada um. Dois Lotes podem alterar o mesmo Fluxo de formas incompatíveis. Atribua cada regressão ao Lote dono do arquivo, ou a um Lote novo.
 5. **Portão:** Execute o portão completo de `laravel-verification` no estado integrado. A evidência de worktrees isolados não prova a combinação.
@@ -95,6 +98,7 @@ Pendências: achado 6.
    - `Valores alterados:` 1 linha por valor, com os consumidores conferidos. A rodada seguinte de `/revisar` coloca esses valores no Mapa de Fluxos.
    - `Achados novos:` caso concreto e `arquivo:linha`, quando houver. Ofereça `/bug` para cada um. A rodada seguinte de `/revisar` também os confere.
    - As perguntas dos achados `bloqueado`.
+   - `Aceitos:` 1 linha por achado aceito, com o motivo, quando houver. A rodada seguinte de `/revisar` os deixa fora do `Veredito:`.
    - `Portão:` comandos, escopo e resultado no estado integrado.
    - Última linha: `Próximo passo: rode /revisar para a rodada seguinte.`
 
@@ -123,10 +127,13 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 | "As correções têm prova; a revisão está aprovada." | **Proibido.** A rodada seguinte de `/revisar` dá o veredito. |
 | "Já estou no arquivo; corrijo os `[NIT]` também." | **Proibido.** Um `[NIT]` entra só com a escolha do usuário. |
 | "A correção exige mudar a Spec; decido sozinho." | **Proibido.** Marque `bloqueado` com a pergunta. O principal a faz ao usuário no relatório. |
+| "O usuário escolheu 2 e 5; os outros achados do Veredito estão aceitos." | **Proibido.** O aceite exige a decisão e o motivo do usuário. Um achado não escolhido continua aberto. |
+| "O vaivém tem uma direção óbvia; delego a correção." | **Proibido.** As duas correções puxam o código em direções opostas. A direção é decisão do usuário. |
 
 ## 9. Prova de Execução (Critério de Saída)
 - `[measured]` Seleção mostrada antes da delegação, com os achados enviados a outra skill à parte.
 - `[measured]` Cada achado com status e a prova do seu tipo, com comando e saída. O `não reproduz` traz também a falha com a linha alterada.
 - `[measured]` Busca do padrão e dos valores alterados citada para cada correção, no Lote e no estado integrado.
 - `[measured]` Portão completo de `laravel-verification` aprovado no estado integrado antes de qualquer commit, com comandos, escopos e resultados citados.
-- `[measured]` Relatório com `Valores alterados`, achados novos, perguntas dos bloqueados e a indicação de `/revisar`.
+- `[measured]` Vaivém perguntado ao usuário antes da delegação.
+- `[measured]` Relatório com `Valores alterados`, achados novos, perguntas dos bloqueados, `Aceitos:` com o motivo de cada achado e a indicação de `/revisar`.
