@@ -48,7 +48,7 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
                                                           /bug
 ```
 
-`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
+`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. Antes de gravar, `/especificar` e `/planejar` passam o rascunho por um Leitor novo, sem o histórico do chat, com `leitura-independente`. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. O usuário pode aceitar um achado, com o motivo. Na rodada 3 sem veredito `pode entregar`, `/revisar` para o ciclo e pergunta como seguir. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
 Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, condução e prova. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o app real.
 
@@ -63,13 +63,13 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/setup` | Detecta tecnologias e comandos; configura pastas e destinos independentes de Specs e Tickets, persistidos por projeto. |
 | `/alinhar` | Entrevista antes do código, uma pergunta por vez. Atualiza o `GLOSSARY.md` e registra ADRs. |
 | `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
-| `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Usa o destino configurado de Specs. |
-| `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Usa o destino configurado de Tickets. |
+| `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Um Leitor novo lê o rascunho e devolve a Paráfrase antes da gravação. Usa o destino configurado de Specs. |
+| `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
 | `/implementar` | Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
 | `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
-| `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Só relatório, prova do fato de segurança e resumo de PR. |
-| `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/bug`. |
+| `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos e só de leitura; sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
+| `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/bug`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
 | `/mapear` | Cria, atualiza e audita o Mapa de Features da aplicação. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador e conduz o app ao vivo. |
@@ -89,6 +89,18 @@ Em outros ambientes, a skill usa subagentes e modelos autorizados disponíveis. 
 
 Copie [o template do ajustador](skills/ajustar/assets/ajustador.md) para `.claude/agents/ajustador.md` no projeto consumidor e instale as quatro disciplinas de modelo. Sem o agente registrado, `/ajustar` usa o subagente geral, que herda o modelo do principal.
 
+### Leitores no Claude Code
+
+`/especificar` e `/planejar` delegam cada leitura a um Leitor novo, com `model: inherit` e só as ferramentas `Read, Grep, Glob`. O Leitor lê nas condições do implementador: sem o histórico do chat, com as instruções do projeto. Cada leitura usa um Leitor novo, nunca um `fork`.
+
+Copie [o template do leitor](skills/leitura-independente/assets/leitor.md) para `.claude/agents/leitor.md` no projeto consumidor e instale `leitura-independente` e `ste100-clean-code`. Sem o agente registrado, as skills usam o subagente geral, que tem todas as ferramentas; a regra "só lê" fica só na instrução. Sem subagentes, a leitura fica `não executada`; o autor não lê o próprio rascunho no lugar do Leitor.
+
+### Revisores no Claude Code
+
+`/revisar` delega cada eixo a um revisor novo, com `model: inherit` e só as ferramentas `Read, Grep, Glob`. O principal grava o diff num arquivo, executa o portão e prova o fato de segurança.
+
+Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/agents/revisor.md` no projeto consumidor e instale `laravel-deep-modules`, `laravel-tdd-seams` e `ste100-clean-code`. Sem o agente registrado, `/revisar` usa o subagente geral, com a regra "só lê" só na instrução.
+
 ### Mapeadores no Claude Code
 
 Em aplicações com 3 ou mais Domínios e mais de 12 Features, `/mapear` delega cada Domínio a um Mapeador **Sonnet 5.5 / medium**, até 4 ao mesmo tempo. Cada Mapeador grava só a pasta do seu Domínio e não conduz o app. O principal reconcilia o índice, roda o conferidor e conduz as Features em série.
@@ -104,6 +116,7 @@ O agente carrega estas skills quando a tarefa exige.
 | `laravel-deep-modules` | Costuras existentes e módulos profundos; Action/DTO quando úteis, CRUD simples quando suficiente. |
 | `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. |
 | `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. |
+| `leitura-independente` | Um Leitor novo lê o rascunho da Spec ou dos tickets antes da gravação: Paráfrase, Prontidão e resolução de cada achado com o usuário. |
 | `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. |
 
 ## Configuração por projeto
