@@ -19,4 +19,6 @@ Consultada em 21/10/2026. As fontes abaixo descrevem correspondências no conte�
 
 `—` significa que esta matriz não estabelece correspondência, não que o autor rejeita ou nunca trata a prática. Não exigimos dois autores para justificar uma regra útil.
 
+Fonte adicional, consultada em 28/10/2026: [ponytail-review](https://github.com/DietrichGebert/ponytail/blob/09c434ab73ca43761c5d8b0c5d341926c2fba710/skills/ponytail-review/SKILL.md). `/revisar` adapta dela a ordem de prioridade, a leitura de chamadores, a carga esperada, a confirmação por caso concreto, os critérios de Enxuto e o achado em 4 partes. Os eixos separados, os 3 níveis de severidade e o atalho documentado sem marcador próprio são escolhas locais.
+
 Fontes de ferramentas: [Pint e Blade](https://laravel.com/framework/docs/pint), [Pest Agent](https://github.com/pestphp/docs/blob/5.x/agent.md), [Pest 5](https://pestphp.com/docs/pest5-now-available). Versões e opções devem ser detectadas no projeto consumidor.
