@@ -16,9 +16,9 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 
 ## 2. Regras Inegociáveis
 - **Use subagentes com contexto limpo:** Sempre que a ferramenta suportar subagentes, dispare 2 revisores paralelos isolados passando apenas Ponteiros de Contexto (referência do diff da etapa 1, Mapa de Fluxos da etapa 2, caminho da Spec, glossário e configuração do projeto). O agente que escreveu o código tem viés de confirmação.
-- **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois, em `/ajustar`, `/implementar` ou `/bug`.
+- **Reporte, não corrija:** `/revisar` não edita código. O usuário decide quais achados corrigir. A correção acontece depois: `/ajustar` corrige os achados com correção localizada; `/implementar`, o requisito que pede uma Fatia nova; `/bug`, o defeito sem causa localizada.
 - **Leia o código conectado, não só o diff:** Leia os chamadores das funções alteradas, as funções chamadas, os testes e o README. Quando uma assinatura, um retorno ou um comportamento muda, busque todos os chamadores com `rg`.
-- **Siga cada valor de ponta a ponta:** Um Fluxo é o caminho de um valor que o diff altera (chave, ID, coluna, status, flag, regra ou formato de retorno), da entrada até cada consumidor: consulta, lista, detalhe, texto exibido, regra, decisão, documento gerado, export, job, notificação e API. A verificação de um consumidor não prova os outros. Exemplo: a lista elimina chaves repetidas, mas o detalhe, os termos, a decisão de exigir assinatura e o PDF também leem a mesma chave. Confira cada um.
+- **Siga cada valor de ponta a ponta:** Um Fluxo é o caminho de um valor que o diff altera (chave, ID, coluna, status, flag, regra, assinatura ou formato de retorno), da entrada até cada consumidor: consulta, lista, detalhe, texto exibido, regra, decisão, documento gerado, export, job, notificação e API. A verificação de um consumidor não prova os outros. Exemplo: a lista elimina chaves repetidas, mas o detalhe, os termos, a decisão de exigir assinatura e o PDF também leem a mesma chave. Confira cada um.
 - **Entregue a revisão completa numa rodada:** A rodada termina só no Critério de Fim da etapa 5. Um `[BLOCKER]` não encerra a busca: registre-o e continue. Assim, o usuário corrige todos os achados de uma vez.
 - **Pese a evidência pelo que ela cobre:** Um teste verde prova só os caminhos que ele executa. A aprovação de um subagente prova só o código que ele leu. Nenhum dos dois substitui o rastreio dos Fluxos.
 - **Passe o pente-fino anti-ruído:** Aponte comentários óbvios, código morto e imports não utilizados segundo `ste100-clean-code`.
@@ -33,7 +33,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 1. **Coleta do Diff e Verificação Base:**
    - Use o alvo que o usuário indicar: mudanças locais, staged, branch, PR ou arquivos. Sem alvo, use o diff contra a branch base, com as mudanças locais. Sem diferença, use o último commit.
    - Inspecione `git status` e o diff do alvo. Registre a referência exata (ex.: `main...HEAD`) e passe a mesma referência aos dois subagentes.
-   - **Rodada seguinte:** Com um relatório anterior de `/revisar` para o mesmo alvo, na conversa ou no handoff, esta é uma rodada seguinte. Use o diff completo do alvo, não só o delta da correção. Liste os achados anteriores para a etapa 6.
+   - **Rodada seguinte:** Com um relatório anterior de `/revisar` para o mesmo alvo, na conversa ou no handoff, esta é uma rodada seguinte. Use o diff completo do alvo, não só o delta da correção. Liste os achados anteriores para a etapa 6. Com relatório de `/ajustar`, leia também o status de cada achado, `Valores alterados:` e `Achados novos:`.
    - Aplique o portão completo de `laravel-verification` ou reutilize evidência ainda válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
 2. **Mapa de Fluxos:** Antes de disparar os subagentes:
    - Liste os valores que o diff altera. Na rodada seguinte, inclua os valores que cada correção alterou. O relatório de `/ajustar` lista esses valores em `Valores alterados:`.
@@ -79,11 +79,13 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
    1. **Cobertura:** Confira se cada arquivo do diff e cada Fluxo têm status nos dois eixos. Devolva cada lacuna a um subagente do mesmo eixo, com contexto limpo. Sem subagentes, cubra a lacuna você mesmo.
    2. **Propagação:** Para cada achado, siga o mesmo valor em todos os consumidores do Mapa. Inclua no achado cada local com o mesmo defeito. Quando a correção difere, abra um achado próprio.
    3. **Divergência:** Investigue até resolver: os eixos afirmam fatos opostos sobre o mesmo trecho (ex.: um diz que o valor nunca é vazio, o outro diz que é); um consumidor aparece no retorno de um eixo e falta no outro; o teste citado como prova não executa o consumidor em questão.
-   4. **Achados novos:** Aplique a etapa 4 a cada achado novo da Consolidação. Coloque-o no eixo do seu tema. Na rodada seguinte, marque com `(perdido na rodada anterior)` o achado em código que a rodada anterior já revisava, e rastreie de novo o Fluxo inteiro desse valor.
+   4. **Achados novos:** Aplique a etapa 4 a cada achado novo da Consolidação. Coloque-o no eixo do seu tema. Na rodada seguinte, marque com `(perdido na rodada anterior)` o achado em código que a rodada anterior já revisava, e rastreie de novo o Fluxo inteiro desse valor. Confirme também cada item de `Achados novos:` de `/ajustar` e numere o confirmado no eixo do seu tema.
    - **Critério de Fim:** Todos os arquivos e Fluxos têm status nos dois eixos, sem lacuna nem divergência aberta. Só então escreva o relatório.
 6. **Relatório por Eixo:**
-   - Comece com `O que a mudança faz:` em 2 ou 3 frases.
-   - Na rodada seguinte, escreva em seguida `Achados anteriores:`, com 1 linha por achado: `corrigido`, `corrigido em parte` ou `não corrigido`, e a prova.
+   - Comece com `Alvo:`, seguido da referência, da branch e do commit revisados (ex.: `main...HEAD` em `feature/pedidos@3f9c2ab`). Depois, escreva `O que a mudança faz:` em 2 ou 3 frases.
+   - Na rodada seguinte, escreva em seguida `Achados anteriores:`, com 1 linha por achado: `corrigido`, `corrigido em parte`, `não corrigido` ou `não reproduz`, e a prova.
+     - O achado `corrigido em parte` ou `não corrigido` volta numerado no seu eixo e entra no `Veredito:`.
+     - O `não reproduz` de `/ajustar`, com a prova de que o teste executa o caso, fica fora do `Veredito:`. Ele só volta numerado com um caso concreto novo que o refuta.
    - Apresente os achados sob `## Standards` e `## Spec`, cada um com seus `[BLOCKER]`, `[IMPORTANTE]` e `[NIT]`. Omita o nível sem achados.
    - Numere os achados em sequência contínua de um eixo para o outro, sem reordenar. Assim, o usuário pode responder "corrija 2 e 5".
    - Explique cada termo técnico na primeira vez que ele aparecer. O leitor pode não conhecer o código.
@@ -102,8 +104,9 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      - Sem `[BLOCKER]` nem `[IMPORTANTE]`: `Veredito: pode entregar.` Caso contrário: `Veredito: corrija 1 e 3 antes.`, com os números desses achados.
      - `Enxuto: -N linhas possíveis.` quando houver achado de Enxuto.
      - `Não verificado:` em 1 linha, quando algo importante não pôde ser verificado.
-   - Sem achados nos dois eixos: escreva `O que a mudança faz:`, depois `Sem achados. Pode entregar.`, `Fluxos rastreados:` e 1 linha com o que foi verificado.
-   - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir. Ofereça `/ajustar` com os números do veredito.
+   - Sem achados nos dois eixos: escreva `Alvo:`, `O que a mudança faz:`, depois `Sem achados. Pode entregar.`, `Fluxos rastreados:` e 1 linha com o que foi verificado.
+   - Com `Veredito: corrija ...`, ofereça `/ajustar` com os números do veredito.
+   - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir.
 7. **Prova do Fato de Segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove esse fato com um teste Pest ou um script que executa o código real. Se não conseguir provar, escreva `não provado`.
 8. **Geração do Briefing de PR (Máximo 40 linhas, padrão ASD-STE100):**
    - **Por que (Why):** 1 a 2 frases explicando o problema resolvido.
@@ -129,7 +132,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
 | "A correção certa é criar um Service, uma Interface e uma configuração nova." | **Proibido.** Proponha a menor correção que funciona. Prefira a correção que apaga código. |
 
 ## 5. Prova de Execução (Critério de Saída)
-- `[measured]` Relatório dos 2 eixos (Standards + Spec) entregue em seções separadas, sem edição de código.
+- `[measured]` Relatório dos 2 eixos (Standards + Spec) entregue em seções separadas, sem edição de código, com a linha `Alvo:`.
 - `[measured]` Mapa de Fluxos montado por busca, com status de cada arquivo do diff e de cada Fluxo nos dois eixos.
 - `[measured]` Consolidação concluída antes do relatório: lacunas devolvidas, achados propagados aos consumidores do mesmo valor e divergências resolvidas.
 - `[measured]` Um só relatório com todos os achados confirmados da rodada, também quando há `[BLOCKER]`.
