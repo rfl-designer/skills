@@ -13,7 +13,7 @@ Prepare uma configuração persistente que as outras skills leem. Configure o pr
 - Inspecione manifests, lockfiles, scripts, configuração de testes e estrutura de código/documentação. Detecte tecnologias e versões sem presumir que Laravel, Livewire ou Pest estejam instalados.
 - Separe versão resolvida no lockfile, instalação confirmada, restrição declarada e tecnologia planejada. Sem prova da instalação/runtime, registre `não confirmado`; o lockfile sozinho não prova instalação.
 - Detecte executor (local, Herd, Sail ou outro), comandos de teste, análise estática, formatação, build e navegador. Reutilize scripts existentes e a URL local já definida. Não inicie servidor quando o ambiente já serve o app.
-- Inspecione remotes para sugerir tracker, sem publicar nada. Detecte diretórios existentes de specs, tickets, glossário, ADRs e verificação antes de sugerir novos.
+- Inspecione remotes para sugerir tracker, sem publicar nada. Detecte diretórios existentes de specs, tickets, glossário, ADRs, verificação e Mapa de Features antes de sugerir novos.
 - Se houver mais de um app, identifique o escopo afetado. Guarde uma seção por escopo no mesmo arquivo; não aplique comandos de um app aos demais.
 
 Não leia nem copie credenciais para a configuração. Para capacidades condicionais, como Blade no Pint ou `--agent` no Pest, use lockfiles/help quando disponíveis; ausência da ferramenta é uma pendência, não autorização para instalá-la.
@@ -25,7 +25,7 @@ Apresente o que encontrou e a recomendação. Pergunte uma categoria por vez, ap
 1. **Tecnologias e execução:** confirme as tecnologias planejadas ou divergências relevantes. Registre comandos completos, diretório de execução e URL; não proponha trocar uma stack existente por padrão.
 2. **Specs:** Markdown local, GitHub, GitLab ou outro destino descrito pelo usuário. Prefira a convenção existente; sem convenção, sugira `docs/specs/`.
 3. **Tickets:** escolha independente da Spec. Para Markdown, sugira `docs/tickets/<spec>/`; para tracker, registre host e projeto/repositório exatos. Inclua convenção de nomes, vínculo com a Spec e representação das dependências.
-4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos e evidências. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias.
+4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias.
 
 As escolhas já feitas dispensam nova confirmação. Para destinos externos, prefira o conector/CLI disponível e registre a capacidade de acesso sem confundir configuração com publicação. Se o usuário escolher outro tracker, documente a operação real disponível; não invente comandos.
 

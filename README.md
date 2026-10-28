@@ -50,6 +50,8 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
 
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código.
 
+Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, condução e prova. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o app real.
+
 Use `/implmentar-em-par` no lugar de `/implementar` para revisar a implementação por componente. O agente explica RED e pausa antes da produção. Depois, implementa e explica um componente por vez, aguardando sua revisão. O teste pode continuar vermelho entre etapas; a Fatia Vertical termina com GREEN e verificação completa.
 
 ## Skills de usuário
@@ -69,6 +71,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) só com relatório, prova do fato de segurança e resumo de PR. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
+| `/mapear` | Cria, atualiza e audita o Mapa de Features da aplicação. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador e conduz o app ao vivo. |
 
 ### Implementação com subagentes no Claude Code
 
@@ -77,6 +80,12 @@ O agente principal coordena `/implementar` e delega cada fatia completa a um imp
 Depois de instalar a skill e as quatro disciplinas de modelo abaixo, copie [o template do implementador](skills/implementar/assets/implementador.md) para `.claude/agents/implementador.md` no projeto consumidor. Preserve customizações caso esse arquivo já exista. A instalação via `npx skills add` não registra o agente automaticamente. Consulte [a configuração no Claude Code](skills/implementar/references/claude-code.md) para conferir modelo, esforço e isolamento.
 
 Em outros ambientes, a skill usa subagentes e modelos autorizados disponíveis. Sem subagentes, executa o ciclo diretamente e informa a limitação.
+
+### Mapeadores no Claude Code
+
+Em aplicações com 3 ou mais Domínios e mais de 12 Features, `/mapear` delega cada Domínio a um Mapeador **Sonnet 5.5 / medium**, até 4 ao mesmo tempo. Cada Mapeador grava só a pasta do seu Domínio e não conduz o app. O principal reconcilia o índice, roda o conferidor e conduz as Features em série.
+
+Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/agents/mapeador.md` no projeto consumidor e instale `ste100-clean-code`. Sem o agente registrado, `/mapear` usa o subagente geral, que herda o modelo do principal. Consulte [os Mapeadores](skills/mapear/references/mapeadores.md) para o contrato de delegação.
 
 ## Skills de modelo
 
@@ -109,12 +118,13 @@ As skills usam as escolhas salvas sem perguntar novamente. Sem configuração, c
 
 Durante a edição, execute testes focados e verificadores do escopo afetado. Antes de commit, PR ou entrega de código, aplique o portão completo de `laravel-verification`. Ao pausar, registre o estado das provas sem repetir a suíte por rotina. Mudanças só de documentação usam os verificadores do pacote.
 
-Valide o pacote com Python 3.10+:
+Valide o pacote com Python 3.10+ e PHP 8.1+ (o teste do conferidor do mapa fica pulado sem PHP):
 
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate_skills.py
 python3 -m unittest discover -s tests -v
+php skills/mapear/scripts/conferir-mapa.php skills/mapear/references/exemplo
 ```
 
 Os [cenários de avaliação](evals/cenarios.md) verificam decisões do agente. Validação estrutural não comprova eficácia; registre execução e comparação com a versão anterior antes de alegar melhoria.

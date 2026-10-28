@@ -41,6 +41,7 @@ Use este formato em `docs/agents/projeto.md` ou no destino existente. Os marcado
 | ADRs | local | {{pasta}} | {{convenção existente ou NNNN-slug.md}} |
 | Protocolos | local | {{pasta}} | {{por feature}} |
 | Evidências | local | {{pasta durável}} | {{não gravar segredos; política de versionamento}} |
+| Mapa de Features | local | {{pasta; docs/features/ como sugestão}} | {{criado por /mapear; atualizar o Arquivo de Feature no mesmo diff da mudança de comportamento}} |
 
 ## Acesso ao tracker
 - Ferramenta: {{conector ou CLI real disponível; omita se tudo for local}}.
