@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Lição {{NNNN}}: {{Nome}}</title>
+<title>{{Nome}}</title>
 <style>
 :root {
   --fundo: #fbfaf7;
@@ -53,7 +53,7 @@ main { max-width: 40rem; margin: 0 auto; padding: 2.5rem 16px 4rem; }
 }
 .rotulo { margin: 0; font-size: .8rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
 h1 { margin: .3rem 0 1rem; font-size: 2rem; line-height: 1.2; }
-h2 { margin: 2.5rem 0 .5rem; font-size: 1.05rem; }
+h2 { margin: 2.5rem 0 .5rem; font-size: 1.05em; }
 .pergunta { font-size: 1.15rem; color: var(--suave); }
 a { color: var(--destaque); }
 code, pre { font: .85em/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--caixa); }
@@ -76,14 +76,18 @@ label { display: block; padding: .3rem 0; cursor: pointer; }
 .retorno { min-height: 1.5em; margin: .5rem 0 0; font-size: .95rem; }
 .retorno[data-estado="certo"] { color: var(--certo); }
 .retorno[data-estado="errado"] { color: var(--errado); }
-textarea { width: 100%; min-height: 4.5rem; padding: .5rem; font: inherit; color: inherit; background: var(--fundo); border: 1px solid var(--linha); border-radius: 4px; }
+textarea, .resumo { width: 100%; min-height: 4.5rem; padding: .5rem; font: inherit; color: inherit; background: var(--fundo); border: 1px solid var(--linha); border-radius: 4px; }
 details { margin-top: .5rem; }
 summary { cursor: pointer; color: var(--destaque); }
 ol.fontes { padding-left: 1.4rem; font-size: .95rem; }
+button { padding: .4rem .8rem; font: .9rem system-ui, sans-serif; color: var(--fundo); background: var(--destaque); border: 0; border-radius: 4px; cursor: pointer; }
+.resumo { margin-top: .5rem; font: .85rem/1.5 ui-monospace, monospace; }
 @media print {
-  :root { --fundo: #fff; --texto: #000; --caixa: #f3f3f3; }
+  :root, :root:not([data-theme="light"]), :root[data-theme="dark"] {
+    --fundo: #fff; --texto: #000; --suave: #444; --linha: #bbb; --caixa: #f3f3f3; --destaque: #000; --certo: #000; --errado: #000;
+  }
   main { max-width: none; padding: 0; }
-  textarea, .retorno:empty { display: none; }
+  textarea, button, .resumo, .retorno:empty { display: none; }
 }
 </style>
 </head>
@@ -160,13 +164,17 @@ ol.fontes { padding-left: 1.4rem; font-size: .95rem; }
         <p>{{Resposta modelo.}}</p>
       </details>
     </fieldset>
+    <p class="nota">No fim, gere o resumo e cole-o na conversa. O agente usa a primeira tentativa de cada questão.</p>
+    <button type="button" id="gerar-resumo">Gerar resumo para o agente</button>
+    <textarea class="resumo" id="resumo" readonly hidden aria-label="Resumo da Prática"></textarea>
   </section>
 
   <section>
     <h2>Leia a seguir</h2>
     <p><a href="{{URL da fonte primária}}">{{Título da fonte primária}}</a>. {{O que ler ou assistir nela e por quê.}}</p>
     <ol class="fontes">
-      <li id="f1"><a href="{{URL}}">{{Fonte citada, com versão}}</a></li>
+      <li id="f1"><a href="{{URL}}">{{Fonte citada, com série}}</a></li>
+      <li id="f2"><code>{{arquivo:linha}}</code>, commit <code>{{abc1234}}</code></li>
     </ol>
   </section>
 
@@ -177,13 +185,36 @@ ol.fontes { padding-left: 1.4rem; font-size: .95rem; }
   </section>
 </main>
 <script>
+var primeiras = new Map();
 document.querySelectorAll('.questao[data-correta]').forEach(function (questao) {
   var retorno = questao.querySelector('.retorno');
   questao.addEventListener('change', function (evento) {
     var certo = evento.target.value === questao.dataset.correta;
+    if (!primeiras.has(questao)) primeiras.set(questao, certo);
     retorno.dataset.estado = certo ? 'certo' : 'errado';
     retorno.textContent = certo ? 'Certo. ' + retorno.dataset.certo : 'Ainda não. ' + retorno.dataset.errado;
   });
+});
+document.getElementById('gerar-resumo').addEventListener('click', function () {
+  var linhas = [document.querySelector('.rotulo').textContent + ': ' + document.querySelector('h1').textContent];
+  document.querySelectorAll('fieldset').forEach(function (questao) {
+    var titulo = questao.querySelector('legend').textContent;
+    var texto = questao.querySelector('textarea');
+    if (questao.dataset.correta) {
+      var resultado = primeiras.has(questao) ? (primeiras.get(questao) ? 'certa' : 'errada') : 'sem resposta';
+      linhas.push(titulo + ' Primeira tentativa: ' + resultado + '.');
+    } else if (texto) {
+      linhas.push(titulo + ' Resposta: ' + (texto.value.trim() || 'sem resposta'));
+    }
+  });
+  var resumo = document.getElementById('resumo');
+  resumo.value = linhas.join('\n');
+  resumo.hidden = false;
+  resumo.select();
+  try { navigator.clipboard.writeText(resumo.value).catch(function () {}); } catch (erro) {}
+});
+window.addEventListener('beforeprint', function () {
+  document.querySelectorAll('details').forEach(function (detalhe) { detalhe.open = true; });
 });
 </script>
 </body>
