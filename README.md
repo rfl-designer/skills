@@ -43,12 +43,12 @@ npx skills add rfl-designer/skills --list
 Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas e destinos. Reexecute quando essas escolhas mudarem. Depois, cada etapa do fluxo produz a entrada da próxima.
 
 ```
-/alinhar → /prototipar → /especificar → /planejar → /implementar → /revisar
+/alinhar → /prototipar → /especificar → /planejar → /implementar → /revisar ⇄ /ajustar
                                                             ↑
                                                           /bug
 ```
 
-`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
+`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
 Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, condução e prova. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o app real.
 
@@ -68,7 +68,8 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/implementar` | Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
 | `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
-| `/revisar` | Revisão adversarial (Standards, Spec e segurança) só com relatório, prova do fato de segurança e resumo de PR. |
+| `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Só relatório, prova do fato de segurança e resumo de PR. |
+| `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, teste RED e GREEN por achado, busca dos consumidores de cada valor alterado e portão no estado integrado. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
 | `/mapear` | Cria, atualiza e audita o Mapa de Features da aplicação. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador e conduz o app ao vivo. |
@@ -81,6 +82,12 @@ O agente principal coordena `/implementar` e delega cada fatia completa a um imp
 Depois de instalar a skill e as quatro disciplinas de modelo abaixo, copie [o template do implementador](skills/implementar/assets/implementador.md) para `.claude/agents/implementador.md` no projeto consumidor. Preserve customizações caso esse arquivo já exista. A instalação via `npx skills add` não registra o agente automaticamente. Consulte [a configuração no Claude Code](skills/implementar/references/claude-code.md) para conferir modelo, esforço e isolamento.
 
 Em outros ambientes, a skill usa subagentes e modelos autorizados disponíveis. Sem subagentes, executa o ciclo diretamente e informa a limitação.
+
+### Ajustadores no Claude Code
+
+`/ajustar` delega cada Lote de achados a um Ajustador **Sonnet 5.5 / medium**, até 2 ao mesmo tempo em worktrees separados. Achados que tocam o mesmo valor ou os mesmos arquivos ficam no mesmo Lote. O principal integra os Lotes, busca regressões nos valores alterados e roda o portão completo.
+
+Copie [o template do ajustador](skills/ajustar/assets/ajustador.md) para `.claude/agents/ajustador.md` no projeto consumidor e instale as quatro disciplinas de modelo. Sem o agente registrado, `/ajustar` usa o subagente geral, que herda o modelo do principal.
 
 ### Mapeadores no Claude Code
 
