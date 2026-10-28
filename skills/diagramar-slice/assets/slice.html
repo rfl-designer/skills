@@ -1,0 +1,1076 @@
+<title>Slice __TITULO__</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout: cada camada é uma faixa horizontal; a slice é uma coluna tracejada que atravessa todas as faixas. */
+:root {
+  --fundo: #f4f6f9;
+  --texto: #18202d;
+  --suave: #586273;
+  --linha: #d5dbe4;
+  --faixa-a: #e9edf3;
+  --faixa-b: #e1e6ee;
+  --slice: #fbfcfd;
+  --moldura: #34445e;
+  --destaque: #1f5fbf;
+  --novo: #1d8048;
+  --alterado: #b26a00;
+  --removido: #c23434;
+  --renomeado: #7146c4;
+  --contexto: #8b94a3;
+  --codigo: #ffffff;
+  --add: #e3f5e9;
+  --add-num: #cdebd7;
+  --del: #fcebeb;
+  --del-num: #f6d5d5;
+  --hunk: #e8eefa;
+  --hunk-texto: #34558f;
+  --aviso: #fff4dc;
+  --sombra: rgba(20, 30, 50, 0.16);
+  --veu: rgba(14, 20, 30, 0.55);
+  --f-ui: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --f-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --col-rotulo: 8.5rem;
+  --resto: 2.5rem;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --fundo: #0e1218;
+    --texto: #e2e7ee;
+    --suave: #97a2b3;
+    --linha: #2a323e;
+    --faixa-a: #151b24;
+    --faixa-b: #1a212c;
+    --slice: #0b0f15;
+    --moldura: #9fb2cf;
+    --destaque: #7ba5ff;
+    --novo: #45c07a;
+    --alterado: #e0a33c;
+    --removido: #f07171;
+    --renomeado: #ad8ff2;
+    --contexto: #677284;
+    --codigo: #0b0f15;
+    --add: #12291b;
+    --add-num: #183624;
+    --del: #2e1517;
+    --del-num: #3d1c1f;
+    --hunk: #16233a;
+    --hunk-texto: #9fbaf2;
+    --aviso: #2d2412;
+    --sombra: rgba(0, 0, 0, 0.55);
+    --veu: rgba(0, 0, 0, 0.66);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --fundo: #0e1218;
+  --texto: #e2e7ee;
+  --suave: #97a2b3;
+  --linha: #2a323e;
+  --faixa-a: #151b24;
+  --faixa-b: #1a212c;
+  --slice: #0b0f15;
+  --moldura: #9fb2cf;
+  --destaque: #7ba5ff;
+  --novo: #45c07a;
+  --alterado: #e0a33c;
+  --removido: #f07171;
+  --renomeado: #ad8ff2;
+  --contexto: #677284;
+  --codigo: #0b0f15;
+  --add: #12291b;
+  --add-num: #183624;
+  --del: #2e1517;
+  --del-num: #3d1c1f;
+  --hunk: #16233a;
+  --hunk-texto: #9fbaf2;
+  --aviso: #2d2412;
+  --sombra: rgba(0, 0, 0, 0.55);
+  --veu: rgba(0, 0, 0, 0.66);
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font: 14px/1.5 var(--f-ui);
+}
+table { font: inherit; border-collapse: collapse; }
+code, .mono { font-family: var(--f-mono); font-size: 0.92em; }
+button, input, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--destaque); outline-offset: 2px; }
+
+.pagina {
+  max-width: 76rem;
+  margin: 0 auto;
+  padding-block: 1.75rem 3rem;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 1.25rem;
+}
+.topo { display: grid; gap: 0.5rem; }
+.sobrelinha {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--suave);
+}
+.topo h1 {
+  margin: 0;
+  font: 600 1.6rem/1.2 var(--f-mono);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.resumo { margin: 0; display: flex; flex-wrap: wrap; gap: 0.35rem 0.9rem; color: var(--suave); }
+.resumo code { color: var(--texto); overflow-wrap: anywhere; }
+.legenda { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.25rem 0 0; padding: 0; list-style: none; }
+.legenda li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.6rem 0.15rem 0.2rem;
+  border: 1px solid var(--linha);
+  border-radius: 999px;
+  background: var(--slice);
+  font-size: 0.85rem;
+  font-variant-numeric: tabular-nums;
+}
+.letra {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.25rem;
+  border-radius: 999px;
+  font: 700 0.72rem/1 var(--f-mono);
+  color: var(--slice);
+  background: var(--cor);
+}
+[data-status="novo"] { --cor: var(--novo); }
+[data-status="alterado"] { --cor: var(--alterado); }
+[data-status="removido"] { --cor: var(--removido); }
+[data-status="renomeado"] { --cor: var(--renomeado); }
+[data-status="contexto"] { --cor: var(--contexto); }
+
+.alerta {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--alterado);
+  border-radius: 6px;
+  background: var(--aviso);
+}
+.alerta ul { margin: 0.3rem 0 0; padding-left: 1.2rem; }
+
+.diagrama { position: relative; border: 1px solid var(--linha); border-radius: 8px; overflow: hidden; }
+.faixa {
+  display: grid;
+  grid-template-columns: var(--col-rotulo) minmax(0, 1fr) var(--resto);
+  background: var(--faixa-a);
+  border-top: 1px solid var(--linha);
+}
+.faixa:first-child { border-top: 0; }
+.faixa:nth-child(even) { background: var(--faixa-b); }
+.rotulo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.85rem 0.75rem;
+}
+.rotulo-nome { font-weight: 650; letter-spacing: 0.01em; overflow-wrap: anywhere; }
+.rotulo-qtd { color: var(--suave); font-size: 0.8rem; font-variant-numeric: tabular-nums; }
+.celula { background: var(--slice); padding: 0.75rem; min-width: 0; }
+.moldura {
+  position: absolute;
+  inset: 0 var(--resto) 0 var(--col-rotulo);
+  border-left: 2px dashed var(--moldura);
+  border-right: 2px dashed var(--moldura);
+  pointer-events: none;
+}
+.moldura-nome {
+  position: absolute;
+  top: 0;
+  right: 0.5rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 0 0 4px 4px;
+  background: var(--moldura);
+  color: var(--slice);
+  font: 600 0.68rem/1.4 var(--f-mono);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.arquivos {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: 0.5rem;
+}
+.sem-arquivos { color: var(--suave); font-size: 0.85rem; padding: 0.35rem 0; }
+.arquivo {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  gap: 0.15rem;
+  text-align: left;
+  padding: 0.5rem 0.65rem 0.5rem 0.75rem;
+  border: 1px solid var(--cor);
+  border-left-width: 5px;
+  border-radius: 6px;
+  background: var(--codigo);
+  cursor: pointer;
+  min-width: 0;
+}
+.arquivo:hover { box-shadow: 0 2px 10px var(--sombra); }
+.arquivo[data-status="contexto"] { border-style: dashed; border-left-style: solid; color: var(--suave); background: transparent; }
+.arquivo-nome { font: 600 0.9rem/1.3 var(--f-mono); overflow-wrap: anywhere; }
+.arquivo-pasta { color: var(--suave); font: 0.75rem/1.3 var(--f-mono); overflow-wrap: anywhere; }
+.arquivo-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.15rem;
+  font: 0.75rem/1.2 var(--f-mono);
+  color: var(--suave);
+  font-variant-numeric: tabular-nums;
+}
+.mais { color: var(--novo); }
+.menos { color: var(--removido); }
+.vazio-diff { padding: 2rem 1rem; text-align: center; border: 1px dashed var(--linha); border-radius: 8px; }
+.rodape { margin: 0; color: var(--suave); font-size: 0.8rem; }
+
+.colar { border: 1px solid var(--linha); border-radius: 8px; background: var(--slice); }
+.colar summary { cursor: pointer; padding: 0.7rem 0.9rem; font-weight: 600; }
+.colar form { display: grid; gap: 0.75rem; padding: 0 0.9rem 0.9rem; }
+.campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.75rem; }
+.campo { display: grid; gap: 0.25rem; }
+.campo label { font-size: 0.8rem; color: var(--suave); }
+.campo input, .campo textarea {
+  width: 100%;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: var(--codigo);
+  font-family: var(--f-mono);
+  font-size: 0.85rem;
+}
+.campo textarea { min-height: 9rem; resize: vertical; }
+.botao {
+  justify-self: start;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--moldura);
+  border-radius: 6px;
+  background: var(--moldura);
+  color: var(--slice);
+  font-weight: 600;
+  cursor: pointer;
+}
+.botao-leve {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: var(--codigo);
+  cursor: pointer;
+}
+.botao-leve:disabled { opacity: 0.45; cursor: default; }
+.comando {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0.4rem 0 0;
+}
+.comando code {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
+  background: var(--faixa-a);
+  overflow-wrap: anywhere;
+}
+.mensagem { margin: 0; min-height: 1.2em; color: var(--suave); }
+
+dialog.modal {
+  width: min(78rem, calc(100vw - 2rem));
+  max-width: none;
+  height: min(92vh, 60rem);
+  max-height: none;
+  padding: 0;
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  background: var(--fundo);
+  color: var(--texto);
+  box-shadow: 0 18px 50px var(--sombra);
+}
+dialog.modal::backdrop { background: var(--veu); }
+.modal-caixa { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.modal-topo {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--linha);
+  background: var(--slice);
+}
+.modal-titulo { display: flex; align-items: flex-start; gap: 0.6rem; min-width: 0; }
+.modal-titulo h2 { margin: 0; font: 600 1rem/1.35 var(--f-mono); overflow-wrap: anywhere; }
+.modal-titulo p { margin: 0.15rem 0 0; color: var(--suave); font-size: 0.82rem; overflow-wrap: anywhere; }
+.selo {
+  flex: none;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--cor);
+  color: var(--slice);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.modal-acoes { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 0.75rem; }
+.navegar { display: flex; align-items: center; gap: 0.4rem; font-variant-numeric: tabular-nums; }
+.posicao { min-width: 4.5rem; text-align: center; color: var(--suave); font-size: 0.85rem; }
+.visao { display: inline-flex; border: 1px solid var(--linha); border-radius: 6px; overflow: hidden; margin: 0; padding: 0; }
+.visao legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.visao label { position: relative; padding: 0.3rem 0.7rem; cursor: pointer; font-size: 0.85rem; background: var(--codigo); }
+.visao label + label { border-left: 1px solid var(--linha); }
+.visao input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.visao label:has(input:checked) { background: var(--moldura); color: var(--slice); }
+.visao label:has(input:focus-visible) { outline: 2px solid var(--destaque); outline-offset: -2px; }
+.fechar { margin-left: auto; }
+.modal-corpo { flex: 1; min-height: 0; overflow: auto; padding: 0.75rem 1rem 1.25rem; display: grid; align-content: start; gap: 0.75rem; }
+.nota-modal {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--linha);
+  border-radius: 6px;
+  background: var(--slice);
+}
+.nota-modal.corte { border-color: var(--alterado); background: var(--aviso); }
+
+.diff {
+  width: 100%;
+  table-layout: fixed;
+  background: var(--codigo);
+  border: 1px solid var(--linha);
+  font: 0.8rem/1.45 var(--f-mono);
+}
+.diff col.c-num { width: 3.6rem; }
+.diff td { padding: 0 0.5rem; vertical-align: top; }
+.diff .num {
+  text-align: right;
+  color: var(--suave);
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+  border-right: 1px solid var(--linha);
+}
+.diff .num::before { content: attr(data-n); }
+.diff .cod { white-space: pre-wrap; overflow-wrap: anywhere; tab-size: 4; }
+.diff .cod::before { content: attr(data-sinal); display: inline-block; width: 1.1em; margin-left: -0.15em; color: var(--suave); user-select: none; }
+.diff tr.l-add td, .diff td.l-add { background: var(--add); }
+.diff tr.l-add .num, .diff .num.l-add { background: var(--add-num); }
+.diff tr.l-del td, .diff td.l-del { background: var(--del); }
+.diff tr.l-del .num, .diff .num.l-del { background: var(--del-num); }
+.diff tr.l-hunk td { background: var(--hunk); color: var(--hunk-texto); padding-block: 0.2rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.diff tr.l-nota td { color: var(--suave); font-style: italic; }
+.diff td.vazia { background: var(--faixa-a); }
+.diff.lado .meio { border-left: 1px solid var(--linha); }
+
+@media (max-width: 640px) {
+  :root { --col-rotulo: 5.75rem; --resto: 0.75rem; }
+  .topo h1 { font-size: 1.25rem; }
+  .rotulo { padding: 0.7rem 0.5rem; }
+  .celula { padding: 0.6rem 0.5rem; }
+  .arquivos { grid-template-columns: minmax(0, 1fr); }
+  dialog.modal { width: 100vw; height: 100%; max-height: 100%; border-radius: 0; }
+  .modal-topo, .modal-corpo { padding-inline: 0.75rem; }
+  .diff col.c-num { width: 2.8rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .arquivo { transition: box-shadow 0.12s ease; }
+}
+</style>
+<!-- corpo -->
+<main class="pagina">
+  <header class="topo">
+    <p class="sobrelinha">Vertical slice</p>
+    <h1 id="nome"></h1>
+    <p class="resumo"><code id="intervalo"></code><span id="total"></span></p>
+    <ul class="legenda" id="legenda" aria-label="Legenda de status"></ul>
+  </header>
+  <div class="alerta" id="erros-regras" role="alert" hidden></div>
+  <details class="colar" id="colar" hidden>
+    <summary>Colar outro diff</summary>
+    <form id="form-colar" novalidate>
+      <div class="campos">
+        <div class="campo"><label for="campo-base">Branch base</label><input id="campo-base" autocomplete="off" spellcheck="false"></div>
+        <div class="campo"><label for="campo-alvo">Branch alvo</label><input id="campo-alvo" autocomplete="off" spellcheck="false"></div>
+      </div>
+      <div class="campo">
+        <label for="campo-diff">Saída do comando, colada sem cortes</label>
+        <textarea id="campo-diff" spellcheck="false"></textarea>
+      </div>
+      <div class="comando"><code id="comando-colar"></code><button type="button" class="botao-leve copiar" data-copiar-de="comando-colar">Copiar</button></div>
+      <button type="submit" class="botao">Gerar slice</button>
+      <p class="mensagem" id="mensagem-colar" role="status"></p>
+    </form>
+  </details>
+  <section aria-label="Diagrama da slice" id="area-diagrama"></section>
+  <p class="rodape" id="rodape"></p>
+</main>
+
+<dialog class="modal" id="modal" aria-labelledby="modal-caminho">
+  <div class="modal-caixa">
+    <div class="modal-topo">
+      <div class="modal-titulo">
+        <span class="selo" id="modal-status"></span>
+        <div>
+          <h2 id="modal-caminho"></h2>
+          <p id="modal-detalhe"></p>
+        </div>
+      </div>
+      <div class="modal-acoes">
+        <div class="navegar">
+          <button type="button" class="botao-leve" id="anterior">Anterior</button>
+          <span class="posicao" id="posicao" aria-live="polite"></span>
+          <button type="button" class="botao-leve" id="proximo">Próximo</button>
+        </div>
+        <fieldset class="visao" id="visao">
+          <legend>Visão do diff</legend>
+          <label><input type="radio" name="visao" id="visao-lado" value="lado">Lado a lado</label>
+          <label><input type="radio" name="visao" id="visao-linha" value="linha">Em linha</label>
+        </fieldset>
+        <button type="button" class="botao-leve fechar" id="fechar">Fechar</button>
+      </div>
+    </div>
+    <div class="modal-corpo" id="modal-corpo"></div>
+  </div>
+</dialog>
+
+<script type="application/json" id="dados">__DADOS__</script>
+<script type="text/plain" id="camadas-padrao">
+# Regras padrão. A primeira regra que combina com o caminho define a camada.
+Testes: (^|/)(tests?|__tests__|spec|e2e|cypress)/|[._-](test|spec)\.[A-Za-z0-9]+$|(^|/)test_[^/]+\.py$|Test\.php$
+Interface: (^|/)(resources/(views|js|css|sass|scss)|app/(Livewire|View)|lang|components|pages|views|layouts|public|assets|styles?)/|\.(blade\.php|vue|svelte|jsx|tsx|css|scss|sass|less|html?)$
+API: (^|/)(routes|app/Http|app/Console|api|[Cc]ontrollers?|graphql)/|\.(graphql|proto)$|(^|/)openapi\.(ya?ml|json)$
+Domínio: (^|/)(app/(Models|Actions|Services|Domain|Domains|Policies|Events|Listeners|Jobs|Mail|Notifications|Rules|Enums|Data|DTOs?|Observers|Exceptions|Support)|domain|services|models|entities)/
+Dados: (^|/)(database|migrations?|seeders?|factories|db|prisma)/|\.(sql|sqlite)$
+</script>
+<script id="nucleo">
+(function (raiz) {
+  'use strict';
+  var LIMITE = 3000;
+  var ORDEM = ['Interface', 'API', 'Domínio', 'Dados', 'Testes'];
+  var OUTROS = 'Outros';
+  var HUNK = /^@@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? @@(.*)$/;
+  var ESCAPES = { a: 7, b: 8, t: 9, n: 10, v: 11, f: 12, r: 13, '"': 34, '\\': 92 };
+
+  function tirarAspas(texto) {
+    if (texto.length < 2 || texto[0] !== '"' || texto[texto.length - 1] !== '"') return texto;
+    var bytes = [];
+    var trecho = '';
+    var corpo = texto.slice(1, -1);
+    var codificador = new TextEncoder();
+    function despejar() {
+      codificador.encode(trecho).forEach(function (b) { bytes.push(b); });
+      trecho = '';
+    }
+    for (var i = 0; i < corpo.length; i++) {
+      if (corpo[i] !== '\\') { trecho += corpo[i]; continue; }
+      despejar();
+      var octal = /^[0-7]{1,3}/.exec(corpo.slice(i + 1, i + 4));
+      if (octal) { bytes.push(parseInt(octal[0], 8)); i += octal[0].length; continue; }
+      var letra = corpo[i + 1];
+      if (letra !== undefined && Object.prototype.hasOwnProperty.call(ESCAPES, letra)) bytes.push(ESCAPES[letra]);
+      else trecho += letra || '';
+      i++;
+    }
+    despejar();
+    return new TextDecoder('utf-8').decode(new Uint8Array(bytes));
+  }
+
+  function lerToken(texto) {
+    if (texto[0] !== '"') return null;
+    for (var i = 1; i < texto.length; i++) {
+      if (texto[i] === '\\') { i++; continue; }
+      if (texto[i] === '"') return [tirarAspas(texto.slice(0, i + 1)), texto.slice(i + 1)];
+    }
+    return null;
+  }
+
+  function semPrefixo(caminho) {
+    return /^[ab]\//.test(caminho) ? caminho.slice(2) : caminho;
+  }
+
+  function caminhoDoCabecalho(valor) {
+    var token = lerToken(valor);
+    var caminho = token ? token[0] : valor.split('\t')[0];
+    return caminho === '/dev/null' ? null : semPrefixo(caminho);
+  }
+
+  function caminhosDoDiffGit(resto) {
+    var a;
+    var b;
+    var primeiro = lerToken(resto);
+    if (primeiro) {
+      var sobra = primeiro[1].replace(/^ /, '');
+      var segundo = lerToken(sobra);
+      a = primeiro[0];
+      b = segundo ? segundo[0] : sobra;
+    } else if (/"$/.test(resto) && resto.lastIndexOf(' "') > 0) {
+      var aspas = resto.lastIndexOf(' "');
+      a = resto.slice(0, aspas);
+      b = tirarAspas(resto.slice(aspas + 1));
+    } else {
+      var meio = (resto.length - 1) / 2;
+      if (resto[meio] === ' ' && resto.slice(2, meio) === resto.slice(meio + 3)) {
+        a = resto.slice(0, meio);
+        b = resto.slice(meio + 1);
+      } else {
+        var corte = resto.indexOf(' b/');
+        a = corte > 0 ? resto.slice(0, corte) : resto;
+        b = corte > 0 ? resto.slice(corte + 1) : resto;
+      }
+    }
+    return [semPrefixo(a), semPrefixo(b)];
+  }
+
+  function novoArquivo() {
+    return {
+      caminho: null, caminhoAntigo: null, status: 'alterado', binario: false, modo: null,
+      hunks: [], contadas: 0, cortado: false, mais: 0, menos: 0,
+      de: null, para: null, renDe: null, renPara: null, gitA: null, gitB: null, antes: null, depois: null
+    };
+  }
+
+  function concluir(arquivo) {
+    if (arquivo.status === 'removido') arquivo.caminho = arquivo.de || arquivo.gitA || arquivo.gitB;
+    else arquivo.caminho = arquivo.renPara || arquivo.para || arquivo.gitB || arquivo.de || arquivo.gitA;
+    if (arquivo.status === 'renomeado') arquivo.caminhoAntigo = arquivo.renDe || arquivo.de || arquivo.gitA;
+    if (arquivo.antes && arquivo.depois) arquivo.modo = { antes: arquivo.antes, depois: arquivo.depois };
+    ['de', 'para', 'renDe', 'renPara', 'gitA', 'gitB', 'antes', 'depois'].forEach(function (chave) { delete arquivo[chave]; });
+    return arquivo;
+  }
+
+  function lerDiff(texto) {
+    var linhas = String(texto || '').replace(/\x1b\[[0-9;]*[A-Za-z]/g, '').replace(/\r\n/g, '\n').split('\n');
+    var arquivos = [];
+    var atual = null;
+    var hunk = null;
+    var emHunk = false;
+    var restaA = 0;
+    var restaB = 0;
+    var numA = 0;
+    var numB = 0;
+
+    function abrir() {
+      if (atual) arquivos.push(concluir(atual));
+      atual = novoArquivo();
+      hunk = null;
+      emHunk = false;
+    }
+    function contar() {
+      atual.contadas++;
+      if (atual.contadas > LIMITE) atual.cortado = true;
+      return !atual.cortado;
+    }
+    function guardar(linha) {
+      if (!contar() || !hunk) return;
+      hunk.linhas.push(linha);
+      if (linha.tipo === '+') atual.mais++;
+      if (linha.tipo === '-') atual.menos++;
+    }
+
+    for (var i = 0; i < linhas.length; i++) {
+      var linha = linhas[i];
+      if (linha.indexOf('diff --git ') === 0) {
+        abrir();
+        var caminhos = caminhosDoDiffGit(linha.slice(11));
+        atual.gitA = caminhos[0];
+        atual.gitB = caminhos[1];
+        continue;
+      }
+      if (atual && emHunk) {
+        var inicial = linha[0];
+        if ((restaA > 0 || restaB > 0) && (linha === '' || inicial === ' ' || inicial === '+' || inicial === '-')) {
+          var tipo = linha === '' ? ' ' : inicial;
+          if (tipo !== '+') restaA--;
+          if (tipo !== '-') restaB--;
+          guardar({ tipo: tipo, texto: linha.slice(1), a: tipo === '+' ? null : numA++, b: tipo === '-' ? null : numB++ });
+          continue;
+        }
+        if (inicial === '\\') {
+          guardar({ tipo: '\\', texto: linha.slice(1).trim(), a: null, b: null });
+          continue;
+        }
+        emHunk = false;
+      }
+      var cabecalho = HUNK.exec(linha);
+      if (atual && cabecalho) {
+        numA = +cabecalho[1];
+        numB = +cabecalho[3];
+        restaA = cabecalho[2] === undefined ? 1 : +cabecalho[2];
+        restaB = cabecalho[4] === undefined ? 1 : +cabecalho[4];
+        emHunk = true;
+        hunk = null;
+        if (contar()) {
+          hunk = { cabecalho: linha, linhas: [] };
+          atual.hunks.push(hunk);
+        }
+        continue;
+      }
+      if (linha.indexOf('--- ') === 0 && (linhas[i + 1] || '').indexOf('+++ ') === 0 && (!atual || atual.contadas > 0)) abrir();
+      if (!atual || atual.contadas > 0) continue;
+      if (linha.indexOf('--- ') === 0) atual.de = caminhoDoCabecalho(linha.slice(4));
+      else if (linha.indexOf('+++ ') === 0) atual.para = caminhoDoCabecalho(linha.slice(4));
+      else if (linha.indexOf('new file mode ') === 0) atual.status = 'novo';
+      else if (linha.indexOf('deleted file mode ') === 0) atual.status = 'removido';
+      else if (linha.indexOf('rename from ') === 0) { atual.status = 'renomeado'; atual.renDe = tirarAspas(linha.slice(12)); }
+      else if (linha.indexOf('rename to ') === 0) { atual.status = 'renomeado'; atual.renPara = tirarAspas(linha.slice(10)); }
+      else if (linha.indexOf('copy to ') === 0) { atual.status = 'novo'; atual.renPara = tirarAspas(linha.slice(8)); }
+      else if (linha.indexOf('old mode ') === 0) atual.antes = linha.slice(9).trim();
+      else if (linha.indexOf('new mode ') === 0) atual.depois = linha.slice(9).trim();
+      else if (linha.indexOf('Binary files ') === 0 || linha === 'GIT binary patch') atual.binario = true;
+    }
+    if (atual) arquivos.push(concluir(atual));
+
+    var porCaminho = new Map();
+    return arquivos.filter(function (arquivo) {
+      if (!arquivo.caminho) return false;
+      var anterior = porCaminho.get(arquivo.caminho);
+      if (!anterior) { porCaminho.set(arquivo.caminho, arquivo); return true; }
+      anterior.status = 'alterado';
+      anterior.binario = anterior.binario || arquivo.binario;
+      anterior.hunks = anterior.hunks.concat(arquivo.hunks);
+      anterior.mais += arquivo.mais;
+      anterior.menos += arquivo.menos;
+      anterior.contadas += arquivo.contadas;
+      anterior.cortado = anterior.cortado || arquivo.cortado;
+      return false;
+    });
+  }
+
+  function lerRegras(texto) {
+    var regras = [];
+    var erros = [];
+    String(texto || '').split(/\r?\n/).forEach(function (bruta, indice) {
+      var linha = bruta.trim();
+      if (!linha || linha[0] === '#') return;
+      var corte = linha.indexOf(':');
+      var camada = corte > 0 ? linha.slice(0, corte).trim() : '';
+      var fonte = corte > 0 ? linha.slice(corte + 1).trim() : '';
+      if (!camada || !fonte) {
+        erros.push({ linha: indice + 1, texto: linha, motivo: 'use o formato "Camada: expressão regular"' });
+        return;
+      }
+      try {
+        regras.push({ camada: camada, re: new RegExp(fonte), fonte: fonte });
+      } catch (erro) {
+        erros.push({ linha: indice + 1, texto: linha, motivo: erro.message });
+      }
+    });
+    return { regras: regras, erros: erros };
+  }
+
+  function classificar(caminho, regras) {
+    for (var i = 0; i < regras.length; i++) {
+      if (regras[i].re.test(caminho)) return regras[i].camada;
+    }
+    return OUTROS;
+  }
+
+  function ordenarCamadas(regras) {
+    var nomes = [];
+    regras.forEach(function (regra) {
+      if (regra.camada !== OUTROS && nomes.indexOf(regra.camada) < 0) nomes.push(regra.camada);
+    });
+    var fixas = ORDEM.filter(function (nome) { return nomes.indexOf(nome) >= 0; });
+    var novas = nomes.filter(function (nome) { return ORDEM.indexOf(nome) < 0; });
+    return fixas.concat(novas, [OUTROS]);
+  }
+
+  function lerConteudo(conteudo) {
+    var linhas = String(conteudo || '').replace(/\r\n/g, '\n').split('\n');
+    if (linhas.length && linhas[linhas.length - 1] === '') linhas.pop();
+    return { linhas: linhas.slice(0, LIMITE), cortado: linhas.length > LIMITE };
+  }
+
+  function comparar(a, b) {
+    return a.caminho < b.caminho ? -1 : a.caminho > b.caminho ? 1 : 0;
+  }
+
+  function montarSlice(dados, regrasPadrao) {
+    var arquivos = lerDiff(dados.diff);
+    var textoRegras = String(dados.camadas || '').trim() ? dados.camadas : regrasPadrao;
+    var lidas = lerRegras(textoRegras);
+    var noDiff = new Set(arquivos.map(function (arquivo) { return arquivo.caminho; }));
+    var contexto = (dados.contexto || []).filter(function (item) {
+      return item && item.caminho && !noDiff.has(item.caminho);
+    }).map(function (item) {
+      var lido = item.binario ? { linhas: [], cortado: false } : lerConteudo(item.conteudo);
+      return { caminho: item.caminho, status: 'contexto', binario: !!item.binario, linhas: lido.linhas, cortado: lido.cortado };
+    });
+    var camadas = ordenarCamadas(lidas.regras).map(function (nome) { return { nome: nome, arquivos: [] }; });
+    function camadaDe(arquivo) {
+      var nome = classificar(arquivo.caminho, lidas.regras);
+      return camadas.filter(function (camada) { return camada.nome === nome; })[0];
+    }
+    arquivos.forEach(function (arquivo) { arquivo.camada = camadaDe(arquivo).nome; camadaDe(arquivo).arquivos.push(arquivo); });
+    contexto.forEach(function (arquivo) { arquivo.camada = camadaDe(arquivo).nome; camadaDe(arquivo).arquivos.push(arquivo); });
+    camadas.forEach(function (camada) {
+      camada.arquivos.sort(function (a, b) {
+        var ca = a.status === 'contexto' ? 1 : 0;
+        var cb = b.status === 'contexto' ? 1 : 0;
+        return ca - cb || comparar(a, b);
+      });
+    });
+    camadas = camadas.filter(function (camada) { return camada.nome !== OUTROS || camada.arquivos.length; });
+    var navegacao = [];
+    camadas.forEach(function (camada) {
+      camada.arquivos.forEach(function (arquivo) { arquivo.indice = navegacao.length; navegacao.push(arquivo); });
+    });
+    var contagem = { novo: 0, alterado: 0, removido: 0, renomeado: 0 };
+    arquivos.forEach(function (arquivo) { contagem[arquivo.status]++; });
+    return {
+      camadas: camadas,
+      arquivos: navegacao,
+      total: arquivos.length,
+      contexto: contexto.length,
+      contagem: contagem,
+      erros: lidas.erros,
+      regrasDoProjeto: String(dados.camadas || '').trim() !== ''
+    };
+  }
+
+  raiz.Slice = {
+    LIMITE: LIMITE,
+    tirarAspas: tirarAspas,
+    lerDiff: lerDiff,
+    lerRegras: lerRegras,
+    classificar: classificar,
+    ordenarCamadas: ordenarCamadas,
+    montarSlice: montarSlice
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+</script>
+<script>
+(function () {
+  'use strict';
+  var S = window.Slice;
+  var ROTULOS = { novo: 'Novo', alterado: 'Alterado', removido: 'Removido', renomeado: 'Renomeado', contexto: 'Sem mudança' };
+  var LETRAS = { novo: 'A', alterado: 'M', removido: 'D', renomeado: 'R' };
+  var OPCOES = '-M --no-color --no-ext-diff --src-prefix=a/ --dst-prefix=b/';
+  var CHAVE_VISAO = 'diagramar-slice:visao';
+  var $ = function (id) { return document.getElementById(id); };
+  var modal = $('modal');
+  var dados = JSON.parse($('dados').textContent);
+  var padrao = $('camadas-padrao').textContent;
+  var estado = { slice: null, indice: -1, origem: null, visao: lerVisao(), ignorarHash: null };
+
+  function esc(texto) {
+    return String(texto).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+  function plural(n, um, varios) { return n.toLocaleString('pt-BR') + ' ' + (n === 1 ? um : varios); }
+  function shell(texto) { return /^[A-Za-z0-9._\/@^~:=+-]+$/.test(texto) ? texto : "'" + texto.replace(/'/g, "'\\''") + "'"; }
+  function intervalo() { return shell(dados.base) + '...' + shell(dados.alvo); }
+
+  function lerVisao() {
+    try {
+      var salva = localStorage.getItem(CHAVE_VISAO);
+      if (salva === 'lado' || salva === 'linha') return salva;
+    } catch (erro) { /* armazenamento indisponível */ }
+    return window.innerWidth >= 900 ? 'lado' : 'linha';
+  }
+  function gravarVisao(visao) {
+    try { localStorage.setItem(CHAVE_VISAO, visao); } catch (erro) { /* armazenamento indisponível */ }
+  }
+
+  function renderizar() {
+    var s = estado.slice = S.montarSlice(dados, padrao);
+    document.title = 'Slice ' + dados.nome;
+    $('nome').textContent = dados.nome;
+    $('intervalo').textContent = dados.base + '...' + dados.alvo;
+    $('total').textContent = plural(s.total, 'arquivo', 'arquivos') + (s.contexto ? ' + ' + plural(s.contexto, 'de contexto', 'de contexto') : '');
+    var legenda = ['novo', 'alterado', 'removido', 'renomeado'].map(function (status) {
+      return '<li data-status="' + status + '"><span class="letra">' + LETRAS[status] + '</span>' + ROTULOS[status] + ' ' + s.contagem[status] + '</li>';
+    });
+    if (s.contexto) legenda.push('<li data-status="contexto"><span class="letra">·</span>Sem mudança ' + s.contexto + '</li>');
+    $('legenda').innerHTML = legenda.join('');
+    var erros = $('erros-regras');
+    erros.hidden = !s.erros.length;
+    erros.innerHTML = s.erros.length ? '<strong>Regras de camada ignoradas:</strong><ul>' + s.erros.map(function (erro) {
+      return '<li>Linha ' + erro.linha + ': <code>' + esc(erro.texto) + '</code> (' + esc(erro.motivo) + ')</li>';
+    }).join('') + '</ul>' : '';
+    $('rodape').textContent = 'Regras de camada: ' + (s.regrasDoProjeto ? (dados.fonteCamadas || 'arquivo do projeto') : 'padrão da skill') + '. Diff de ' + dados.base + '...' + dados.alvo + ' com renomeações (-M).';
+    var area = $('area-diagrama');
+    if (!s.total) {
+      area.innerHTML = '<p class="vazio-diff">Sem diferenças: o diff não tem arquivos alterados.</p>';
+      return;
+    }
+    area.innerHTML = '<div class="diagrama" role="list">' + s.camadas.map(function (camada) {
+      var itens = camada.arquivos.map(cartao).join('');
+      return '<div class="faixa" role="listitem"><div class="rotulo"><span class="rotulo-nome">' + esc(camada.nome) + '</span>' +
+        '<span class="rotulo-qtd">' + plural(camada.arquivos.length, 'arquivo', 'arquivos') + '</span></div>' +
+        '<div class="celula">' + (itens ? '<ul class="arquivos">' + itens + '</ul>' : '<p class="sem-arquivos">Sem arquivos nesta camada.</p>') + '</div>' +
+        '<div aria-hidden="true"></div></div>';
+    }).join('') + '<div class="moldura" aria-hidden="true"><span class="moldura-nome">slice</span></div></div>';
+  }
+
+  function cartao(arquivo) {
+    var partes = arquivo.caminho.split('/');
+    var nome = partes.pop();
+    var pasta = partes.length ? partes.join('/') + '/' : '';
+    var meta;
+    if (arquivo.status === 'contexto') meta = '<span>sem mudança</span>';
+    else {
+      meta = '<span class="letra">' + LETRAS[arquivo.status] + '</span>';
+      if (arquivo.binario) meta += '<span>binário</span>';
+      else meta += '<span class="mais">+' + arquivo.mais + '</span><span class="menos">−' + arquivo.menos + '</span>' + (arquivo.cortado ? '<span>cortado</span>' : '');
+    }
+    return '<li><button type="button" class="arquivo" data-status="' + arquivo.status + '" data-indice="' + arquivo.indice + '" title="' + esc(arquivo.caminho) + '"' +
+      ' aria-label="' + esc(arquivo.caminho + ', ' + ROTULOS[arquivo.status].toLowerCase()) + '">' +
+      '<span class="arquivo-nome">' + esc(nome) + '</span>' + (pasta ? '<span class="arquivo-pasta">' + esc(pasta) + '</span>' : '') +
+      '<span class="arquivo-meta">' + meta + '</span></button></li>';
+  }
+
+  function nota(html, classe) { return '<p class="nota-modal' + (classe ? ' ' + classe : '') + '">' + html + '</p>'; }
+  function comando(texto) {
+    return '<span class="comando"><code>' + esc(texto) + '</code><button type="button" class="botao-leve copiar" data-copiar="' + esc(texto) + '">Copiar</button></span>';
+  }
+
+  function corpoDoDiff(arquivo) {
+    var partes = [];
+    if (arquivo.binario) return nota('Arquivo binário: sem diff de texto.');
+    if (arquivo.modo) partes.push(nota('Permissão alterada: <code>' + esc(arquivo.modo.antes) + '</code> → <code>' + esc(arquivo.modo.depois) + '</code>.'));
+    if (arquivo.cortado) {
+      var caminhos = (arquivo.caminhoAntigo ? shell(arquivo.caminhoAntigo) + ' ' : '') + shell(arquivo.caminho);
+      partes.push(nota('O diff deste arquivo tem mais de ' + S.LIMITE.toLocaleString('pt-BR') + ' linhas. A tela mostra as primeiras ' +
+        S.LIMITE.toLocaleString('pt-BR') + '. Para ver o diff completo, execute:' + comando('git diff ' + OPCOES + ' ' + intervalo() + ' -- ' + caminhos), 'corte'));
+    }
+    if (!arquivo.hunks.length) {
+      var vazio = { renomeado: 'Renomeado sem mudança de conteúdo.', novo: 'Arquivo novo e vazio.', removido: 'Arquivo removido e vazio.' }[arquivo.status];
+      if (vazio || !arquivo.modo) partes.push(nota(vazio || 'Sem mudança de texto.'));
+      return partes.join('');
+    }
+    partes.push(estado.visao === 'lado' ? tabelaLado(arquivo) : tabelaLinha(arquivo));
+    return partes.join('');
+  }
+
+  function classeDe(tipo) { return tipo === '+' ? 'l-add' : tipo === '-' ? 'l-del' : 'l-ctx'; }
+  function num(n, classe) { return '<td class="num' + (classe ? ' ' + classe : '') + '"' + (n === null || n === undefined ? '' : ' data-n="' + n + '"') + '></td>'; }
+  function codigo(linha, extra) {
+    return '<td class="cod' + (extra ? ' ' + extra : '') + '" data-sinal="' + (linha.tipo === ' ' ? ' ' : linha.tipo === '-' ? '-' : '+') + '">' + esc(linha.texto) + '</td>';
+  }
+
+  function tabelaLinha(arquivo) {
+    var html = ['<table class="diff"><colgroup><col class="c-num"><col class="c-num"><col></colgroup><tbody>'];
+    arquivo.hunks.forEach(function (hunk) {
+      html.push('<tr class="l-hunk"><td colspan="3">' + esc(hunk.cabecalho) + '</td></tr>');
+      hunk.linhas.forEach(function (linha) {
+        if (linha.tipo === '\\') { html.push('<tr class="l-nota"><td colspan="2"></td><td>' + esc(linha.texto) + '</td></tr>'); return; }
+        html.push('<tr class="' + classeDe(linha.tipo) + '">' + num(linha.a) + num(linha.b) + codigo(linha) + '</tr>');
+      });
+    });
+    html.push('</tbody></table>');
+    return html.join('');
+  }
+
+  function tabelaLado(arquivo) {
+    var html = ['<table class="diff lado"><colgroup><col class="c-num"><col><col class="c-num"><col></colgroup><tbody>'];
+    function lado(linha, numero) {
+      if (!linha) return '<td class="num vazia"></td><td class="vazia"></td>';
+      var classe = classeDe(linha.tipo);
+      return num(numero, classe === 'l-ctx' ? '' : classe) + codigo(linha, classe);
+    }
+    arquivo.hunks.forEach(function (hunk) {
+      var removidas = [];
+      var adicionadas = [];
+      function despejar() {
+        for (var i = 0; i < Math.max(removidas.length, adicionadas.length); i++) {
+          var esquerda = removidas[i];
+          var direita = adicionadas[i];
+          html.push('<tr>' + lado(esquerda, esquerda && esquerda.a) + lado(direita, direita && direita.b).replace('<td class="num', '<td class="meio num') + '</tr>');
+        }
+        removidas = [];
+        adicionadas = [];
+      }
+      html.push('<tr class="l-hunk"><td colspan="4">' + esc(hunk.cabecalho) + '</td></tr>');
+      hunk.linhas.forEach(function (linha) {
+        if (linha.tipo === '-') { if (adicionadas.length) despejar(); removidas.push(linha); return; }
+        if (linha.tipo === '+') { adicionadas.push(linha); return; }
+        despejar();
+        if (linha.tipo === '\\') { html.push('<tr class="l-nota"><td></td><td colspan="3">' + esc(linha.texto) + '</td></tr>'); return; }
+        html.push('<tr>' + lado(linha, linha.a) + lado(linha, linha.b).replace('<td class="num', '<td class="meio num') + '</tr>');
+      });
+      despejar();
+    });
+    html.push('</tbody></table>');
+    return html.join('');
+  }
+
+  function corpoDoContexto(arquivo) {
+    if (arquivo.binario) return nota('Arquivo binário: sem conteúdo de texto.');
+    var partes = [nota('Arquivo sem mudança na branch. A tela mostra o conteúdo em <code>' + esc(dados.alvo) + '</code>.')];
+    if (arquivo.cortado) {
+      partes.push(nota('O arquivo tem mais de ' + S.LIMITE.toLocaleString('pt-BR') + ' linhas. A tela mostra as primeiras ' +
+        S.LIMITE.toLocaleString('pt-BR') + '. Para ver o arquivo completo, execute:' + comando('git show ' + shell(dados.alvo + ':' + arquivo.caminho)), 'corte'));
+    }
+    var html = ['<table class="diff"><colgroup><col class="c-num"><col></colgroup><tbody>'];
+    arquivo.linhas.forEach(function (texto, i) {
+      html.push('<tr class="l-ctx">' + num(i + 1) + codigo({ tipo: ' ', texto: texto }) + '</tr>');
+    });
+    html.push('</tbody></table>');
+    partes.push(html.join(''));
+    return partes.join('');
+  }
+
+  function mostrarArquivo() {
+    var lista = estado.slice.arquivos;
+    var arquivo = lista[estado.indice];
+    var selo = $('modal-status');
+    selo.dataset.status = arquivo.status;
+    selo.textContent = ROTULOS[arquivo.status];
+    $('modal-caminho').textContent = arquivo.caminho;
+    var detalhe = 'Camada: ' + arquivo.camada;
+    if (arquivo.caminhoAntigo) detalhe = 'Caminho antigo: ' + arquivo.caminhoAntigo + ' · ' + detalhe;
+    $('modal-detalhe').textContent = detalhe;
+    $('posicao').textContent = (estado.indice + 1) + ' de ' + lista.length;
+    $('anterior').disabled = estado.indice === 0;
+    $('proximo').disabled = estado.indice === lista.length - 1;
+    $('visao-' + estado.visao).checked = true;
+    var corpo = $('modal-corpo');
+    corpo.innerHTML = arquivo.status === 'contexto' ? corpoDoContexto(arquivo) : corpoDoDiff(arquivo);
+    corpo.scrollTop = 0;
+  }
+
+  function botaoDo(indice) { return document.querySelector('.arquivo[data-indice="' + indice + '"]'); }
+
+  function abrir(indice, origem) {
+    if (!estado.slice || indice < 0 || indice >= estado.slice.arquivos.length) return;
+    estado.indice = indice;
+    if (origem) estado.origem = origem;
+    mostrarArquivo();
+    if (!modal.open) modal.showModal();
+    gravarHash(estado.slice.arquivos[indice].caminho);
+  }
+  function mover(passo) {
+    var destino = estado.indice + passo;
+    if (modal.open && destino >= 0 && destino < estado.slice.arquivos.length) abrir(destino);
+  }
+  function fechar() { if (modal.open) modal.close(); }
+
+  function codificar(caminho) { return encodeURIComponent(caminho).replace(/%2F/g, '/'); }
+  function lerHash() {
+    var achado = /^#file=(.*)$/.exec(location.hash);
+    if (!achado) return null;
+    try { return decodeURIComponent(achado[1]); } catch (erro) { return achado[1]; }
+  }
+  function trocarHash(novo) {
+    if (location.hash === novo || (!novo && !location.hash)) return;
+    try {
+      history.replaceState(null, '', novo || location.pathname + location.search);
+    } catch (erro) {
+      estado.ignorarHash = novo;
+      location.hash = novo;
+    }
+  }
+  function gravarHash(caminho) { trocarHash('#file=' + codificar(caminho)); }
+  function abrirPeloHash() {
+    var caminho = lerHash();
+    if (caminho === null) { fechar(); return; }
+    var lista = estado.slice ? estado.slice.arquivos : [];
+    for (var i = 0; i < lista.length; i++) {
+      if (lista[i].caminho === caminho) { abrir(i); return; }
+    }
+  }
+
+  function copiar(botao) {
+    var texto = botao.dataset.copiar || ($(botao.dataset.copiarDe) || {}).textContent || '';
+    function selecionar() {
+      var alvo = botao.previousElementSibling;
+      var faixa = document.createRange();
+      faixa.selectNodeContents(alvo);
+      var selecao = window.getSelection();
+      selecao.removeAllRanges();
+      selecao.addRange(faixa);
+      botao.textContent = 'Selecionado';
+    }
+    try {
+      navigator.clipboard.writeText(texto).then(function () { botao.textContent = 'Copiado'; }, selecionar);
+    } catch (erro) {
+      selecionar();
+    }
+  }
+
+  document.addEventListener('click', function (evento) {
+    var arquivo = evento.target.closest('.arquivo');
+    if (arquivo) { abrir(+arquivo.dataset.indice, arquivo); return; }
+    var botao = evento.target.closest('.copiar');
+    if (botao) copiar(botao);
+  });
+  $('anterior').addEventListener('click', function () { mover(-1); });
+  $('proximo').addEventListener('click', function () { mover(1); });
+  $('fechar').addEventListener('click', fechar);
+  modal.addEventListener('click', function (evento) { if (evento.target === modal) fechar(); });
+  document.addEventListener('keydown', function (evento) {
+    if (!modal.open || evento.altKey || evento.ctrlKey || evento.metaKey || evento.shiftKey) return;
+    var alvo = evento.target;
+    if (alvo && (/^(INPUT|SELECT|TEXTAREA)$/.test(alvo.tagName) || alvo.isContentEditable)) return;
+    if (evento.key === 'ArrowLeft') { evento.preventDefault(); mover(-1); }
+    if (evento.key === 'ArrowRight') { evento.preventDefault(); mover(1); }
+  });
+  modal.addEventListener('close', function () {
+    trocarHash('');
+    var origem = estado.origem && document.contains(estado.origem) ? estado.origem : botaoDo(estado.indice);
+    estado.origem = null;
+    if (origem) origem.focus();
+  });
+  $('visao').addEventListener('change', function (evento) {
+    estado.visao = evento.target.value;
+    gravarVisao(estado.visao);
+    if (modal.open) mostrarArquivo();
+  });
+  window.addEventListener('hashchange', function () {
+    if (estado.ignorarHash !== null && location.hash === estado.ignorarHash) { estado.ignorarHash = null; return; }
+    estado.ignorarHash = null;
+    abrirPeloHash();
+  });
+
+  if (dados.modo === 'artefato') {
+    var colar = $('colar');
+    var campoBase = $('campo-base');
+    var campoAlvo = $('campo-alvo');
+    var atualizarComando = function () {
+      var base = campoBase.value.trim() || 'main';
+      var alvo = campoAlvo.value.trim() || 'HEAD';
+      $('comando-colar').textContent = 'git diff ' + OPCOES + ' ' + shell(base) + '...' + shell(alvo);
+    };
+    colar.hidden = false;
+    campoBase.value = dados.base;
+    campoAlvo.value = dados.alvo;
+    atualizarComando();
+    campoBase.addEventListener('input', atualizarComando);
+    campoAlvo.addEventListener('input', atualizarComando);
+    $('form-colar').addEventListener('submit', function (evento) {
+      evento.preventDefault();
+      var texto = $('campo-diff').value;
+      var mensagem = $('mensagem-colar');
+      var quantos = S.lerDiff(texto).length;
+      if (!quantos) {
+        mensagem.textContent = 'Sem diferenças: o texto não tem arquivos de diff. Confira se colou a saída completa do comando.';
+        return;
+      }
+      var base = campoBase.value.trim() || 'base';
+      var alvo = campoAlvo.value.trim() || 'alvo';
+      fechar();
+      dados = { modo: 'artefato', nome: alvo, base: base, alvo: alvo, diff: texto, contexto: [], camadas: dados.camadas, fonteCamadas: dados.fonteCamadas };
+      renderizar();
+      mensagem.textContent = 'Slice gerada com ' + plural(quantos, 'arquivo', 'arquivos') + '.';
+    });
+  }
+
+  renderizar();
+  abrirPeloHash();
+})();
+</script>

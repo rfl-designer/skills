@@ -48,7 +48,7 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
                                                           /bug
 ```
 
-`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código.
+`/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
 Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, condução e prova. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o app real.
 
@@ -72,6 +72,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
 | `/mapear` | Cria, atualiza e audita o Mapa de Features da aplicação. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador e conduz o app ao vivo. |
+| `/diagramar-slice` | Gera um diagrama HTML descartável da slice de uma branch: arquivos do diff `base...alvo` por camada, com o diff de cada arquivo num modal. Sem git, gera um artefato Claude a partir do diff colado. No fim, pergunta se pode apagar o HTML. |
 
 ### Implementação com subagentes no Claude Code
 
@@ -118,7 +119,7 @@ As skills usam as escolhas salvas sem perguntar novamente. Sem configuração, c
 
 Durante a edição, execute testes focados e verificadores do escopo afetado. Antes de commit, PR ou entrega de código, aplique o portão completo de `laravel-verification`. Ao pausar, registre o estado das provas sem repetir a suíte por rotina. Mudanças só de documentação usam os verificadores do pacote.
 
-Valide o pacote com Python 3.10+ e PHP 8.1+ (o teste do conferidor do mapa fica pulado sem PHP):
+Valide o pacote com Python 3.10+, PHP 8.1+ e Node 18+. Sem PHP, o teste do conferidor do mapa fica pulado. Sem Node, o teste do núcleo do diagrama de `/diagramar-slice` fica pulado:
 
 ```bash
 python3 -m pip install -r requirements-dev.txt
