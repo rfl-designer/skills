@@ -1,6 +1,6 @@
 # Protocolo reutilizável de verificação
 
-Use quando a feature precisar ser conduzida novamente por outro agente. Atualize o runbook ou teste existente; senão, use a pasta de Protocolos configurada (`docs/verification/<feature>.md` como fallback). Guarde provas na pasta de Evidências configurada. Reutilize o destino acordado na sessão.
+Use quando a feature precisar ser conduzida novamente por outro agente. Atualize o runbook ou teste existente. Com Mapa de Features configurado, registre o protocolo no Arquivo de Feature: pré-condições e condução em `Como conduzir`, limpeza em `Armadilhas`. Senão, use a pasta de Protocolos configurada (`docs/verification/<feature>.md` como fallback). Guarde provas na pasta de Evidências configurada. Reutilize o destino acordado na sessão.
 
 Registre somente o necessário:
 

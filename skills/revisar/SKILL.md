@@ -57,6 +57,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      - Aponta requisitos faltantes e escopo extra não solicitado (*scope creep*).
      - **Bug:** Caça resultado errado e erro em casos de borda (vazio, zero, último item, arredondamento, fuso horário). Caça chamador quebrado pela mudança. Caça correção feita num só chamador, com a função compartilhada ainda errada.
      - **Teste ausente:** Aponta lógica de risco sem um teste Pest que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Pede um teste bom, não cobertura.
+     - **Mapa desatualizado:** Com Mapa de Features configurado, aponta comportamento visível alterado sem atualização do Arquivo de Feature no mesmo diff.
 3. **Confirmação dos Achados:** Antes de reportar, cada subagente:
    1. Escreve o caso concreto de cada achado.
    2. Relê as linhas e confirma o fato: o chamador existe, o valor pode ser vazio, o código não tem uso.
