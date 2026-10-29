@@ -1,6 +1,6 @@
 # Mapeadores
 
-Um Mapeador é um subagente que mapeia um Domínio. O agente principal coordena: faz o inventário, escreve o README raiz, delega, reconcilia e conduz o app. O Mapeador lê o código do seu Domínio e devolve um resultado curto.
+Um Mapeador é um subagente que mapeia um Domínio. O agente principal coordena: faz o inventário, escreve o README raiz, delega e reconcilia. O Mapeador lê o código do seu Domínio e devolve um resultado curto.
 
 ## Regras
 
@@ -10,7 +10,7 @@ Um Mapeador é um subagente que mapeia um Domínio. O agente principal coordena:
 - O Mapeador não conduz o app, não roda migrations, seeders, filas ou serviços externos e não cria subagentes. Ele usa git só para leitura, como `git log` e `git blame`.
 - O Mapeador usa as convenções do README raiz: autenticação, sessões e comando base. Uma convenção que falta volta como dúvida; ele não cria outra.
 - No modo Criar, o Mapeador grava só na pasta do seu Domínio. No modo Auditar, ele não grava arquivos.
-- O agente principal grava o README raiz, `jornadas.md` e a linha `Base:`. Ele também conduz cada Feature ao vivo e decide cada correção.
+- O agente principal grava o README raiz, `jornadas.md` e a linha `Base:`. Ele também decide cada correção.
 
 ## Contrato no modo Criar
 
@@ -51,7 +51,6 @@ Fora do mapa proposto:
 Jornadas candidatas: checkout com login expirado (conta + vendas).
 Pré-condições ausentes no seed: pedido entregue para o cliente de teste.
 Deriva (só Auditar): pedidos.md, Sub-feature `pedidos-cancelar`: o botão agora é `Cancelar pedido` (resources/views/livewire/pedidos/tabela.blade.php:42).
-Receita de condução (só Auditar): uma por Feature, em até 5 passos.
 Dúvidas: o que o código não responde.
 ```
 
