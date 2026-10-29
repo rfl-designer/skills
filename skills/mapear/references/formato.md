@@ -23,7 +23,7 @@ Comece com o título `# Mapa de Features de <App>` e um parágrafo sobre o uso d
 
 Depois, use estas H2. O conferidor exige todas:
 
-1. `Pré-condições base`: como iniciar o app, URL, dados de seed, autenticação na condução, e-mail, fila e isolamento. Inclua o **Diagnóstico**: os comandos que provam que a instância merece condução. Por exemplo, health check, migrations em dia, assets atualizados e commit sob prova.
+1. `Pré-condições base`: como iniciar o app, URL, dados de seed, autenticação na condução, e-mail, fila e isolamento. Inclua o **Diagnóstico**: os comandos que provam que a instância merece condução. Por exemplo, banco igual à linha `Banco da condução` da configuração, health check, migrations em dia, assets atualizados e commit sob prova.
 2. `Convenções de condução`: o comando base da ferramenta, seletores preferidos, espera pelo estado final, uso de `tinker` só para ler efeitos, ambiente permitido e flags.
 3. `Prova e lacunas`: o padrão de prova e como registrar um caminho inalcançável.
 4. `Varredura completa`: a ordem de uma regressão ampla. Termine com o link para `jornadas.md`.
@@ -108,6 +108,8 @@ Uma Âncora liga a Feature a um identificador estável do código. Com ela, um a
 | `parcial` | Um agente conduziu parte das entradas. O detalhe lista as não conduzidas. |
 | `não conduzida` | A receita vem só da leitura do código. |
 | `bloqueada` | Um agente tentou e uma pré-condição impediu. O detalhe diz qual. |
+
+`/mapear` grava só `não conduzida`. `/conduzir` e `laravel-verification` gravam os outros valores depois de uma condução real.
 
 Um defeito do produto não muda o Estado. O agente o reporta ao usuário. O mapa continua com o comportamento esperado.
 

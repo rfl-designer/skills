@@ -8,11 +8,12 @@ Base: commit 3f9c2ab em 2026-10-28
 
 - Inicie o app com `composer run dev`. A URL local é `http://loja.test`.
 - Faça o diagnóstico antes da primeira condução e depois de cada falha:
+  - `php artisan tinker --execute='echo DB::connection()->getDatabaseName();'` mostra `loja_local`, o banco da linha `Banco da condução` na configuração.
   - `curl -fsS http://loja.test/up` responde com sucesso.
   - `php artisan migrate:status` não mostra migration pendente.
   - `public/hot` existe, ou `npm run build` rodou depois da última mudança em `resources/`.
   - `git rev-parse --short HEAD` mostra o commit sob prova.
-- Prepare os dados com `php artisan migrate:fresh --seed`, só no banco local. O seed cria o usuário `cliente@loja.test` e três produtos.
+- Prepare os dados com `php artisan migrate:fresh --seed`, só depois do diagnóstico do banco. O comando apaga todas as tabelas. O seed cria o usuário `cliente@loja.test` e três produtos.
 - Nos probes Pest, autentique com `actingAs()`. A senha do seed fica no `DatabaseSeeder`; não a copie para o mapa.
 - O Mailpit local recebe os e-mails em `http://localhost:8025`.
 - No app local, rode `php artisan queue:work --once` depois de uma ação que enfileira trabalho.
@@ -22,7 +23,7 @@ Base: commit 3f9c2ab em 2026-10-28
 - Prefira papel ARIA e nome acessível. Depois, use o atributo `dusk`. Use classe CSS só como último recurso.
 - Depois de uma ação Livewire, espere o estado final visível. Não use espera fixa.
 - Conduza pela tela, pelo comando ou pela rota que o usuário usa. Use `php artisan tinker` só para ler o efeito depois da ação.
-- Conduza no ambiente local ou de teste. Nunca conduza em produção.
+- Conduza só no banco da linha `Banco da condução`. `APP_ENV=local` não prova que o banco é local.
 - Para uma variante com flag, ative a flag antes e desative-a no fim.
 
 ## Prova e lacunas
@@ -71,6 +72,6 @@ Não descreva implementação. Nomeie só caminhos do usuário, identificadores 
 - Atualize o Arquivo de Feature no mesmo diff da mudança de comportamento visível.
 - Uma Feature nova recebe um arquivo e uma linha neste índice. Uma Feature removida perde os dois.
 - Uma Âncora nova vai para uma Feature ou para `Fora do mapa`.
-- Depois de conduzir, atualize a linha `Estado:` com a data e o commit.
+- Depois de conduzir, atualize a linha `Estado:` com a data e o commit. `/conduzir` conduz uma Feature, um Domínio ou o mapa inteiro.
 - Só `/mapear` atualiza a linha `Base:`, depois de reconciliar todo o código até esse commit.
 - Antes de entregar, rode o `scripts/conferir-mapa.php` da skill `mapear` sobre esta pasta.

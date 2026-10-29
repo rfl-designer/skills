@@ -50,7 +50,7 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
 
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. Antes de gravar, `/especificar` e `/planejar` passam o rascunho por um Leitor novo, sem o histórico do chat, com `leitura-independente`. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. O usuário pode aceitar um achado, com o motivo. Na rodada 3 sem veredito `pode entregar`, `/revisar` para o ciclo e pergunta como seguir. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
-Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, condução e prova. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o app real.
+Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, receitas de condução e prova. `/mapear` lê o código e não opera o app. Execute `/conduzir` para provar as receitas no app local. Antes da primeira condução, `/conduzir` confirma que o app e o Pest usam o banco permitido. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o código.
 
 Use `/implmentar-em-par` no lugar de `/implementar` para revisar a implementação por componente. O agente explica RED e pausa antes da produção. Depois, implementa e explica um componente por vez, aguardando sua revisão. O teste pode continuar vermelho entre etapas; a Fatia Vertical termina com GREEN e verificação completa.
 
@@ -72,7 +72,8 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/bug`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
-| `/mapear` | Cria, atualiza e audita o Mapa de Features da aplicação. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador e conduz o app ao vivo. |
+| `/mapear` | Cria, atualiza e audita o Mapa de Features contra o código, sem operar o app. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador. |
+| `/conduzir` | Conduz as receitas do Mapa de Features no app local, em série. Antes, confirma que o app e o Pest usam o banco permitido. Atualiza a linha `Estado:` e separa Deriva, lacuna de condução e defeito do produto. |
 | `/diagramar-slice` | Gera um diagrama HTML descartável da slice de uma branch: arquivos do diff `base...alvo` por camada, com o diff de cada arquivo num modal. Sem git, gera um artefato Claude a partir do diff colado. No fim, pergunta se pode apagar o HTML. |
 
 ### Implementação com subagentes no Claude Code
@@ -103,7 +104,7 @@ Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/ag
 
 ### Mapeadores no Claude Code
 
-Em aplicações com 3 ou mais Domínios e mais de 12 Features, `/mapear` delega cada Domínio a um Mapeador **Sonnet 5.5 / medium**, até 4 ao mesmo tempo. Cada Mapeador grava só a pasta do seu Domínio e não conduz o app. O principal reconcilia o índice, roda o conferidor e conduz as Features em série.
+Em aplicações com 3 ou mais Domínios e mais de 12 Features, `/mapear` delega cada Domínio a um Mapeador **Sonnet 5.5 / medium**, até 4 ao mesmo tempo. Cada Mapeador grava só a pasta do seu Domínio e não conduz o app. O principal reconcilia o índice e roda o conferidor. Depois, `/conduzir` conduz as Features em série.
 
 Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/agents/mapeador.md` no projeto consumidor e instale `ste100-clean-code`. Sem o agente registrado, `/mapear` usa o subagente geral, que herda o modelo do principal. Consulte [os Mapeadores](skills/mapear/references/mapeadores.md) para o contrato de delegação.
 
