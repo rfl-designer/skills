@@ -40,7 +40,7 @@ Use este formato em `docs/agents/projeto.md` ou no destino existente. Os marcado
 | Glossário | local | {{caminho do arquivo}} | {{termos de domínio}} |
 | ADRs | local | {{pasta}} | {{convenção existente ou NNNN-slug.md}} |
 | Protocolos | local | {{pasta}} | {{por feature}} |
-| Evidências | local | {{pasta durável}} | {{não gravar segredos; política de versionamento}} |
+| Evidências | local | {{pasta durável}} | {{nome <domínio>/<feature>/<id-da-sub-feature>.<extensão>, sem data; política de versionamento; sem segredos}} |
 | Mapa de Features | local | {{pasta; docs/features/ como sugestão}} | {{criado por /mapear; atualizar o Arquivo de Feature no mesmo diff da mudança de comportamento}} |
 
 ## Acesso ao tracker
@@ -70,3 +70,15 @@ Instruções explícitas da sessão prevalecem; não regrave preferências sem p
 ```
 
 Uma escolha de destino da Spec nunca determina automaticamente o destino dos tickets. Configurar GitHub/GitLab não cria issues. Se faltarem informações de acesso, registre-as como pendentes e peça apenas quando a publicação fizer parte da tarefa.
+
+## Política de Evidências
+
+Registre uma política na linha `Evidências`. Recomende a primeira:
+
+| Política | Quando usar | O que fazer |
+| --- | --- | --- |
+| Fora do Git | padrão | Acrescente a pasta ao `.gitignore` do projeto. Para um PR, publique os artefatos no CI com retenção limitada, por exemplo `retention-days` no GitHub Actions, ou anexe-os ao PR. A linha `Estado:` e a receita guardam o registro durável. |
+| Git com substituição | o time revisa as provas no PR | Versione texto e poucas imagens. A condução nova substitui o arquivo. Cada substituição de binário aumenta o histórico do repositório. |
+| Git LFS | o time precisa do histórico das imagens | Configure o LFS para os tipos binários da pasta antes do primeiro artefato. Sem LFS instalado, registre a pendência; este setup não o instala. |
+
+Em todas as políticas, o nome do artefato é estável e sem data, e a condução nova substitui o arquivo. Não mova nem renomeie artefatos antigos sem pedido; mostre ao usuário os nomes fora da convenção.

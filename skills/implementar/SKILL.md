@@ -54,7 +54,7 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
 1. Aguarde o retorno e confira o diff contra a Spec, os critérios de aceite e o escopo atribuído. Um retorno parcial, sem RED esperado ou com verificação bloqueada não conclui a fatia. Retome o mesmo agente com a pendência e preserve o trabalho válido.
 2. Integre uma fatia por vez, por diff ou commits quando autorizados. Resolva conflitos sem descartar trabalho alheio. Se a resolução alterar comportamento, retorne ao ciclo de teste da fatia afetada.
 3. Execute o portão completo de `laravel-verification` sobre o estado integrado antes de commit ou entrega. Evidência de worktrees isolados não prova a combinação. Reutilize resultados apenas quando ainda cobrem exatamente o código, configuração e dependências relevantes; mudanças posteriores invalidam a cobertura afetada.
-4. Com o portão aprovado (`[measured]`), faça commit atômico se autorizado; caso contrário, registre o checkpoint no working tree. Atualize dependências e selecione a próxima fatia desbloqueada. Limpe apenas worktrees criados por este fluxo, depois de preservar integração e evidências.
+4. Com o portão aprovado (`[measured]`), faça commit atômico se autorizado; caso contrário, registre o checkpoint no working tree. Atualize dependências e selecione a próxima fatia desbloqueada. A evidência de um worktree é temporária: ela serve só para conferir o retorno. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe apenas os worktrees criados por este fluxo.
 5. Ao concluir todos os tickets, apresente as provas do estado integrado e instrua o usuário a rodar `/revisar`.
 
 ## 6. Racionalizações Proibidas (Anti-Atalho)

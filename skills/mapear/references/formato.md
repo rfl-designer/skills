@@ -30,7 +30,7 @@ Depois, use estas H2. O conferidor exige todas:
 5. `Domínios`: uma H3 por Domínio com uma linha por Feature, ou uma linha por Domínio na aplicação grande.
 6. `Fora do mapa`: cada Âncora do inventário que não pertence a uma Feature, com o motivo. Por exemplo, health check, rota de infraestrutura ou comando interno.
 7. `Contrato dos Arquivos de Feature`: o contrato abaixo, em poucas linhas, para o agente que não tem esta skill.
-8. `Manutenção`: as regras de atualização no mesmo diff, de `Estado:` e de `Base:`.
+8. `Manutenção`: as regras de atualização no mesmo diff, de `Estado:`, de `Base:` e dos artefatos na pasta de evidências.
 
 Escreva as pré-condições comuns uma vez, no README raiz. Um Arquivo de Feature repete só o que muda.
 
@@ -124,6 +124,9 @@ Rode o conferidor sobre a pasta do mapa. Ele exige PHP 8.1 ou mais novo:
 ```bash
 php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features
 php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features --ancoras=<inventario>.txt
+php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features --evidencias=docs/verification/evidencias
 ```
 
 Ele confere links e arquivos fora do índice, as H2 e sua ordem, as linhas `Base:`, `Âncoras:` e `Estado:`, IDs únicos e Âncoras repetidas. Com `--ancoras`, ele também confere a cobertura do inventário e as Âncoras que não existem mais no código. O inventário tem uma Âncora por linha; linhas vazias e linhas com `#` no início ficam fora.
+
+Com `--evidencias=<pasta>`, ele confere o nome de cada artefato da pasta de evidências: `<domínio>/<feature>/<id-da-sub-feature>.<extensão>`, ou `<id-da-sub-feature>.<detalhe>.<extensão>` para mais de um arquivo. Ele aponta o artefato sem Sub-feature no mapa e o artefato na pasta de outra Feature. Arquivos com `.` no início, como `.gitkeep`, ficam fora.

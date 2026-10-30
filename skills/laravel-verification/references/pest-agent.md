@@ -23,6 +23,6 @@ O primeiro comando verifica HTTP, o segundo exige o plugin Browser. Para mutaç�
 
 Use ambiente e banco de testes. Confira quais traits e hooks realmente se aplicam ao probe; inicialize nele o setup necessário. Não presuma isolamento só pela opção `--agent`.
 
-Registre o snippet, o resultado e os artefatos no protocolo da feature. Promova comportamento durável a teste de regressão; probes servem ao feedback rápido.
+Probes servem ao feedback rápido. Promova comportamento durável a teste de regressão. Se a feature precisa repetir o probe, escreva-o como item de `Como conduzir` no Arquivo de Feature, ou no protocolo quando não há mapa. Substitua o item antigo; não guarde versões anteriores. Guarde os artefatos segundo a seção `Guardar a evidência` da skill.
 
 Fontes: [Agent](https://github.com/pestphp/docs/blob/5.x/agent.md), [Pest 5](https://pestphp.com/docs/pest5-now-available).

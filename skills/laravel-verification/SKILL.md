@@ -61,4 +61,22 @@ Reporte comando, alcance, resultado, estado verificado (commit ou arquivos/diff)
 - `[inferred]` ou `[guess]`: conclusão sem execução; explique sua base e limite.
 - `desatualizado`, `não verificado` e `não aplicável`: use explicitamente quando corresponderem ao caso.
 
-Diga se o resultado veio de teste focado, probe ou suíte completa. Para UI, cite o fluxo exercitado e a prova de efeito. Guarde screenshots e logs sem segredos em um destino que sobreviva à limpeza.
+Diga se o resultado veio de teste focado, probe ou suíte completa. Para UI, cite o fluxo exercitado e a prova de efeito.
+
+### Guardar a evidência
+Cada tipo de evidência tem um destino e uma validade. Não acumule arquivos por execução.
+
+| Tipo | Exemplo | Destino | Validade |
+|---|---|---|---|
+| Prova de estado | saída do portão, RED e GREEN | retorno ao principal, nota de pausa, descrição do PR ou CI | até a próxima mudança do estado coberto; depois, `desatualizado` |
+| Probe | snippet `--agent` | teste de regressão, ou item de `Como conduzir` no Arquivo de Feature | até a promoção; depois, não guarde o snippet solto |
+| Artefato | screenshot, log, saída do console | pasta de Evidências da configuração | até a próxima condução da mesma Sub-feature, que substitui o arquivo |
+
+- Não grave a prova de estado como arquivo no repositório.
+- Dê ao artefato um nome estável, sem data: `<domínio>/<feature>/<id-da-sub-feature>.<extensão>`. Para mais de um arquivo, use `<id-da-sub-feature>.<detalhe>.<extensão>`. A linha `Estado:` guarda a data e o commit.
+- Sem Mapa de Features, use `<feature>/<caso>.<extensão>`. Guarde a prova de uma jornada na pasta da primeira Feature, com o ID da Sub-feature inicial.
+- O `screenshot()` do plugin Browser grava na pasta do plugin. Mova o arquivo de prova para a pasta de Evidências, com o nome estável.
+- Siga a política de versionamento da linha `Evidências` na configuração. Sem política, não faça `git add` de artefatos binários e ofereça `/setup`.
+- Quando uma Sub-feature sai do mapa, apague seus artefatos na mesma mudança. Com Mapa de Features, confira a pasta com o conferidor de `/mapear` e a opção `--evidencias`.
+- Não grave segredos, senhas ou valores de `.env` em artefatos.
+- Guarde os artefatos fora de diretórios temporários que o runner limpa.

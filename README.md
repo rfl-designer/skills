@@ -116,7 +116,7 @@ O agente carrega estas skills quando a tarefa exige.
 | --- | --- |
 | `laravel-deep-modules` | Costuras existentes e módulos profundos; Action/DTO quando úteis, CRUD simples quando suficiente. |
 | `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. |
-| `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. |
+| `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. Cada evidência tem destino e validade; o artefato tem nome estável e a condução nova o substitui. |
 | `leitura-independente` | Um Leitor novo lê o rascunho da Spec ou dos tickets antes da gravação: Paráfrase, Prontidão e resolução de cada achado com o usuário. |
 | `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. |
 
@@ -124,7 +124,7 @@ O agente carrega estas skills quando a tarefa exige.
 
 `/setup` detecta a stack existente, pergunta só pelas escolhas faltantes e grava `docs/agents/projeto.md` (ou o arquivo já acordado). Um ponteiro nas instruções do projeto permite reutilizar a configuração em outras sessões e agentes.
 
-O registro inclui versões e fontes da detecção, executor, comandos, URL local e pastas de domínio, protocolos e evidências. Specs e tickets têm destinos separados: Markdown local, GitHub, GitLab ou outro fluxo disponível. Por exemplo, Specs em `docs/specs/` e Tickets em Issues do GitHub.
+O registro inclui versões e fontes da detecção, executor, comandos, URL local e pastas de domínio, protocolos e evidências. Para as evidências, ele registra também a política de versionamento: fora do Git (padrão), Git com substituição ou Git LFS. Specs e tickets têm destinos separados: Markdown local, GitHub, GitLab ou outro fluxo disponível. Por exemplo, Specs em `docs/specs/` e Tickets em Issues do GitHub.
 
 As skills usam as escolhas salvas sem perguntar novamente. Sem configuração, continuam com seus defaults e oferecem `/setup`. Uma instrução explícita da sessão prevalece. Reexecutar o setup preserva conteúdo manual e atualiza apenas escolhas alteradas; configurar um tracker não publica issues nem instala tecnologias.
 

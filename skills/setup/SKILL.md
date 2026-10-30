@@ -25,7 +25,7 @@ Apresente o que encontrou e a recomendação. Pergunte uma categoria por vez, ap
 1. **Tecnologias e execução:** confirme as tecnologias planejadas ou divergências relevantes. Registre comandos completos, diretório de execução e URL; não proponha trocar uma stack existente por padrão.
 2. **Specs:** Markdown local, GitHub, GitLab ou outro destino descrito pelo usuário. Prefira a convenção existente; sem convenção, sugira `docs/specs/`.
 3. **Tickets:** escolha independente da Spec. Para Markdown, sugira `docs/tickets/<spec>/`; para tracker, registre host e projeto/repositório exatos. Inclua convenção de nomes, vínculo com a Spec e representação das dependências.
-4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias.
+4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias. Para Evidências, pergunte também a política de versionamento da [configuração](references/configuracao.md#política-de-evidências) e recomende `Fora do Git`.
 
 As escolhas já feitas dispensam nova confirmação. Para destinos externos, prefira o conector/CLI disponível e registre a capacidade de acesso sem confundir configuração com publicação. Se o usuário escolher outro tracker, documente a operação real disponível; não invente comandos.
 
@@ -34,7 +34,7 @@ As escolhas já feitas dispensam nova confirmação. Para destinos externos, pre
 Use [references/configuracao.md](references/configuracao.md) como estrutura. Preencha só o que se aplica; não deixe marcadores de template na configuração final.
 
 - Por padrão, grave `docs/agents/projeto.md`, com caminhos relativos à raiz do repositório e diretório de execução explícito por app. Preserve outro destino já acordado.
-- Crie os diretórios locais confirmados para artefatos. Não trate URLs como pastas nem mova documentos existentes. Para convenções com `<spec>`, crie só a pasta base; a subpasta nasce com a Spec correspondente. Pastas vazias podem não entrar no Git; as skills as recriam ao gravar o primeiro conteúdo.
+- Crie os diretórios locais confirmados para artefatos. Com a política `Fora do Git`, acrescente a pasta de Evidências ao `.gitignore` do projeto. Não trate URLs como pastas nem mova documentos existentes. Para convenções com `<spec>`, crie só a pasta base; a subpasta nasce com a Spec correspondente. Pastas vazias podem não entrar no Git; as skills as recriam ao gravar o primeiro conteúdo.
 - Registre verificadores ausentes como pendências. Este setup não instala dependências, atualiza versões principais ou altera o ambiente global. Instalação solicitada separadamente exige executar e validar a mudança real, além de atualizar o registro.
 - Acrescente um bloco pequeno `Configuração das skills` no arquivo de instruções já utilizado, apontando para a configuração. Se nenhum existir, crie `AGENTS.md` mínimo. Se mais de um já existir, mantenha o mesmo ponteiro nos arquivos usados pelos agentes do projeto.
 - Delimite o bloco com `<!-- skills:config:start -->` e `<!-- skills:config:end -->`. Atualize o bloco existente; preserve todas as instruções fora dele. Se já houver um ponteiro sem esses marcadores, atualize-o sem criar outro concorrente.

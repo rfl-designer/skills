@@ -91,7 +91,7 @@ Pendências: achado 6.
 3. **Integração:** Integre um Lote por vez, só com o delta do Lote. Um conflito que muda comportamento volta ao ciclo de prova do Lote afetado.
 4. **Regressões:** Junte os `Valores alterados` de todos os Lotes. No estado integrado, busque de novo com `rg` os consumidores de cada valor e confira cada um. Dois Lotes podem alterar o mesmo Fluxo de formas incompatíveis. Atribua cada regressão ao Lote dono do arquivo, ou a um Lote novo.
 5. **Portão:** Execute o portão completo de `laravel-verification` no estado integrado. A evidência de worktrees isolados não prova a combinação.
-6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. Limpe só os worktrees criados por este fluxo, depois de preservar a integração e as evidências.
+6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe só os worktrees criados por este fluxo.
 7. **Relatório:**
    - 1 linha por achado: número, título, status (`corrigido`, `não reproduz`, `bloqueado` ou `desatualizado`) e prova.
    - Os achados enviados a `/implementar` ou `/bug`, quando houver.

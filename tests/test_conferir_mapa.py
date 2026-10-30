@@ -125,6 +125,41 @@ class FeatureMapCheckerTest(unittest.TestCase):
         self.edit("README.md", "- `comando:inspire`", "- `rota:checkout`: duplicada.\n- `comando:inspire`")
         self.assert_fails_with("Âncora em Fora do mapa e também em")
 
+    def write_evidence(self, *relatives):
+        evidence = Path(self.temp.name) / "evidencias"
+        for relative in relatives:
+            path = evidence / relative
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("prova")
+        return evidence
+
+    def test_accepts_evidence_named_after_sub_feature(self):
+        evidence = self.write_evidence("vendas/pedidos/pedidos-cancelar.png",
+                                       "vendas/pedidos/pedidos-fechar-dia.saida.log", ".gitkeep")
+        result = self.run_checker(f"--evidencias={evidence}")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("evidências: 2 arquivos ligados a Sub-features", result.stdout)
+
+    def test_reports_evidence_without_sub_feature(self):
+        evidence = self.write_evidence("vendas/pedidos/pedidos-cancelar.png",
+                                       "vendas/pedidos/pedidos-reembolso.png",
+                                       "vendas/pedidos/2026-10-01-cancelamento.png")
+        result = self.run_checker("--evidencias", str(evidence))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("evidência vendas/pedidos/pedidos-reembolso.png: sem Sub-feature no mapa", result.stdout)
+        self.assertIn("evidência vendas/pedidos/2026-10-01-cancelamento.png: sem Sub-feature no mapa", result.stdout)
+        self.assertNotIn("pedidos-cancelar.png", result.stdout)
+
+    def test_reports_evidence_in_other_feature_folder(self):
+        evidence = self.write_evidence("conta/acesso/pedidos-cancelar.png")
+        self.assert_fails_with("a Sub-feature pedidos-cancelar está em vendas/pedidos.md",
+                               f"--evidencias={evidence}")
+
+    def test_usage_error_without_evidence_folder(self):
+        result = self.run_checker(f"--evidencias={Path(self.temp.name) / 'ausente'}")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("Pasta de evidências não encontrada", result.stderr)
+
     def test_usage_error_without_folder(self):
         result = subprocess.run(["php", str(SCRIPT)], capture_output=True, text=True, check=False)
         self.assertEqual(result.returncode, 2)
