@@ -2,7 +2,7 @@
 
 Pacote de skills para desenvolvimento com agentes de IA em PHP, Laravel e Livewire. O pacote funciona em Claude Code, Codex e Antigravity.
 
-O pacote adapta práticas de Addy Osmani (`agent-skills`), Matt Pocock (`skills`) e Lauren Tan, poteto (`pstack`) para Laravel/Livewire. A estrutura do fluxo se aproxima sobretudo de Matt. A [matriz de referências](docs/referencias.md) distingue práticas compartilhadas, correspondências e escolhas locais; não presume consenso em cada regra.
+O pacote adapta práticas de Addy Osmani (`agent-skills`), Matt Pocock (`skills`), Lauren Tan, poteto (`pstack`), e Robert C. Martin (`ub-mode`) para Laravel/Livewire. A estrutura do fluxo se aproxima sobretudo de Matt. A [matriz de referências](docs/referencias.md) distingue práticas compartilhadas, correspondências e escolhas locais; não presume consenso em cada regra.
 
 ## Instalação
 
@@ -67,7 +67,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
 | `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
-| `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
+| `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos e só de leitura; sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
 | `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/bug`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
@@ -114,11 +114,11 @@ O agente carrega estas skills quando a tarefa exige.
 
 | Skill | Função |
 | --- | --- |
-| `laravel-deep-modules` | Costuras existentes e módulos profundos; Action/DTO quando úteis, CRUD simples quando suficiente. |
-| `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. |
-| `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. Cada evidência tem destino e validade; o artefato tem nome estável e a condução nova o substitui. |
+| `laravel-deep-modules` | Costuras existentes e módulos profundos; Action/DTO quando úteis, CRUD simples quando suficiente. Estado inválido impossível de escrever, validação só na entrada, operação repetível e um só escritor. |
+| `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. Apaga o teste que passa com a Costura vazia. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
+| `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. Mede mutação e CRAP < 10 nos arquivos do diff. É a única fonte da ordem do portão. Cada evidência tem destino e validade; o artefato tem nome estável e a condução nova o substitui. |
 | `leitura-independente` | Um Leitor novo lê o rascunho da Spec ou dos tickets antes da gravação: Paráfrase, Prontidão e resolução de cada achado com o usuário. |
-| `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. |
+| `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. O corpo do commit diz por que mudou e como você provou. |
 
 ## Configuração por projeto
 
@@ -133,6 +133,7 @@ As skills usam as escolhas salvas sem perguntar novamente. Sem configuração, c
 - Pest
 - Larastan / PHPStan
 - Laravel Pint com `"Pint/laravel_blade": true` em `rules` do `pint.json` para cobrir Blade (ou `--blade` numa execução compatível). Preserve as demais regras.
+- Opcional, para a qualidade dos testes: driver de cobertura (PCOV ou Xdebug) e mutação (`--mutate` no `pest --help`, ou Infection). Sem eles, `laravel-verification` registra mutação e CRAP como `não verificado`.
 - Opcional: `pestphp/pest-plugin-agent`, detectado por `pest --help`. Pest 5 exige PHP 8.4+; não é atualizado automaticamente por estas skills.
 - Recomendado: `pestphp/pest-plugin-browser` (versão compatível com o Pest instalado) e Playwright (`npm install playwright@latest` e `npx playwright install`) para a verificação no navegador
 

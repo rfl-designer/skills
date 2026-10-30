@@ -1,0 +1,236 @@
+diff --git a/app/Actions/AprovarPedido.php b/app/Actions/AprovarPedido.php
+new file mode 100644
+index 0000000..d3fde25
+--- /dev/null
++++ b/app/Actions/AprovarPedido.php
+@@ -0,0 +1,29 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Actions;
++
++use App\Enums\StatusPedido;
++use App\Models\Pedido;
++use App\Models\User;
++use App\Notifications\PedidoAprovado;
++use Illuminate\Support\Facades\DB;
++
++final class AprovarPedido
++{
++    public function handle(Pedido $pedido, User $gerente): Pedido
++    {
++        DB::transaction(function () use ($pedido, $gerente): void {
++            $pedido->update([
++                'status' => StatusPedido::Aprovado,
++                'aprovado_em' => now(),
++                'aprovado_por' => $gerente->id,
++            ]);
++        });
++
++        $pedido->cliente->user->notify(new PedidoAprovado($pedido));
++
++        return $pedido;
++    }
++}
+diff --git a/app/Console/Commands/AprovarPedido.php b/app/Console/Commands/AprovarPedido.php
+index fb34870..70c2312 100644
+--- a/app/Console/Commands/AprovarPedido.php
++++ b/app/Console/Commands/AprovarPedido.php
+@@ -4,27 +4,23 @@ declare(strict_types=1);
+ 
+ namespace App\Console\Commands;
+ 
+-use App\Enums\StatusPedido;
++use App\Actions\AprovarPedido as AprovarPedidoAction;
+ use App\Models\Pedido;
++use App\Models\User;
+ use Illuminate\Console\Command;
+ 
+ final class AprovarPedido extends Command
+ {
+-    protected $signature = 'pedidos:aprovar {pedido}';
++    protected $signature = 'pedidos:aprovar {pedido} {--gerente=}';
+ 
+     protected $description = 'Aprova um Pedido pendente. O suporte usa este comando a pedido do Gerente.';
+ 
+-    public function handle(): int
++    public function handle(AprovarPedidoAction $aprovar): int
+     {
+         $pedido = Pedido::findOrFail($this->argument('pedido'));
++        $gerente = User::query()->where('papel', 'gerente')->firstOrFail();
+ 
+-        if ($pedido->status !== StatusPedido::Pendente) {
+-            $this->error('O pedido não está pendente.');
+-
+-            return self::FAILURE;
+-        }
+-
+-        $pedido->update(['status' => StatusPedido::Aprovado, 'aprovado_em' => now()]);
++        $aprovar->handle($pedido, $gerente);
+ 
+         return self::SUCCESS;
+     }
+diff --git a/app/Livewire/Pedidos/Lista.php b/app/Livewire/Pedidos/Lista.php
+index 5b8fed5..81d1ae7 100644
+--- a/app/Livewire/Pedidos/Lista.php
++++ b/app/Livewire/Pedidos/Lista.php
+@@ -4,12 +4,20 @@ declare(strict_types=1);
+ 
+ namespace App\Livewire\Pedidos;
+ 
++use App\Actions\AprovarPedido;
+ use App\Models\Pedido;
+ use Illuminate\Contracts\View\View;
+ use Livewire\Component;
+ 
+ final class Lista extends Component
+ {
++    public function aprovar(int $pedidoId, AprovarPedido $aprovar): void
++    {
++        $pedido = Pedido::findOrFail($pedidoId);
++
++        $aprovar->handle($pedido, auth()->user());
++    }
++
+     public function render(): View
+     {
+         $user = auth()->user();
+diff --git a/app/Models/Pedido.php b/app/Models/Pedido.php
+index 2aced30..925e7fb 100644
+--- a/app/Models/Pedido.php
++++ b/app/Models/Pedido.php
+@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
+ 
+ final class Pedido extends Model
+ {
+-    protected $fillable = ['cliente_id', 'total_centavos', 'status', 'aprovado_em'];
++    protected $fillable = ['cliente_id', 'total_centavos', 'status', 'aprovado_em', 'aprovado_por'];
+ 
+     protected function casts(): array
+     {
+@@ -24,4 +24,9 @@ final class Pedido extends Model
+     {
+         return $this->belongsTo(Cliente::class);
+     }
++
++    public function aprovador(): BelongsTo
++    {
++        return $this->belongsTo(User::class, 'aprovado_por');
++    }
+ }
+diff --git a/app/Notifications/PedidoAprovado.php b/app/Notifications/PedidoAprovado.php
+new file mode 100644
+index 0000000..e5fd1fd
+--- /dev/null
++++ b/app/Notifications/PedidoAprovado.php
+@@ -0,0 +1,29 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Notifications;
++
++use App\Models\Pedido;
++use Illuminate\Notifications\Messages\MailMessage;
++use Illuminate\Notifications\Notification;
++
++final class PedidoAprovado extends Notification
++{
++    public function __construct(private readonly Pedido $pedido) {}
++
++    /**
++     * @return list<string>
++     */
++    public function via(object $notifiable): array
++    {
++        return ['mail'];
++    }
++
++    public function toMail(object $notifiable): MailMessage
++    {
++        return (new MailMessage)
++            ->subject('Pedido aprovado')
++            ->line("O pedido {$this->pedido->id} foi aprovado.");
++    }
++}
+diff --git a/database/migrations/2026_10_30_000004_add_aprovado_por_to_pedidos_table.php b/database/migrations/2026_10_30_000004_add_aprovado_por_to_pedidos_table.php
+new file mode 100644
+index 0000000..3e599a2
+--- /dev/null
++++ b/database/migrations/2026_10_30_000004_add_aprovado_por_to_pedidos_table.php
+@@ -0,0 +1,17 @@
++<?php
++
++declare(strict_types=1);
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::table('pedidos', function (Blueprint $table): void {
++            $table->foreignId('aprovado_por')->nullable()->after('aprovado_em')->constrained('users');
++        });
++    }
++};
+diff --git a/resources/views/livewire/pedidos/lista.blade.php b/resources/views/livewire/pedidos/lista.blade.php
+index ff6f017..ee3a034 100644
+--- a/resources/views/livewire/pedidos/lista.blade.php
++++ b/resources/views/livewire/pedidos/lista.blade.php
+@@ -5,6 +5,14 @@
+                 <td>{{ $pedido->id }}</td>
+                 <td>{{ number_format($pedido->total_centavos / 100, 2, ',', '.') }}</td>
+                 <td>{{ $pedido->status->name }}</td>
++                @if (auth()->user()->isGerente())
++                    <td>{{ $pedido->aprovador?->name }}</td>
++                    <td>
++                        @if ($pedido->status === \App\Enums\StatusPedido::Pendente)
++                            <button wire:click="aprovar({{ $pedido->id }})">Aprovar</button>
++                        @endif
++                    </td>
++                @endif
+             </tr>
+         @endforeach
+     </table>
+diff --git a/tests/Feature/AprovarPedidoTest.php b/tests/Feature/AprovarPedidoTest.php
+new file mode 100644
+index 0000000..ac3f1b4
+--- /dev/null
++++ b/tests/Feature/AprovarPedidoTest.php
+@@ -0,0 +1,32 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Actions\AprovarPedido;
++use App\Enums\StatusPedido;
++use App\Livewire\Pedidos\Lista;
++use App\Models\Pedido;
++use App\Models\User;
++use Illuminate\Support\Facades\Notification;
++use Livewire\Livewire;
++
++it('aprova o pedido na Action', function (): void {
++    Notification::fake();
++    $gerente = User::factory()->create(['papel' => 'gerente']);
++    $pedido = Pedido::factory()->create(['status' => StatusPedido::Pendente]);
++
++    $resultado = app(AprovarPedido::class)->handle($pedido, $gerente);
++
++    expect($resultado)->not->toBeNull();
++});
++
++it('gerente aprova pela lista', function (): void {
++    Notification::fake();
++    $gerente = User::factory()->create(['papel' => 'gerente']);
++    $pedido = Pedido::factory()->create(['status' => StatusPedido::Pendente]);
++
++    Livewire::actingAs($gerente)
++        ->test(Lista::class)
++        ->call('aprovar', $pedido->id)
++        ->assertOk();
++});
