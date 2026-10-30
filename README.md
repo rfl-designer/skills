@@ -65,7 +65,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
 | `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Um Leitor novo lê o rascunho e devolve a Paráfrase antes da gravação. Usa o destino configurado de Specs. |
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
-| `/implementar` | Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
+| `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
 | `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos e só de leitura; sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |

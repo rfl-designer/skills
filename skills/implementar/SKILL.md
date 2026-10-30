@@ -1,6 +1,6 @@
 ---
 name: implementar
-description: Orquestra a implementação de uma Especificação ou ticket em Laravel e Livewire com subagentes por fatia, TDD na Costura (Pest), Larastan e Pint (.php e .blade.php). Use quando o usuário digitar /implementar.
+description: Orquestra a implementação dos tickets planejados de uma Especificação em Laravel e Livewire com subagentes por fatia, TDD na Costura (Pest), Larastan e Pint (.php e .blade.php). Use quando o usuário digitar /implementar.
 disable-model-invocation: true
 ---
 
@@ -13,6 +13,7 @@ Leia a configuração apontada nas instruções do projeto; sem ponteiro, procur
 O agente principal coordena os tickets planejados e delega cada Fatia Vertical completa a um implementador. Cada implementador aplica Red-Green-Refactor na Costura pública escolhida e na Fronteira `Livewire`/HTTP. O principal confere e integra as entregas, validando o estado integrado antes de commit ou entrega.
 
 ## 2. Regras Inegociáveis
+- **Exija tickets planejados:** A unidade de trabalho é o ticket. A Spec dá o contexto. Se o usuário der uma Spec sem tickets, não implemente e não crie tickets. Informe a falta de tickets e recomende `/planejar`.
 - **Carregue as disciplinas de modelo:** Aplique rigorosamente `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification` e `ste100-clean-code`.
 - **Siga o ciclo Red-Green-Refactor:** Escreva o teste Pest falhando antes de escrever o código de produção da fatia.
 - **Delegue a fatia inteira:** O mesmo implementador escreve o teste, confirma RED, implementa GREEN e refatora. Não separe teste e produção entre agentes. O principal mantém a coordenação; não configure esta skill inteira com `context: fork`.
@@ -59,6 +60,7 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
 ## 6. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
+| "A Spec é pequena; implemento direto, sem tickets." | **Proibido.** Sem tickets planejados, pare e recomende `/planejar`. Não crie tickets por conta própria. |
 | "Vou implementar os 4 tickets de uma vez e rodar o Pest apenas no final." | **Proibido.** Cada implementador testa e verifica sua fatia completa antes de retornar; o principal verifica a integração. Faça commits por fatia quando autorizados. |
 | "O teste da Action passou, não preciso testar o componente Livewire." | **Proibido.** Teste regras na Costura escolhida e integração/autorização na Fronteira. CRUD simples pode usar o teste de Fronteira sem Action artificial. |
 | "Vou commitar agora e corrigir os erros do Larastan e do Pint no último commit." | **Proibido.** Nenhum commit entra na branch com erro de tipo ou formatação pendente. |
