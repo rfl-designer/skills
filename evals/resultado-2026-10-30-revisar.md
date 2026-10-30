@@ -1,6 +1,6 @@
 # Avaliação de nível 1 de `/revisar`: versão curta contra a atual
 
-Data: 30/10/2026. Base do pacote: `63836f7`. Versão atual: `skills/revisar/SKILL.md` nesse commit (3.662 palavras). Candidata: a mesma skill sem repetição (2.884 palavras, −21%). Executor e avaliador: o autor das duas versões, no papel de agente principal. Os revisores foram subagentes gerais novos, sem o histórico da sessão e sem o gabarito.
+Data: 30/10/2026. Base do pacote: `63836f7`. Versão atual: `skills/revisar/SKILL.md` nesse commit (3.662 palavras). Candidata testada: a mesma skill sem repetição (2.884 palavras, −21%). Versão adotada: a candidata com as regras que o inventário achou perdidas (3.275 palavras, −11%). Executor e avaliador: o autor das versões, no papel de agente principal. Os revisores foram subagentes gerais novos, sem o histórico da sessão e sem o gabarito.
 
 Esta avaliação mede o trabalho do revisor: as etapas 3 e 4, que o subagente executa. Ela não mede a Consolidação, o relatório nem as rodadas seguintes, que o agente principal executa.
 
@@ -65,6 +65,18 @@ O inventário da versão testada achou perdas reais, quase todas na parte do age
 
 Na parte do revisor, a versão testada estreitou 2 regras: "propriedade pública" no lugar de propriedade sensível ou ID, e "ação que grava" no lugar de ação mutável. A fixture não exercita essa diferença.
 
-A versão corrigida devolve cada perda e cada regra estreitada ao texto da versão atual. Ela tem 3.218 palavras (−12%). Na parte do revisor, ela difere da versão testada só por voltar ao texto da versão atual.
+A versão corrigida devolve cada perda e cada regra estreitada ao texto da versão atual. Um 2º leitor novo comparou a versão corrigida com a atual. Ele não achou regra, limite, exceção ou marcador literal perdido. Ele apontou 2 mudanças de alcance e 6 perdas pequenas de precisão:
+- o pente-fino anti-ruído só no eixo Standards;
+- "Memória que só cresce" reduzida ao padrão `->get()`;
+- o aceite "pelo usuário" na conversa, "uma" pergunta na rodada 3, a definição de rodada seguinte, "chamadores das funções alteradas", a ordem dos níveis e o marcador do vaivém no critério de saída.
 
-Pendente: um leitor novo confere a versão corrigida. Até essa conferência, `skills/revisar/SKILL.md` continua na versão atual.
+A versão adotada devolve também esses 8 pontos ao texto da versão atual.
+
+## Conclusão
+
+- **Adotada:** a versão de 3.275 palavras (−11%). Na parte do revisor, ela tem o conteúdo da versão atual com menos palavras, e a versão testada, com o mesmo desenho, achou os mesmos defeitos.
+- **Ganho de eficácia:** não declarado. As 2 versões empataram nos defeitos plantados.
+- **Ganho de custo:** −11% de palavras na skill. A diferença de tokens e tempo dos revisores é pequena para 4 execuções por versão.
+- **Não medido:** a Consolidação, o relatório, as rodadas seguintes, o vaivém e o limite de rodadas, que o agente principal executa. Para essas partes, a prova é só o inventário de regras.
+- **Lição:** a primeira redução perdeu regras do agente principal, e a medida dos revisores não pegou essas perdas. Ao encurtar uma skill, faça também o inventário de regras por um leitor novo.
+- **Fixture:** o `User` sem `Notifiable` e o `Schedule::call` com `onOneServer()` sem `name()` são defeitos reais da fixture, fora do gabarito. Uma próxima avaliação deve corrigir esses pontos ou incluí-los no gabarito.

@@ -37,7 +37,7 @@ Fonte adicional, consultada em 30/10/2026: [ub-mode](https://github.com/unclebob
 - "Test Behavior, Not Implementation": o teste que passa com a Costura vazia sai. "If an honest test is impractical, do not write a bad one": a prova `parcial` ou `não verificado`.
 - "Model the Domain", "Boundary Discipline", "Type System Discipline", "Make Operations Idempotent" e "Separate Before Serializing Shared State", em `laravel-deep-modules` e no eixo Standards de `/revisar`.
 - "Commit and Push": o corpo do commit diz por que e como você provou. "Worktree Cleanup": o worktree com delta não integrado espera a decisão do usuário.
-- "Laziness Protocol" (uma decisão num só lugar): a ordem do portão fica só em `laravel-verification`. A [avaliação de nível 1](../evals/resultado-2026-10-30-revisar.md) compara uma versão de `/revisar` sem repetição com a atual.
+- "Laziness Protocol" (uma decisão num só lugar): a ordem do portão fica só em `laravel-verification`. `/revisar` perdeu 11% das palavras sem perder regras. A [avaliação de nível 1](../evals/resultado-2026-10-30-revisar.md) registra a comparação com a versão anterior.
 
 São escolhas locais: o escopo da mutação nos arquivos do diff, a ausência de driver como `não verificado` sem bloquear o commit e o `match` com braços simples como exceção registrada. Não adotamos: o push direto na branch principal, porque o fluxo passa por PR e `/revisar`; o registro de toda ação, porque `/pausar` e a evidência `[measured]` já cobrem a retomada; o dryer, porque não há equivalente estrutural maduro em PHP e `/revisar` já aponta duplicação; e o [uml-viewer](https://github.com/unclebob/uml-viewer).
 
