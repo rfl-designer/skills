@@ -1,6 +1,6 @@
 ---
 name: laravel-verification
-description: Verifica mudanças Laravel com feedback rápido durante a edição e portão completo antes de commit, PR ou entrega. Inclui Blade no Pint, navegador e probes Pest --agent quando disponíveis. Use também ao registrar evidências para uma pausa.
+description: Verifica mudanças Laravel com feedback rápido durante a edição e portão completo antes de commit, PR ou entrega. Inclui Blade no Pint, mutação e CRAP no escopo alterado, navegador e probes Pest --agent quando disponíveis. Use também ao registrar evidências para uma pausa.
 ---
 
 # Verificação Proporcional Laravel (`laravel-verification`)
@@ -30,7 +30,9 @@ Essa configuração exige Pint com suporte a Blade e suas dependências Node/Pre
 - **Ao pausar:** registre o último resultado, seu escopo e o estado verificado. Reutilize evidência se os arquivos e dependências cobertos não mudaram. Caso contrário, marque `desatualizado` e deixe o comando pendente na retomada. Não rode a suíte completa apenas para pausar.
 
 ## 3. Portão completo
-Use os comandos completos da configuração para o app afetado, no diretório de execução registrado. Respeite wrappers e scripts existentes também no ciclo RED/GREEN; não os some novamente aos comandos já completos. Se faltarem, use os padrões abaixo. Com Blade habilitado, a ordem é formatação → análise estática → testes:
+Esta seção é a única fonte da ordem do portão. As outras skills apontam para ela.
+
+Use os comandos completos da configuração para o app afetado, no diretório de execução registrado. Respeite wrappers e scripts existentes também no ciclo RED/GREEN; não os some novamente aos comandos já completos. Se faltarem, use os padrões abaixo. Com Blade habilitado, a ordem é formatação → análise estática → testes → qualidade dos testes → navegador, quando a seção 4 o exige:
 
 ```bash
 ./vendor/bin/pint --test
@@ -41,6 +43,25 @@ Use os comandos completos da configuração para o app afetado, no diretório de
 Se Pint falhar, formate o escopo alterado e repita os checks que a edição invalidou. PHPStan/Pest que já passaram continuam válidos enquanto seu código, configuração e dependências relevantes permanecem iguais. Não repita checks apenas para mudar de etapa.
 
 Nunca enfraqueça testes, tipos ou configuração para obter verde. Se uma ferramenta não pode executar, registre o comando, o erro e a cobertura ausente. Não declare o portão completo como aprovado.
+
+### Qualidade dos testes
+Um teste verde prova só que ele passa. A mutação prova que o teste falha quando a regra quebra. Execute esta etapa depois dos testes verdes, só nos arquivos PHP de produção do diff. As duas medidas exigem driver de cobertura (PCOV ou Xdebug). Sem driver ou sem ferramenta, registre `não verificado` com o motivo. Essa ausência não bloqueia o commit; ela aparece na evidência e no PR. Não instale dependências para esta etapa.
+
+1. **Mutação:** Use o comando da configuração. Sem configuração, confira o help:
+   - Pest com `--mutate` no help: `./vendor/bin/pest --mutate --path=<arquivos do diff, separados por vírgula>`.
+   - Infection instalado: `./vendor/bin/infection --git-diff-filter=AM --git-diff-base=<base>`.
+
+   Trate cada mutante que sobrevive e cada linha sem cobertura:
+   - Escreva o teste que mata o mutante.
+   - Ou apague o código que nenhum comportamento usa.
+   - Ou registre o mutante como equivalente, com o motivo. Um mutante equivalente não muda nenhum resultado observável.
+2. **CRAP:** Gere o relatório Clover fora do repositório: `./vendor/bin/pest --coverage-clover=<arquivo>`. Depois, execute `php <pasta-desta-skill>/scripts/crap.php <arquivo> <arquivos do diff>`. O limite é 10. O script sai com 1 quando um método fica com CRAP 10 ou mais.
+   - CRAP = CC² × (1 − cobertura)³ + CC. CC é a complexidade ciclomática. Com cobertura total, CRAP = CC.
+   - Primeiro, teste os ramos sem cobertura. Se o CRAP continua alto, separe o método por responsabilidade.
+   - Um `match` ou `switch` com braços simples pode ficar acima do limite. Registre o motivo.
+   - A linha `fora do relatório:` mostra um arquivo do diff sem medida. Confira o `<source>` do `phpunit.xml`. Um arquivo com lógica e sem medida fica `não verificado`.
+
+Não baixe `--min`, não aumente `--limite` e não exclua arquivos para obter verde.
 
 ## 4. Provar comportamento real
 Quando o diff toca Blade, Livewire, Alpine, CSS ou JavaScript, prove o caminho real no navegador e o efeito esperado. `Livewire::test()` comprova a fronteira no servidor; não executa o navegador.
@@ -61,7 +82,7 @@ Reporte comando, alcance, resultado, estado verificado (commit ou arquivos/diff)
 - `[inferred]` ou `[guess]`: conclusão sem execução; explique sua base e limite.
 - `desatualizado`, `não verificado` e `não aplicável`: use explicitamente quando corresponderem ao caso.
 
-Diga se o resultado veio de teste focado, probe ou suíte completa. Para UI, cite o fluxo exercitado e a prova de efeito.
+Diga se o resultado veio de teste focado, probe ou suíte completa. Para UI, cite o fluxo exercitado e a prova de efeito. Para a qualidade dos testes, cite os mutantes mortos, sobreviventes, sem cobertura e equivalentes, com o motivo de cada equivalente. Cite também os métodos com CRAP 10 ou mais e o motivo de cada exceção.
 
 ### Guardar a evidência
 Cada tipo de evidência tem um destino e uma validade. Não acumule arquivos por execução.

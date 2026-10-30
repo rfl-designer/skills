@@ -17,6 +17,7 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
 - **Reproduza antes de corrigir:** Escreva um teste no Pest (na `Action` ou com `Livewire::test()`) que reproduza exatamente o bug e falhe (`RED`).
 - **Corrija a causa raiz, não o sintoma:** Se um dado inválido chegou à `Action`, corrija a validação na Fronteira (`Livewire\Form` / `FormRequest`) e a tipagem no DTO, em vez de espalhar `if ($x !== null)` defensivos pelo código.
 - **Separe a reprodução da correção:** Verifique que o teste de regressão falha sem a correção e passa com ela.
+- **Ataque a premissa:** Depois de 2 correções com a mesma premissa sem GREEN, aplique a regra "Ataque a premissa" de `laravel-tdd-seams`. Sem essa skill, pare, reverta as duas correções, escreva a premissa numa frase e prove-a por execução antes da 3ª correção.
 
 ## 3. Processo (Loop de 5 Etapas)
 1. **Reproduzir (Loop Vermelho):**
@@ -33,7 +34,7 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
    - Aplique a menor alteração estrutural que elimina a causa raiz respeitando `laravel-deep-modules`.
    - Remova qualquer instrumentação temporária (`dd`, `dump`, `Log::debug`).
 4. **Proteger (Guard & Verification):**
-   - Durante o diagnóstico, execute o teste de regressão focado; use probes Pest Agent se disponíveis. Antes de entregar, aplique o portão completo de `laravel-verification` (Pint com Blade habilitado → PHPStan → Pest, mais navegador quando necessário).
+   - Durante o diagnóstico, execute o teste de regressão focado; use probes Pest Agent se disponíveis. Antes de entregar, aplique o portão completo de `laravel-verification`.
    - Se o usuário pedir commits, grave o teste de regressão em um commit antes do commit da correção. O histórico mostra o vermelho e depois o verde.
 5. **Relatório Curto de Causa Raiz:**
    - Explique em 3 bullets: (1) Qual era a causa raiz, (2) Qual teste Pest agora impede a regressão, (3) Qual foi o resultado medido da verificação.
@@ -43,10 +44,12 @@ Localizar a causa raiz de um defeito em Laravel/Livewire através de hipóteses 
 |---|---|
 | "Já sei qual é o erro olhando o código, vou alterar direto sem criar o teste antes." | **Proibido.** Sem ver o teste falhar antes da alteração, você não provou que o teste realmente captura o bug. |
 | "O primeiro fix não funcionou, vou adicionar mais um try/catch por cima." | **Proibido.** Releia o erro, reverta a tentativa falha e formule uma hipótese baseada em evidência medida. |
+| "Dois fixes da mesma hipótese falharam; tento uma terceira variação." | **Proibido.** Escreva a premissa comum numa frase e prove-a ou refute-a por execução antes da 3ª correção. |
 | "Vou colocar `@` ou `optional()` para silenciar o erro de propriedade nula." | **Proibido.** Silenciar exceção oculta corrupção de estado. Corrija a origem do dado nulo. |
 | "A primeira hipótese parece certa, não preciso listar outras." | **Proibido.** Uma hipótese única prende a busca na primeira ideia plausível. Liste de 3 a 5. |
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Teste de regressão no Pest visto falhando (`RED`) antes do fix.
 - `[measured]` Mesmo teste visto passando (`GREEN`) após o fix.
+- `[measured]` Depois de 2 correções sem GREEN: a premissa comum numa frase e a execução que a prova ou refuta.
 - `[measured]` Portão completo de `laravel-verification` aprovado para o estado corrigido; regressão preservada em teste permanente.

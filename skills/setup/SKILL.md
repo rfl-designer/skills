@@ -18,6 +18,11 @@ Prepare uma configuração persistente que as outras skills leem. Configure o pr
 
 Não leia nem copie credenciais para a configuração. Para capacidades condicionais, como Blade no Pint ou `--agent` no Pest, use lockfiles/help quando disponíveis; ausência da ferramenta é uma pendência, não autorização para instalá-la.
 
+Para a qualidade dos testes de `laravel-verification`, detecte também:
+- O driver de cobertura: `php -m` mostra `pcov` ou `xdebug`.
+- A mutação: `--mutate` no help do Pest, ou `infection/infection` no `composer.lock`.
+- O `<source>` do `phpunit.xml`, que define os arquivos medidos.
+
 ## 2. Completar as escolhas
 
 Apresente o que encontrou e a recomendação. Pergunte uma categoria por vez, apenas quando a sessão ou a configuração existente não resolver:

@@ -44,9 +44,10 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
    - Reutilize a Costura acordada. Crie Enum, DTO ou Action apenas quando justificam a complexidade encapsulada. Preserve validação, autorização e proteção do estado Livewire.
    - Durante as edições, use o ciclo rápido de `laravel-verification`; probes `--agent` são opcionais quando disponíveis.
    - Execute `./vendor/bin/pest --filter=<NomeDoTeste>` até ficar verde.
+   - Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `laravel-tdd-seams`. Se a premissa vem da Spec ou do ticket, pare e devolva a premissa e a prova ao principal. O principal leva a decisão ao usuário.
 4. **Passo REFACTOR & PORTÃO DE VERIFICAÇÃO:**
    - Remova código morto e comentários desnecessários (`ste100-clean-code`).
-   - Antes do commit ou entrega da fatia, aplique o portão completo de `laravel-verification`: Pint com Blade habilitado → PHPStan → Pest, mais navegador quando necessário. Reutilize resultados que ainda cobrem o estado atual.
+   - Antes do commit ou entrega da fatia, aplique o portão completo de `laravel-verification`. Reutilize resultados que ainda cobrem o estado atual.
 5. **Retorno ao principal:** Entregue ticket, critérios atendidos, arquivos alterados, diretório/worktree e diff ou commits autorizados. Inclua comandos, evidência RED e GREEN, portão completo, estado coberto e bloqueios. Distinga teste focado de suíte completa. Preserve mudanças e artefatos até a integração; não avance para outro ticket por conta própria.
 
 ## 5. Integrar e avançar (agente principal)
@@ -54,7 +55,7 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
 1. Aguarde o retorno e confira o diff contra a Spec, os critérios de aceite e o escopo atribuído. Um retorno parcial, sem RED esperado ou com verificação bloqueada não conclui a fatia. Retome o mesmo agente com a pendência e preserve o trabalho válido.
 2. Integre uma fatia por vez, por diff ou commits quando autorizados. Resolva conflitos sem descartar trabalho alheio. Se a resolução alterar comportamento, retorne ao ciclo de teste da fatia afetada.
 3. Execute o portão completo de `laravel-verification` sobre o estado integrado antes de commit ou entrega. Evidência de worktrees isolados não prova a combinação. Reutilize resultados apenas quando ainda cobrem exatamente o código, configuração e dependências relevantes; mudanças posteriores invalidam a cobertura afetada.
-4. Com o portão aprovado (`[measured]`), faça commit atômico se autorizado; caso contrário, registre o checkpoint no working tree. Atualize dependências e selecione a próxima fatia desbloqueada. A evidência de um worktree é temporária: ela serve só para conferir o retorno. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe apenas os worktrees criados por este fluxo.
+4. Com o portão aprovado (`[measured]`), faça commit atômico se autorizado; caso contrário, registre o checkpoint no working tree. A mensagem do commit segue `ste100-clean-code`. Atualize dependências e selecione a próxima fatia desbloqueada. A evidência de um worktree é temporária: ela serve só para conferir o retorno. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe apenas os worktrees criados por este fluxo. Antes de remover um worktree, confira com `git -C <worktree> status` e o diff que todo o delta dele está integrado. Um worktree com mudança não integrada espera a decisão do usuário.
 5. Ao concluir todos os tickets, apresente as provas do estado integrado e instrua o usuário a rodar `/revisar`.
 
 ## 6. Racionalizações Proibidas (Anti-Atalho)
@@ -68,6 +69,5 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
 
 ## 7. Prova de Execução (Critério de Saída)
 Para cada fatia entregue e para o estado integrado, apresente evidência medida, com comando, diretório e estado coberto:
-- `[measured]` Saída verde de `./vendor/bin/pest`.
-- `[measured]` Saída sem erros de `./vendor/bin/phpstan analyse`.
-- `[measured]` Saída limpa do Pint com Blade habilitado; cite o escopo efetivamente verificado.
+- `[measured]` Cada etapa do portão completo de `laravel-verification`, com o escopo efetivamente verificado.
+- `[measured]` Worktrees removidos só com o delta integrado; os outros, listados para a decisão do usuário.

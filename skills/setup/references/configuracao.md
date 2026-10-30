@@ -28,9 +28,11 @@ Use este formato em `docs/agents/projeto.md` ou no destino existente. Os marcado
 | Formatação PHP/Blade | {{comando e como Blade é habilitado}} | {{estado}} |
 | Build | {{comando ou não aplicável}} | {{estado}} |
 | Navegador | {{comando ou ferramenta disponível}} | {{estado}} |
+| Mutação | {{`pest --mutate --path=<arquivos>`, Infection com `--git-diff-filter=AM` ou ausente}} | {{estado}} |
+| Relatório Clover para CRAP | {{`pest --coverage-clover=<arquivo fora do repositório>` ou ausente}} | {{estado}} |
 
-- Capacidades condicionais: {{Pest Agent, Browser, Blade no Pint; detectadas ou não disponíveis}}.
-- Ordem do portão: formatação → análise estática → testes; acrescente build/navegador quando necessários.
+- Capacidades condicionais: {{Pest Agent, Browser, Blade no Pint, driver de cobertura (PCOV ou Xdebug); detectadas ou não disponíveis}}.
+- Ordem do portão: a de `laravel-verification`. Registre aqui só as exceções do projeto.
 
 ## Destinos
 | Artefato | Tipo | Destino exato | Convenção |
