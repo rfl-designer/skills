@@ -12,8 +12,9 @@ const PREFIXOS = ['rota', 'livewire', 'comando', 'agenda', 'notificacao', 'flag'
 const LINHA_BASE = '/^Base: commit [0-9a-f]{7,40} em \d{4}-\d{2}-\d{2}\b/u';
 const LINHA_ESTADO = '/^Estado: (conduzida|parcial|não conduzida|bloqueada) em \d{4}-\d{2}-\d{2}, commit [0-9a-f]{7,40}\b/u';
 const ID_DA_SUB_FEATURE = '/^- `([a-z0-9]+(?:-[a-z0-9]+)*)`/u';
+const NOME_DA_EVIDENCIA = '/^([a-z0-9]+(?:-[a-z0-9]+)*)\./u';
 
-$uso = "Uso: php conferir-mapa.php <pasta-do-mapa> [--ancoras=<arquivo>]\n";
+$uso = "Uso: php conferir-mapa.php <pasta-do-mapa> [--ancoras=<arquivo>] [--evidencias=<pasta>]\n";
 $argumentos = array_slice($argv, 1);
 if ($argumentos === [] || in_array($argumentos[0], ['-h', '--help'], true)) {
     fwrite($argumentos === [] ? STDERR : STDOUT, $uso);
@@ -21,13 +22,13 @@ if ($argumentos === [] || in_array($argumentos[0], ['-h', '--help'], true)) {
 }
 
 $pasta = null;
-$inventario = null;
+$opcoes = ['ancoras' => null, 'evidencias' => null];
 for ($i = 0; $i < count($argumentos); $i++) {
     $argumento = $argumentos[$i];
-    if (str_starts_with($argumento, '--ancoras=')) {
-        $inventario = substr($argumento, strlen('--ancoras='));
-    } elseif ($argumento === '--ancoras' && isset($argumentos[$i + 1])) {
-        $inventario = $argumentos[++$i];
+    if (preg_match('/^--(ancoras|evidencias)=(.*)$/u', $argumento, $m) === 1) {
+        $opcoes[$m[1]] = $m[2];
+    } elseif (in_array($argumento, ['--ancoras', '--evidencias'], true) && isset($argumentos[$i + 1])) {
+        $opcoes[substr($argumento, 2)] = $argumentos[++$i];
     } elseif ($pasta === null && !str_starts_with($argumento, '-')) {
         $pasta = $argumento;
     } else {
@@ -41,12 +42,18 @@ if ($raiz === false || !is_dir($raiz)) {
     fwrite(STDERR, "Pasta do mapa não encontrada: {$pasta}\n");
     exit(2);
 }
+$inventario = $opcoes['ancoras'];
 if ($inventario !== null && !is_file($inventario)) {
     fwrite(STDERR, "Inventário não encontrado: {$inventario}\n");
     exit(2);
 }
+$evidencias = $opcoes['evidencias'] === null ? null : realpath($opcoes['evidencias']);
+if ($opcoes['evidencias'] !== null && ($evidencias === false || !is_dir($evidencias))) {
+    fwrite(STDERR, "Pasta de evidências não encontrada: {$opcoes['evidencias']}\n");
+    exit(2);
+}
 
-$erros = conferir($raiz, $inventario);
+$erros = conferir($raiz, $inventario, $evidencias);
 foreach ($erros['lista'] as $erro) {
     echo $erro, PHP_EOL;
 }
@@ -59,7 +66,7 @@ exit(0);
 /**
  * @return array{lista: list<string>, resumo: string}
  */
-function conferir(string $raiz, ?string $inventario): array
+function conferir(string $raiz, ?string $inventario, ?string $evidencias): array
 {
     $erros = [];
     $indice = $raiz . DIRECTORY_SEPARATOR . 'README.md';
@@ -110,6 +117,11 @@ function conferir(string $raiz, ?string $inventario): array
         [$errosDoInventario, $cobertos] = conferirInventario($inventario, $ancoras, $foraDoMapa);
         $erros = array_merge($erros, $errosDoInventario);
         $resumo .= sprintf('; inventário: %d itens cobertos', $cobertos);
+    }
+    if ($evidencias !== null) {
+        [$errosDasEvidencias, $ligadas] = conferirEvidencias($evidencias, $ids);
+        $erros = array_merge($erros, $errosDasEvidencias);
+        $resumo .= sprintf('; evidências: %d arquivos ligados a Sub-features', $ligadas);
     }
 
     return ['lista' => $erros, 'resumo' => $resumo];
@@ -289,6 +301,39 @@ function conferirInventario(string $inventario, array $ancoras, array $foraDoMap
     }
 
     return [$erros, $cobertos];
+}
+
+/**
+ * @param array<string, string> $ids
+ * @return array{0: list<string>, 1: int}
+ */
+function conferirEvidencias(string $evidencias, array $ids): array
+{
+    $caminhos = [];
+    $iterador = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($evidencias, FilesystemIterator::SKIP_DOTS));
+    foreach ($iterador as $arquivo) {
+        if ($arquivo->isFile() && !str_starts_with($arquivo->getFilename(), '.')) {
+            $caminhos[] = relativo($evidencias, (string) $arquivo->getPathname());
+        }
+    }
+    sort($caminhos);
+
+    $erros = [];
+    $ligadas = 0;
+    foreach ($caminhos as $caminho) {
+        $feature = dirname($caminho) . '.md';
+        $id = preg_match(NOME_DA_EVIDENCIA, basename($caminho), $m) === 1 ? $m[1] : null;
+        $origem = $id === null ? null : ($ids[$id] ?? null);
+        if ($origem === null) {
+            $erros[] = "evidência {$caminho}: sem Sub-feature no mapa; o nome deve ser <domínio>/<feature>/<id-da-sub-feature>.<extensão>";
+        } elseif (strstr($origem, ':', true) !== $feature) {
+            $erros[] = "evidência {$caminho}: a Sub-feature {$id} está em {$origem}; mova o arquivo para a pasta dessa Feature";
+        } else {
+            $ligadas++;
+        }
+    }
+
+    return [$erros, $ligadas];
 }
 
 function cobre(string $ancora, string $item): bool

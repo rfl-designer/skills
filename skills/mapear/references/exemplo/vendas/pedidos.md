@@ -39,7 +39,7 @@ Pré-condições:
 - **Pix.** Ative a flag: `php artisan tinker --execute='Laravel\Pennant\Feature::for(App\Models\User::firstWhere("email", "cliente@loja.test"))->activate("checkout-pix");'`. Ação: finalize um pedido. Resultado: o checkout mostra `Pagar com Pix`. Desative a flag no fim com `deactivate`.
 - **Fechar o dia.** Conduza: `php artisan pedidos:fechar-dia --data=2026-10-28`. Resultado: código de saída `0` e a saída `1 pedido fechado`. O Mailpit mostra `Resumo do dia 28/10/2026`.
 - **Regressão.** Conduza: `./vendor/bin/pest tests/Feature/Pedidos`.
-- **Prova.** Capture a lista depois do cancelamento e a saída do fechamento. Guarde os dois na pasta de evidências.
+- **Prova.** Capture a lista depois do cancelamento em `vendas/pedidos/pedidos-cancelar.png` e a saída do fechamento em `vendas/pedidos/pedidos-fechar-dia.saida.log`, na pasta de evidências.
 
 ## Armadilhas
 

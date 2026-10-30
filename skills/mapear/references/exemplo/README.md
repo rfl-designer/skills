@@ -34,7 +34,8 @@ Base: commit 3f9c2ab em 2026-10-28
 - Confira o efeito, não só a tela: linha no banco, e-mail no Mailpit, arquivo em `storage/` ou recarga da página.
 - Um fake vale só na fronteira de um serviço externo, por exemplo `Http::fake()` para o gateway de pagamento.
 - Para um caminho inalcançável, diga o caminho e o bloqueio: conta, permissão, serviço externo ou sistema operacional. Conduza o caminho real mais próximo.
-- Guarde as provas em `docs/verification/evidencias/`, sem segredos.
+- Guarde as provas em `docs/verification/evidencias/`, sem segredos. O nome é `<domínio>/<feature>/<id-da-sub-feature>.<extensão>`, sem data. A condução nova substitui o arquivo; a linha `Estado:` guarda a data e o commit.
+- A pasta de evidências fica fora do Git. No PR, o CI publica os artefatos com retenção limitada.
 
 ## Varredura completa
 
@@ -71,7 +72,8 @@ Não descreva implementação. Nomeie só caminhos do usuário, identificadores 
 
 - Atualize o Arquivo de Feature no mesmo diff da mudança de comportamento visível.
 - Uma Feature nova recebe um arquivo e uma linha neste índice. Uma Feature removida perde os dois.
+- Uma Sub-feature ou Feature removida perde também seus artefatos na pasta de evidências.
 - Uma Âncora nova vai para uma Feature ou para `Fora do mapa`.
 - Depois de conduzir, atualize a linha `Estado:` com a data e o commit. `/conduzir` conduz uma Feature, um Domínio ou o mapa inteiro.
 - Só `/mapear` atualiza a linha `Base:`, depois de reconciliar todo o código até esse commit.
-- Antes de entregar, rode o `scripts/conferir-mapa.php` da skill `mapear` sobre esta pasta.
+- Antes de entregar, rode o `scripts/conferir-mapa.php` da skill `mapear` sobre esta pasta, com `--evidencias=docs/verification/evidencias` quando a pasta existe.

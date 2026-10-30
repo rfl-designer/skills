@@ -64,7 +64,7 @@ Faça a guarda antes da primeira condução. Repita-a depois de cada mudança em
 2. **Executar:** Para cada Feature do alcance, em série:
    - Leia o Arquivo de Feature e prepare as pré-condições.
    - Execute cada item de `Como conduzir` com o comando base e a ferramenta do README.
-   - Registre a ação, o comando, o resultado e o caminho da evidência. Siga as regras de evidência de `laravel-verification`.
+   - Registre a ação, o comando, o resultado e o caminho da evidência. Siga as regras de evidência de `laravel-verification`: o nome do artefato é estável, e a condução nova substitui o arquivo da mesma Sub-feature.
    - Depois de cada falha, faça o Diagnóstico de novo.
    - Sem navegador, conduza HTTP e Artisan e marque `parcial`, com o motivo.
    - Se o app não inicia, informe o bloqueio exato e mantenha `não conduzida`.
@@ -86,7 +86,9 @@ Faça a guarda antes da primeira condução. Repita-a depois de cada mudança em
    | `bloqueada` | Você tentou e uma pré-condição impediu. O detalhe diz qual. |
 
    Um defeito do produto não muda o Estado. O mapa continua com o comportamento esperado.
-6. **Conferir:** Rode o conferidor da skill `mapear`: `php <pasta-da-skill-mapear>/scripts/conferir-mapa.php <destino>`. Sem a skill `mapear`, registre `conferidor: não executado`.
+6. **Conferir:** Rode o conferidor da skill `mapear`: `php <pasta-da-skill-mapear>/scripts/conferir-mapa.php <destino> --evidencias=<pasta de Evidências>`. Omita `--evidencias` quando a pasta não existe. Sem a skill `mapear`, registre `conferidor: não executado`.
+   - Mova cada artefato que o conferidor aponta numa pasta errada.
+   - Mostre ao usuário os artefatos sem Sub-feature. Apague-os só depois da confirmação. Um nome antigo, com data, também aparece nessa lista.
 7. **Resultado:** Declare um destes resultados:
    - `em dia`: cada Feature do alcance conduzida e nada para corrigir.
    - `corrigido`: um conjunto de correções provadas. Releia cada arquivo alterado.
@@ -107,6 +109,6 @@ Faça a guarda antes da primeira condução. Repita-a depois de cada mudança em
 - `[measured]` Saída do Diagnóstico antes da primeira condução.
 - `[measured]` Por condução: ação, comando, resultado e caminho da evidência.
 - `[measured]` Por Feature do alcance, uma linha `Estado:` coerente com o que rodou.
-- `[measured]` Saída `OK` do conferidor, ou `não executado` com o motivo.
+- `[measured]` Saída `OK` do conferidor, com `--evidencias` quando a pasta existe, ou `não executado` com o motivo.
 - `[measured]` `git status` sem mudança fora do mapa, das evidências e da linha `Banco da condução`.
 - `[measured]` O resultado, as Derivas e lacunas corrigidas e os defeitos reportados.
