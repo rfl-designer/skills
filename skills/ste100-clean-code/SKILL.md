@@ -14,6 +14,7 @@ Manter toda comunicação, documentação (`SPEC`, `GLOSSARY.md`, PRs) e código
 - **Mantenha frases curtas:** Limite instruções procedimentais a no máximo 20 palavras e explicações descritivas a no máximo 25 palavras.
 - **Dê uma instrução por frase:** Separe passos múltiplos em listas numeradas.
 - **Corte muletas de IA (`/unslop`):** Proíba expressões vazias como *"Certamente!"*, *"Vamos mergulhar nisso"*, *"É importante notar que"*, *"Robusto e escalável"*, *"Sem mais delongas"*. Vá direto ao fato técnico.
+- **Escreva o commit com a prova:** O título diz o que mudou. O corpo diz por que mudou e como você provou. A prova é o comando e o resultado `[measured]`, por exemplo `pest --filter=AprovaPedido: 3 passed`. Sem prova executada, escreva `não verificado` e o motivo.
 
 ## 3. Regras Inegociáveis de Código (`/no-comments`)
 - **Não narre o que o código já diz:** Remova todo comentário que apenas repete o nome do método ou variável (ex.: `// Busca o usuário pelo ID`).
@@ -29,7 +30,9 @@ Manter toda comunicação, documentação (`SPEC`, `GLOSSARY.md`, PRs) e código
 | "Vou deixar comentários `// Passo 1`, `// Passo 2` dentro do método `handle()` para ficar didático." | **Proibido.** Se o método precisa de divisórias em comentário, extraia métodos privados com nomes claros. |
 | "Vou comentar o código antigo em vez de apagar, caso precisemos dele depois." | **Proibido.** O Git guarda o histórico. Delete código morto imediatamente. |
 | "Vou escrever uma introdução longa elogiando a pergunta do usuário." | **Proibido.** Comece a resposta diretamente pela decisão, diagnóstico ou resultado. |
+| "O título `fix: corrige aprovação` basta; o diff mostra o resto." | **Proibido.** O diff mostra o quê, não o porquê nem a prova. Escreva os dois no corpo. |
 
 ## 5. Prova de Execução (Critério de Saída)
 - `[measured]` Zero código comentado ou comentários narrativos (`// valida dados`, `// salva no banco`) no `git diff`.
 - `[measured]` Texto da Spec, ticket ou PR escrito em voz ativa e frases curtas sob o padrão ASD-STE100.
+- `[measured]` Corpo de cada commit com o porquê e a prova, ou com `não verificado` e o motivo.

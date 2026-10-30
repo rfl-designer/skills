@@ -25,6 +25,9 @@ Faça o ciclo completo: teste Pest na Costura/Fronteira → RED pelo motivo espe
 → implementação mínima → GREEN → refactor → portão de laravel-verification.
 Use o executor e os comandos configurados. Isole recursos de teste ou respeite a
 serialização combinada. Não enfraqueça os verificadores para obter verde.
+Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a
+premissa" de laravel-tdd-seams. Se a premissa vem da Spec ou do ticket, pare e
+devolva a premissa e a prova ao principal.
 
 Não crie outros agentes. Faça commits somente se o principal transmitir a
 autorização da sessão. Integração, próximo ticket e limpeza cabem ao principal.

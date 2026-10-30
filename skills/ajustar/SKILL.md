@@ -68,9 +68,9 @@ Avise cada Ajustador que há outros agentes no repositório: não reverta mudan�
 1. **Base:** Confirme o diretório, a base, o diff revisado e os achados do Lote. Não selecione outros achados.
 2. **Prova antes:** Escolha a prova de cada achado pela seção 3. No achado com comportamento, escreva o teste do caso concreto na Costura ou na Fronteira. Execute `./vendor/bin/pest --filter=<Teste>` e confirme a falha pelo motivo do achado.
 3. **Correção:** Aplique a menor correção que resolve o caso em todos os locais. Prefira a correção que apaga código.
-4. **Prova depois:** Execute a prova de cada achado até ela passar.
+4. **Prova depois:** Execute a prova de cada achado até ela passar. Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `laravel-tdd-seams`. Se a premissa vem da Correção do achado, marque o achado `bloqueado`, com a premissa, a prova e a pergunta.
 5. **Propagação:** Busque com `rg` o padrão corrigido e cada valor alterado. Confira cada consumidor. Trate a regressão e o defeito sem relação pela seção 3.
-6. **Portão:** Aplique o portão completo de `laravel-verification`: Pint com Blade habilitado → PHPStan → Pest, mais navegador quando necessário.
+6. **Portão:** Aplique o portão completo de `laravel-verification`.
 7. **Retorno:** Devolva neste formato, sem colar os arquivos:
 
 ```markdown
@@ -91,7 +91,7 @@ Pendências: achado 6.
 3. **Integração:** Integre um Lote por vez, só com o delta do Lote. Um conflito que muda comportamento volta ao ciclo de prova do Lote afetado.
 4. **Regressões:** Junte os `Valores alterados` de todos os Lotes. No estado integrado, busque de novo com `rg` os consumidores de cada valor e confira cada um. Dois Lotes podem alterar o mesmo Fluxo de formas incompatíveis. Atribua cada regressão ao Lote dono do arquivo, ou a um Lote novo.
 5. **Portão:** Execute o portão completo de `laravel-verification` no estado integrado. A evidência de worktrees isolados não prova a combinação.
-6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe só os worktrees criados por este fluxo.
+6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A mensagem segue `ste100-clean-code` e cita os números dos achados. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe só os worktrees criados por este fluxo. Antes de remover um worktree, confira com `git -C <worktree> status` e o diff que todo o delta dele está integrado. Um worktree com mudança não integrada espera a decisão do usuário.
 7. **Relatório:**
    - 1 linha por achado: número, título, status (`corrigido`, `não reproduz`, `bloqueado` ou `desatualizado`) e prova.
    - Os achados enviados a `/implementar` ou `/bug`, quando houver.

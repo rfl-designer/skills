@@ -35,6 +35,10 @@ Escolha a prova pelo tipo do achado:
 - Sem teste viável, como numa condição de corrida: motivo e prova mais próxima,
   marcada como "parcial".
 
+Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a
+premissa" de laravel-tdd-seams. Se a premissa vem da Correção do achado, marque
+o achado "bloqueado", com a premissa, a prova e a pergunta.
+
 Se o teste passa antes da correção, altere a linha do achado de propósito. Se o
 teste falha, desfaça a alteração e registre "não reproduz" com as duas saídas,
 sem alterar a produção. Se o teste não falha, reescreva-o para o caso concreto.

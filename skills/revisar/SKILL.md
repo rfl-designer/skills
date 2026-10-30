@@ -48,7 +48,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
    - **Subagente 1 — Eixo Standards & Laravel/Livewire Security:**
      - **Carga esperada:** Procura a carga no repositório (README, filas, Horizon, Octane, scheduler, deploy). Declara a carga presumida.
      - **Segurança:** Verifica se propriedades sensíveis/IDs em componentes `Livewire` possuem `#[Locked]`. Verifica se toda ação mutável chama `$this->authorize()` / `Policy`.
-     - **Perda de dados:** Caça erro engolido em `try/catch`, várias escritas sem `DB::transaction()` e job ou evento disparado antes do commit sem `afterCommit()`.
+     - **Perda de dados:** Caça erro engolido em `try/catch`, várias escritas sem `DB::transaction()` e job ou evento disparado antes do commit sem `afterCommit()`. Caça a operação que, executada 2 vezes, grava, cobra ou envia em dobro: job com retry, webhook, comando agendado, duplo clique.
      - **Escala:**
        - N+1 queries Eloquent (falta de `with()` ou `preventLazyLoading`).
        - Condição de corrida entre leitura e escrita: `firstOrCreate` sem índice único, falta de `lockForUpdate()` ou `increment()`.
@@ -69,7 +69,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
      - Compara o diff linha a linha com a Especificação gerada em `/especificar`.
      - Aponta requisitos faltantes e escopo extra não solicitado (*scope creep*).
      - **Bug:** Caça resultado errado e erro em casos de borda (vazio, zero, último item, arredondamento, fuso horário). Caça chamador quebrado pela mudança. Caça correção feita num só chamador, com a função compartilhada ainda errada.
-     - **Teste ausente:** Aponta lógica de risco sem um teste Pest que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Pede um teste bom, não cobertura.
+     - **Teste ausente:** Aponta lógica de risco sem um teste Pest que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Pede um teste bom, não cobertura. Aponta também o teste que ainda passa com a Costura a devolver vazio, sem gravar nada.
      - **Mapa desatualizado:** Com Mapa de Features configurado, aponta comportamento visível alterado sem atualização do Arquivo de Feature no mesmo diff.
 4. **Confirmação dos Achados:** Antes de reportar, cada subagente:
    1. Escreve o caso concreto de cada achado.
@@ -118,7 +118,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Dentro
    - **Por que (Why):** 1 a 2 frases explicando o problema resolvido.
    - **O que mudou (What changed):** Bullets curtos focados nas Fronteiras (`Livewire`/HTTP) e Costuras (`Actions`/DTOs).
    - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo) e liste exatamente quais rotas/componentes podem ser afetados. Inclua o fato de segurança da etapa 7 com a prova ou o rótulo `não provado`. Liste os achados `aceito` como **Riscos aceitos**, com o motivo.
-   - **Prova de Execução (`[measured]`):** Resumo dos resultados do Pest, Larastan e Pint.
+   - **Prova de Execução (`[measured]`):** Resumo do portão completo de `laravel-verification`.
 
 ## 4. No Claude Code
 Use o agente customizado `revisor`, com `model: inherit` e as ferramentas `Read, Grep, Glob`.
