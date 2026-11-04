@@ -71,7 +71,7 @@ Faça a guarda antes da primeira condução. Repita-a depois de cada mudança em
 3. **Triagem:** Classifique cada falha:
    - **Deriva:** corrija o Arquivo de Feature.
    - **Lacuna de condução:** corrija a receita, ou marque o caminho como manual, com o motivo.
-   - **Defeito do produto:** reporte com o caso concreto e ofereça `/bug`. Não altere o mapa nem o código.
+   - **Defeito do produto:** reporte com o caso concreto e ofereça `/depurar`. Não altere o mapa nem o código.
 
    Uma diferença sem commit, Spec ou pedido que a explique é defeito do produto. Rode cada receita corrigida de novo, a partir do arquivo. Uma Âncora nova ou removida, uma Feature nova ou uma Feature removida vai para `/mapear`.
 4. **Limpar:** Remova os dados que a condução criou. Desative as flags que ela ativou. Preserve as evidências.

@@ -1,10 +1,10 @@
 ---
-name: bug
-description: Diagnostica e corrige bugs em PHP, Laravel e Livewire por método científico (reproduzir no Pest, localizar por busca binária, corrigir na causa raiz e validar). Use quando o usuário digitar /bug.
+name: depurar
+description: Diagnostica e corrige bugs em PHP, Laravel e Livewire por método científico (reproduzir no Pest, localizar por busca binária, corrigir na causa raiz e validar). Use quando o usuário digitar /depurar.
 disable-model-invocation: true
 ---
 
-# Diagnóstico Científico e Correção de Bugs (`/bug`)
+# Diagnóstico Científico e Correção de Bugs (`/depurar`)
 
 ## Configuração do projeto
 Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
