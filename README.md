@@ -45,7 +45,7 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
 ```
 /alinhar → /prototipar → /especificar → /planejar → /implementar → /revisar ⇄ /ajustar
                                                             ↑
-                                                          /bug
+                                                          /depurar
 ```
 
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. Antes de gravar, `/especificar` e `/planejar` passam o rascunho por um Leitor novo, sem o histórico do chat, com `leitura-independente`. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. O usuário pode aceitar um achado, com o motivo. Na rodada 3 sem veredito `pode entregar`, `/revisar` para o ciclo e pergunta como seguir. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
@@ -67,9 +67,9 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
 | `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
-| `/bug` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
+| `/depurar` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos e só de leitura; sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
-| `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/bug`. |
+| `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/depurar`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
 | `/mapear` | Cria, atualiza e audita o Mapa de Features contra o código, sem operar o app. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador. |

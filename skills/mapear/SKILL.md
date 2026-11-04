@@ -82,7 +82,7 @@ Se o alcance toca 3 ou mais Domínios, delegue um Mapeador por Domínio afetado,
 3. **Reconciliar:** Confira por amostra cada Deriva citada com `arquivo:linha`. Procure no histórico recente entradas novas sem Feature. Exija um caminho concreto antes de declarar uma falta.
 4. **Triagem:**
    - **Deriva do mapa:** o código está certo e o mapa está errado. Corrija o mapa e marque a receita alterada `não conduzida`.
-   - **Defeito do produto:** o código está errado. Reporte com o caso concreto e ofereça `/bug`. Não altere o mapa nem o código.
+   - **Defeito do produto:** o código está errado. Reporte com o caso concreto e ofereça `/depurar`. Não altere o mapa nem o código.
 5. **Resultado:** Declare um destes resultados:
    - `em dia`: cobertura completa e nada para corrigir.
    - `corrigido`: um conjunto de correções provadas. Releia cada arquivo alterado.

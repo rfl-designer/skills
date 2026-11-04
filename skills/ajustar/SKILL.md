@@ -25,7 +25,7 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 - **Corrija os achados escolhidos:** O argumento ou a mensagem do usuário escolhe os achados ("corrija 2 e 5"). Sem escolha, use os achados do `Veredito:` do relatório: todos os `[BLOCKER]` e `[IMPORTANTE]`. Um `[NIT]` entra só quando o usuário o escolhe.
 - **Registre os achados aceitos:** Quando o usuário decide não corrigir um achado, ele o aceita. Registre o achado em `Aceitos:`, com o motivo do usuário. Sem motivo, pergunte o motivo. Um achado que o usuário não escolheu não está aceito: ele continua aberto.
 - **Leve o vaivém ao usuário:** Um achado com `(vaivém do achado N)` não entra num Lote antes da resposta do usuário. A Correção dele traz as duas direções e a pergunta.
-- **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Action ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/bug`. Esses achados ficam fora dos Lotes.
+- **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Action ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/depurar`. Esses achados ficam fora dos Lotes.
 - **Use o relatório como contrato:** A Correção do achado é o ponto de partida. O Ajustador pode aplicar uma correção menor que resolve o mesmo caso concreto. Uma correção que muda a Spec, muda um contrato externo ou exige escolha entre opções recebe o status `bloqueado`, com a pergunta para o usuário.
 - **Prove cada correção pelo tipo do achado:**
   - **Com comportamento:** O caso concreto vira um teste Pest. O teste falha antes da correção pelo motivo do achado (RED) e passa depois (GREEN).
@@ -45,10 +45,10 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 
 ## 4. Preparar e delegar (agente principal)
 1. **Relatório:** Use o relatório mais recente de `/revisar` para o mesmo alvo, da conversa ou do arquivo citado no handoff. Os números dos achados valem só nesse relatório. Sem relatório, ou com achados sem as 4 partes, peça o relatório ao usuário ou ofereça uma nova rodada de `/revisar`. Os achados vêm do relatório, não de memória ou resumo.
-2. **Seleção:** Aplique a regra de seleção. Mostre a lista com número, nível e título, e continue. Mostre à parte os achados que vão para `/implementar` ou `/bug`.
+2. **Seleção:** Aplique a regra de seleção. Mostre a lista com número, nível e título, e continue. Mostre à parte os achados que vão para `/implementar` ou `/depurar`.
    - Seleção vazia (`Veredito: pode entregar.` ou `Sem achados.`, sem escolha do usuário): informe e pare.
    - Número que o relatório não tem: informe e não o delegue.
-   - Pedido sem achado no relatório: ofereça `/bug` ou `/revisar`.
+   - Pedido sem achado no relatório: ofereça `/depurar` ou `/revisar`.
    - Pedido ambíguo: pergunte e espere a resposta.
    - Achado com `(vaivém do achado N)`: faça a pergunta da Correção antes de delegar. Com a direção escolhida, ele entra num Lote. Com a decisão de manter o código, ele vira `aceito`.
 3. **Estado:** Confira `git status` e a linha `Alvo:` do relatório. Com outra branch no checkout, pare e pergunte. Releia o `arquivo:linha` de cada achado; com código alterado depois do relatório, localize o trecho de novo. Sem o trecho, marque o achado `desatualizado` e não o delegue.
@@ -94,9 +94,9 @@ Pendências: achado 6.
 6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A mensagem segue `ste100-clean-code` e cita os números dos achados. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe só os worktrees criados por este fluxo. Antes de remover um worktree, confira com `git -C <worktree> status` e o diff que todo o delta dele está integrado. Um worktree com mudança não integrada espera a decisão do usuário.
 7. **Relatório:**
    - 1 linha por achado: número, título, status (`corrigido`, `não reproduz`, `bloqueado` ou `desatualizado`) e prova.
-   - Os achados enviados a `/implementar` ou `/bug`, quando houver.
+   - Os achados enviados a `/implementar` ou `/depurar`, quando houver.
    - `Valores alterados:` 1 linha por valor, com os consumidores conferidos. A rodada seguinte de `/revisar` coloca esses valores no Mapa de Fluxos.
-   - `Achados novos:` caso concreto e `arquivo:linha`, quando houver. Ofereça `/bug` para cada um. A rodada seguinte de `/revisar` também os confere.
+   - `Achados novos:` caso concreto e `arquivo:linha`, quando houver. Ofereça `/depurar` para cada um. A rodada seguinte de `/revisar` também os confere.
    - As perguntas dos achados `bloqueado`.
    - `Aceitos:` 1 linha por achado aceito, com o motivo, quando houver. A rodada seguinte de `/revisar` os deixa fora do `Veredito:`.
    - `Portão:` comandos, escopo e resultado no estado integrado.
