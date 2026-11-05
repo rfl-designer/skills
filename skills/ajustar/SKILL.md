@@ -14,7 +14,7 @@ Leia a configuração apontada nas instruções do projeto; sem ponteiro, procur
 Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal agrupa os achados em Lotes e delega cada Lote a um Ajustador. O Ajustador prova cada correção. O principal integra os Lotes, procura regressões nos valores alterados e verifica o estado integrado. Depois, o usuário roda `/revisar` para a rodada seguinte.
 
 ## 2. Termos
-- **Achado:** item numerado do relatório de `/revisar`, com caso concreto, `arquivo:linha` e as 4 partes (O que é, Problema, Correção, Se não corrigir).
+- **Achado:** item numerado do relatório de `/revisar`, com caso concreto, `arquivo:linha`, as 4 partes (O que é, Problema, Correção, Se não corrigir) e a Prova: o arquivo de prova, o comando e a saída.
 - **Fluxo:** o caminho de um valor, da entrada até cada consumidor, como em `/revisar`.
 - **Lote:** grupo de achados que um só Ajustador corrige.
 - **Ajustador:** subagente que corrige um Lote.
@@ -22,16 +22,14 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 
 ## 3. Regras Inegociáveis
 - **Carregue as disciplinas de modelo:** Aplique `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification` e `ste100-clean-code`.
-- **Corrija os achados escolhidos:** O argumento ou a mensagem do usuário escolhe os achados ("corrija 2 e 5"). Sem escolha, use os achados do `Veredito:` do relatório: todos os `[BLOCKER]` e `[IMPORTANTE]`. Um `[NIT]` entra só quando o usuário o escolhe.
+- **Corrija os achados escolhidos:** O argumento ou a mensagem do usuário escolhe os achados ("corrija 2 e 5"). Sem escolha, use os achados do `Veredito:` do relatório: todos os `[BLOCKER]` e `[IMPORTANTE]`.
 - **Registre os achados aceitos:** Quando o usuário decide não corrigir um achado, ele o aceita. Registre o achado em `Aceitos:`, com o motivo do usuário. Sem motivo, pergunte o motivo. Um achado que o usuário não escolheu não está aceito: ele continua aberto.
 - **Leve o vaivém ao usuário:** Um achado com `(vaivém do achado N)` não entra num Lote antes da resposta do usuário. A Correção dele traz as duas direções e a pergunta.
 - **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Action ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/depurar`. Esses achados ficam fora dos Lotes.
 - **Use o relatório como contrato:** A Correção do achado é o ponto de partida. O Ajustador pode aplicar uma correção menor que resolve o mesmo caso concreto. Uma correção que muda a Spec, muda um contrato externo ou exige escolha entre opções recebe o status `bloqueado`, com a pergunta para o usuário.
 - **Prove cada correção pelo tipo do achado:**
-  - **Com comportamento:** O caso concreto vira um teste Pest. O teste falha antes da correção pelo motivo do achado (RED) e passa depois (GREEN).
+  - **Com comportamento:** O caso concreto vira um teste Pest. Parta do arquivo de prova do achado, na pasta de `Provas:` do relatório. O teste falha antes da correção pelo motivo do achado (RED) e passa depois (GREEN).
   - **Teste ausente:** Escreva o teste. Quebre a lógica de propósito, veja o teste falhar e desfaça a quebra. Aqui, o teste verde na primeira execução é o resultado esperado.
-  - **Estrutura ou duplicação:** Os testes do trecho e o portão são a prova. Sem teste no trecho, escreva antes um teste de caracterização: ele fixa o comportamento atual e fica verde antes e depois.
-  - **Código morto, import ou comentário:** A prova é a busca com `rg` sem uso e o portão.
   - **Mapa desatualizado:** A prova é o conferidor de `/mapear` e a condução da entrada afetada, segundo `laravel-verification`.
   - **Sem teste viável** (condição de corrida, carga): Registre o motivo e use a prova mais próxima, como a contagem de queries ou o índice único no schema. Marque a prova como `parcial`.
 - **Prove o `não reproduz`:** No achado com comportamento, o teste pode passar antes da correção. Antes de concluir, altere a linha do achado de propósito e veja o teste falhar; depois, desfaça a alteração. Com a falha, o teste executa o caso: registre `não reproduz` com o teste e as duas saídas, e mantenha a produção sem alteração. Sem a falha, o teste não executa o caso: reescreva-o para o caso concreto.
@@ -44,7 +42,7 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 - **Deixe o veredito para `/revisar`:** `/ajustar` prova as correções. A rodada seguinte de `/revisar` revisa o diff completo e confirma o resultado.
 
 ## 4. Preparar e delegar (agente principal)
-1. **Relatório:** Use o relatório mais recente de `/revisar` para o mesmo alvo, da conversa ou do arquivo citado no handoff. Os números dos achados valem só nesse relatório. Sem relatório, ou com achados sem as 4 partes, peça o relatório ao usuário ou ofereça uma nova rodada de `/revisar`. Os achados vêm do relatório, não de memória ou resumo.
+1. **Relatório:** Use o relatório mais recente de `/revisar` para o mesmo alvo, da conversa ou do arquivo citado no handoff. Os números dos achados valem só nesse relatório. Sem relatório, ou com achados sem as 4 partes e a Prova, peça o relatório ao usuário ou ofereça uma nova rodada de `/revisar`. Os achados vêm do relatório, não de memória ou resumo.
 2. **Seleção:** Aplique a regra de seleção. Mostre a lista com número, nível e título, e continue. Mostre à parte os achados que vão para `/implementar` ou `/depurar`.
    - Seleção vazia (`Veredito: pode entregar.` ou `Sem achados.`, sem escolha do usuário): informe e pare.
    - Número que o relatório não tem: informe e não o delegue.
@@ -66,7 +64,7 @@ Avise cada Ajustador que há outros agentes no repositório: não reverta mudan�
 
 ## 5. Processo do Ajustador (por Lote)
 1. **Base:** Confirme o diretório, a base, o diff revisado e os achados do Lote. Não selecione outros achados.
-2. **Prova antes:** Escolha a prova de cada achado pela seção 3. No achado com comportamento, escreva o teste do caso concreto na Costura ou na Fronteira. Execute `./vendor/bin/pest --filter=<Teste>` e confirme a falha pelo motivo do achado.
+2. **Prova antes:** Escolha a prova de cada achado pela seção 3. No achado com comportamento, parta do arquivo de prova do achado e ponha o teste na Costura ou na Fronteira. Sem o arquivo, escreva o teste do caso concreto. Execute `./vendor/bin/pest --filter=<Teste>` e confirme a falha pelo motivo do achado.
 3. **Correção:** Aplique a menor correção que resolve o caso em todos os locais. Prefira a correção que apaga código.
 4. **Prova depois:** Execute a prova de cada achado até ela passar. Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `laravel-tdd-seams`. Se a premissa vem da Correção do achado, marque o achado `bloqueado`, com a premissa, a prova e a pergunta.
 5. **Propagação:** Busque com `rg` o padrão corrigido e cada valor alterado. Confira cada consumidor. Trate a regressão e o defeito sem relação pela seção 3.
@@ -125,7 +123,7 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 | "O requisito faltante é só uma tela nova; implemento como correção." | **Proibido.** Uma Fatia nova vai para `/implementar`, com teste na Costura e na Fronteira. |
 | "Cada Lote passou nos testes; a integração está verde." | **Proibido.** Busque os consumidores dos valores alterados e rode o portão no estado integrado. |
 | "As correções têm prova; a revisão está aprovada." | **Proibido.** A rodada seguinte de `/revisar` dá o veredito. |
-| "Já estou no arquivo; corrijo os `[NIT]` também." | **Proibido.** Um `[NIT]` entra só com a escolha do usuário. |
+| "Já estou no arquivo; refatoro também o trecho ao lado." | **Proibido.** Corrija só os achados escolhidos. O refactor é de `/implementar`. |
 | "A correção exige mudar a Spec; decido sozinho." | **Proibido.** Marque `bloqueado` com a pergunta. O principal a faz ao usuário no relatório. |
 | "O usuário escolheu 2 e 5; os outros achados do Veredito estão aceitos." | **Proibido.** O aceite exige a decisão e o motivo do usuário. Um achado não escolhido continua aberto. |
 | "O vaivém tem uma direção óbvia; delego a correção." | **Proibido.** As duas correções puxam o código em direções opostas. A direção é decisão do usuário. |

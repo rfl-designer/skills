@@ -46,7 +46,8 @@ Avise cada implementador que há outros agentes no repositório: não reverta mu
    - Execute `./vendor/bin/pest --filter=<NomeDoTeste>` até ficar verde.
    - Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `laravel-tdd-seams`. Se a premissa vem da Spec ou do ticket, pare e devolva a premissa e a prova ao principal. O principal leva a decisão ao usuário.
 4. **Passo REFACTOR & PORTÃO DE VERIFICAÇÃO:**
-   - Remova código morto e comentários desnecessários (`ste100-clean-code`).
+   - Remova código morto, imports e opções sem uso e comentários desnecessários (`ste100-clean-code`).
+   - Enxugue o próprio diff: reutilize o helper, a Action ou o Scope que o repositório já tem; use o que o Laravel ou o PHP já resolvem; tire a interface com uma só implementação e a configuração que ninguém altera; junte quase-cópias que mudam juntas; separe a função com várias responsabilidades. Aceite CRUD simples e Costuras existentes (`laravel-deep-modules`). `/revisar` não aponta estilo nem estrutura: esta é a etapa deles.
    - Antes do commit ou entrega da fatia, aplique o portão completo de `laravel-verification`. Reutilize resultados que ainda cobrem o estado atual.
 5. **Retorno ao principal:** Entregue ticket, critérios atendidos, arquivos alterados, diretório/worktree e diff ou commits autorizados. Inclua comandos, evidência RED e GREEN, portão completo, estado coberto e bloqueios. Distinga teste focado de suíte completa. Preserve mudanças e artefatos até a integração; não avance para outro ticket por conta própria.
 

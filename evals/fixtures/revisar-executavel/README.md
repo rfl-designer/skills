@@ -22,7 +22,7 @@ Consequência: o defeito não plantado do `User` sem `Notifiable`, que a avalia�
 evals/fixtures/revisar-executavel/montar.sh <pasta>
 ```
 
-O script copia `projeto/`, cria o repositório com a base em `master` e o diff em `feature/aprovar-pela-lista`, instala as dependências e roda o Pest. Para várias pastas, instale uma vez e passe a pasta pronta como segundo argumento: o script copia `vendor/` com links físicos. Não rode `composer` numa pasta com links físicos, porque ele reescreve arquivos que as outras pastas compartilham.
+O script copia `projeto/`, cria o repositório com a base em `master` e o diff em `feature/aprovar-pela-lista`, instala as dependências e roda o Pest. Para várias pastas, instale uma vez e passe a pasta pronta como segundo argumento: o script copia `vendor/` com links físicos. Não rode `composer` numa pasta com links físicos, porque ele reescreve arquivos que as outras pastas compartilham. O Pest grava `vendor/pestphp/pest/.temp/test-results`, que as pastas também compartilham; é só um cache de resultados.
 
 Depois, copie `skills/revisar/` e as 3 disciplinas do revisor para `<pasta>/skills/`. Dê ao revisor só essa pasta. Não dê `gabarito/`, `evals/cenarios.md` nem os arquivos de resultado: eles descrevem os defeitos plantados.
 

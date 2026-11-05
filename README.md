@@ -68,7 +68,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
 | `/depurar` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
-| `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos e só de leitura; sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
+| `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos, cada um na sua worktree, provam cada achado por execução; o principal reexecuta cada prova na head e na base, e o defeito da base sai do veredito. Estilo e estrutura ficam com `/implementar`. Sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
 | `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/depurar`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
@@ -98,9 +98,9 @@ Copie [o template do leitor](skills/leitura-independente/assets/leitor.md) para 
 
 ### Revisores no Claude Code
 
-`/revisar` delega cada eixo a um revisor novo, com `model: inherit` e só as ferramentas `Read, Grep, Glob`. O principal grava o diff num arquivo, executa o portão e prova o fato de segurança.
+`/revisar` delega cada eixo a um revisor novo, com `model: inherit` e as ferramentas `Read, Grep, Glob, Bash`. Cada revisor trabalha numa worktree própria e executa só o Pest com a configuração de teste. O principal faz a guarda do ambiente de teste, cria as worktrees, executa o portão, reexecuta cada prova e prova o fato de segurança.
 
-Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/agents/revisor.md` no projeto consumidor e instale `laravel-deep-modules`, `laravel-tdd-seams` e `ste100-clean-code`. Sem o agente registrado, `/revisar` usa o subagente geral, com a regra "só lê" só na instrução.
+Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/agents/revisor.md` no projeto consumidor e instale `laravel-deep-modules`, `laravel-tdd-seams` e `ste100-clean-code`. Sem o agente registrado, `/revisar` usa o subagente geral, com as regras "só na sua worktree" e "só no ambiente de teste" só na instrução.
 
 ### Mapeadores no Claude Code
 
