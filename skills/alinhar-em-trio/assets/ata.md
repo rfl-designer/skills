@@ -36,7 +36,8 @@ Ramos recusados:
 - Mudanças de posição: <agente, rodada, argumento e de quem veio; ou nenhuma>
 - Concordâncias sem argumento recusadas: <agente e rodada; ou nenhuma>
 - Decisão: <formulação do Julgador>
-- Origem: unanimidade | decidido pelo humano (pergunta de negócio | impasse)
+- Origem: unanimidade | decidido pelo humano (impasse)
+- Fatos de negócio do humano: <pergunta e resposta; ou nenhum>. Um fato de negócio não decide o nó: o trio decide com ele.
 - Evidências: <`arquivo:linha`, URLs, protótipos e o resultado observado>
 - Concordância: opus CONCORDO; sol CONCORDO; argon CONCORDO
 
@@ -51,7 +52,9 @@ Ramos recusados:
 ## SPEC
 - Rascunho: <caminho>; versão atual v<n>
 - Leitura Independente: <linha no formato de `leitura-independente`>
-- Achados do Leitor: <achado, tipo (redação, decisão ou negócio) e resolução>
+- Leituras: <1 ou 2>; versão que cada Leitor leu: <v1, v3>
+- Achados do Leitor: <achado, severidade, classe (`corrigir`, `contestar`, `perguntar` ou `mover para tickets`) e resolução>
+- Paráfrase: <confirmada pelo trio, ou recusada na rodada de OK n>
 - Rodadas de OK:
   - v1: opus OK; sol RECUSA (fidelidade, nó 03); argon OK
 - Glossário: <termos>

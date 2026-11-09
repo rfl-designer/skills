@@ -91,7 +91,7 @@ Grave esta seção só quando a sessão roda no herdr ou quando o usuário pede.
 
 ```markdown
 ## Trio de alinhamento
-- Julgador esperado: Claude Code, `claude-opus-5-5`, esforço `xhigh`. Só registro: a configuração não escolhe o modelo da sessão do humano.
+- Julgador esperado: Claude Code, `claude-fable-5-2`, esforço `medium`. Só registro: a configuração não escolhe o modelo da sessão do humano. O humano inicia o Julgador com `claude --model claude-fable-5-2 --effort medium`.
 - Timeout de cada resposta: 15 minutos.
 - Labels: `review-for-human` (SPEC para o review); `aguardando-humano` (escalada pendente).
 - Versões conferidas: {{versão do herdr e de cada CLI, com a data do `--help`}}.
