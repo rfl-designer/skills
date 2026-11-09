@@ -14,6 +14,7 @@ Prepare uma configuração persistente que as outras skills leem. Configure o pr
 - Separe versão resolvida no lockfile, instalação confirmada, restrição declarada e tecnologia planejada. Sem prova da instalação/runtime, registre `não confirmado`; o lockfile sozinho não prova instalação.
 - Detecte executor (local, Herd, Sail ou outro), comandos de teste, análise estática, formatação, build e navegador. Reutilize scripts existentes e a URL local já definida. Não inicie servidor quando o ambiente já serve o app.
 - Inspecione remotes para sugerir tracker, sem publicar nada. Detecte diretórios existentes de specs, tickets, glossário, ADRs, verificação e Mapa de Features antes de sugerir novos.
+- Execute `test "${HERDR_ENV:-}" = 1` para saber se a sessão roda no herdr. O resultado decide a categoria 5 da etapa 2.
 - Se houver mais de um app, identifique o escopo afetado. Guarde uma seção por escopo no mesmo arquivo; não aplique comandos de um app aos demais.
 
 Não leia nem copie credenciais para a configuração. Para capacidades condicionais, como Blade no Pint ou `--agent` no Pest, use lockfiles/help quando disponíveis; ausência da ferramenta é uma pendência, não autorização para instalá-la.
@@ -31,6 +32,12 @@ Apresente o que encontrou e a recomendação. Pergunte uma categoria por vez, ap
 2. **Specs:** Markdown local, GitHub, GitLab ou outro destino descrito pelo usuário. Prefira a convenção existente; sem convenção, sugira `docs/specs/`.
 3. **Tickets:** escolha independente da Spec. Para Markdown, sugira `docs/tickets/<spec>/`; para tracker, registre host e projeto/repositório exatos. Inclua convenção de nomes, vínculo com a Spec e representação das dependências.
 4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias. Para Evidências, pergunte também a política de versionamento da [configuração](references/configuracao.md#política-de-evidências) e recomende `Fora do Git`.
+5. **Trio de alinhamento:** ofereça esta categoria só quando a sessão roda no herdr ou quando o usuário pede. Ela configura `/alinhar-em-trio`.
+   - Mostre o trio padrão da [configuração](references/configuracao.md#trio-de-alinhamento). Confirme o nome, o `--kind`, o modelo, o esforço e os argumentos de cada agente.
+   - Para cada CLI do trio, execute `<cli> --help`. Confira cada flag dos argumentos e grave as flags reais. Para o Antigravity CLI, liste também os modelos com `agy models`.
+   - Execute `herdr agent` (sem subcomando, que mostra a ajuda do grupo) e confira os `--kind` aceitos. Não execute `herdr` sem subcomando: esse comando abre a TUI.
+   - Não instale um CLI ausente. Registre a pendência.
+   - Confirme as labels `review-for-human` e `aguardando-humano` e o timeout de cada resposta. Não crie labels no tracker.
 
 As escolhas já feitas dispensam nova confirmação. Para destinos externos, prefira o conector/CLI disponível e registre a capacidade de acesso sem confundir configuração com publicação. Se o usuário escolher outro tracker, documente a operação real disponível; não invente comandos.
 
@@ -54,5 +61,6 @@ Antes de encerrar:
 
 - Releia a configuração e os ponteiros. Confira caminhos locais e escopos; campos externos devem conter o host/projeto escolhido.
 - Distinga comandos encontrados, executados e ainda não verificados. Só marque como testado o que rodou no ambiente configurado.
+- Com a seção `Trio de alinhamento`, confirme que cada flag dos argumentos tem o estado `--help executado` ou uma pendência.
 - Confirme que `/especificar` e `/planejar` conseguem determinar os destinos sem nova pergunta. Se um acesso externo falhou, mantenha a preferência e registre o bloqueio; não troque silenciosamente para arquivos locais.
 - Informe o arquivo gravado, tecnologias detectadas, destinos escolhidos e pendências. Não abra issues nem faça commit só para provar o setup.
