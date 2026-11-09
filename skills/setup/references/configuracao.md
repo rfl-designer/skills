@@ -84,3 +84,25 @@ Registre uma política na linha `Evidências`. Recomende a primeira:
 | Git LFS | o time precisa do histórico das imagens | Configure o LFS para os tipos binários da pasta antes do primeiro artefato. Sem LFS instalado, registre a pendência; este setup não o instala. |
 
 Em todas as políticas, o nome do artefato é estável e sem data, e a condução nova substitui o arquivo. Não mova nem renomeie artefatos antigos sem pedido; mostre ao usuário os nomes fora da convenção.
+
+## Trio de alinhamento
+
+Grave esta seção só quando a sessão roda no herdr ou quando o usuário pede. `/alinhar-em-trio` lê esta seção. Sem ela, a skill usa o trio padrão abaixo.
+
+```markdown
+## Trio de alinhamento
+- Julgador esperado: Claude Code, `claude-opus-5-5`, esforço `xhigh`. Só registro: a configuração não escolhe o modelo da sessão do humano.
+- Timeout de cada resposta: 15 minutos.
+- Labels: `review-for-human` (SPEC para o review); `aguardando-humano` (escalada pendente).
+- Versões conferidas: {{versão do herdr e de cada CLI, com a data do `--help`}}.
+
+| Nome | `--kind` | Diretório do pane | Argumentos depois de `--` | Estado da prova |
+| --- | --- | --- | --- | --- |
+| opus | claude | raiz do repositório | `--model claude-opus-5-5 --effort medium --permission-mode dontAsk --add-dir <dir-do-agente> --allowedTools "Read Grep Glob WebSearch WebFetch Write(/<dir-do-agente>/**) Edit(/<dir-do-agente>/**)"` | {{`--help` executado em AAAA-MM-DD, ou pendência}} |
+| sol | codex | raiz do repositório | `-m gpt-6.1-sol -c model_reasoning_effort=medium --sandbox workspace-write -C <dir-do-agente> --ask-for-approval on-request --search` | {{estado}} |
+| argon | agy | `<dir-do-agente>` | `--model gemini-4-argon --effort medium --mode accept-edits --sandbox` | {{estado}} |
+```
+
+`<dir-do-agente>` não é um marcador de template. `/alinhar-em-trio` troca esse texto pelo caminho absoluto do diretório do agente em cada sessão. Mantenha-o na configuração final.
+
+Os argumentos limitam a escrita de cada agente ao seu diretório. Não troque esses limites por um modo sem permissões. Se um CLI não aceita uma flag, registre a flag real que o `--help` mostra, ou a pendência.

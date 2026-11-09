@@ -48,6 +48,12 @@ Execute `/setup` uma vez no projeto consumidor para combinar tecnologias, pastas
                                                           /depurar
 ```
 
+No [herdr](https://github.com/herdrdev/herdr), `/alinhar-em-trio` substitui as 3 primeiras etapas:
+
+```
+/alinhar-em-trio → review humano (review-for-human) → /planejar → ...
+```
+
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. Antes de gravar, `/especificar` e `/planejar` passam o rascunho por um Leitor novo, sem o histórico do chat, com `leitura-independente`. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. O usuário pode aceitar um achado, com o motivo. Na rodada 3 sem veredito `pode entregar`, `/revisar` para o ciclo e pergunta como seguir. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
 Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, receitas de condução e prova. `/mapear` lê o código e não opera o app. Execute `/conduzir` para provar as receitas no app local. Antes da primeira condução, `/conduzir` confirma que o app e o Pest usam o banco permitido. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o código.
@@ -62,6 +68,7 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | --- | --- |
 | `/setup` | Detecta tecnologias e comandos; configura pastas e destinos independentes de Specs e Tickets, persistidos por projeto. |
 | `/alinhar` | Entrevista antes do código, uma pergunta por vez. Atualiza o `GLOSSARY.md` e registra ADRs. |
+| `/alinhar-em-trio` | Só no herdr. O Julgador conduz 3 agentes de modelos diferentes pela árvore de decisão, com unanimidade em cada nó. Leva ao humano só as perguntas de negócio, os impasses e os diálogos de permissão. Condensa as decisões numa SPEC: um Leitor novo lê a SPEC, e o trio confere a fidelidade dela à ata. Publica a SPEC com a label `review-for-human`. |
 | `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
 | `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Um Leitor novo lê o rascunho e devolve a Paráfrase antes da gravação. Usa o destino configurado de Specs. |
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
@@ -107,6 +114,20 @@ Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/ag
 Em aplicações com 3 ou mais Domínios e mais de 12 Features, `/mapear` delega cada Domínio a um Mapeador **Sonnet 5.5 / medium**, até 4 ao mesmo tempo. Cada Mapeador grava só a pasta do seu Domínio e não conduz o app. O principal reconcilia o índice e roda o conferidor. Depois, `/conduzir` conduz as Features em série.
 
 Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/agents/mapeador.md` no projeto consumidor e instale `ste100-clean-code`. Sem o agente registrado, `/mapear` usa o subagente geral, que herda o modelo do principal. Consulte [os Mapeadores](skills/mapear/references/mapeadores.md) para o contrato de delegação.
+
+### Trio no herdr
+
+`/alinhar-em-trio` roda só dentro de um pane do herdr (`HERDR_ENV=1`). Fora do herdr, a skill recusa a execução e recomenda `/alinhar`.
+
+- **Julgador:** a sessão do humano, de preferência Claude Code com Opus 5.5 e esforço `xhigh`. Ele modera, grava a ata e escreve a SPEC. Ele não vota.
+- **Trio padrão:** cada agente roda no seu pane, com esforço `medium`:
+  - `opus`: Claude Code, Opus 5.5.
+  - `sol`: Codex, GPT-6.1 Sol.
+  - `argon`: Antigravity CLI, Gemini 4 Argon.
+- **Limites:** cada agente lê o repositório e pesquisa na web. Ele escreve só no seu diretório, fora do repositório. O Julgador nunca aprova um diálogo de permissão de um agente; ele mostra o diálogo ao humano.
+- **Pausa:** o humano pode responder a uma escalada mais tarde. Nesse caso, o Julgador publica a pergunta numa Issue com a label `aguardando-humano` e grava uma nota de `/pausar`. Para continuar, use `/alinhar-em-trio retomar <link>`.
+
+Requisitos: herdr 0.9.5 ou mais novo e os 3 CLIs instalados e autenticados. Execute `/setup` dentro do herdr para gravar a seção `Trio de alinhamento`. O `/setup` confere as flags de cada CLI com o `--help`. A [referência de comandos](skills/alinhar-em-trio/references/herdr.md) mostra como cada flag foi verificada. A execução completa do trio ainda não está verificada.
 
 ## Skills de modelo
 
