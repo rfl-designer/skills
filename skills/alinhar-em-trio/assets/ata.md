@@ -10,7 +10,7 @@
   | --- | --- | --- | --- | --- | --- |
   | opus | claude | claude-opus-5-5 | medium | <pane_id> | 0 |
   | sol | codex | gpt-6.1-sol | medium | <pane_id> | 0 |
-  | argon | agy | gemini-4-argon | medium | <pane_id> | 0 |
+  | argon | agy | gemini-4-argon | low | <pane_id> | 0 |
 - Diretório da sessão: <caminho absoluto>
 - Tab do herdr: <tab_id>
 - Issue de escalada: nenhuma | <URL>
