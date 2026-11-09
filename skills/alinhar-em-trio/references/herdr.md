@@ -65,7 +65,7 @@ claude --model claude-fable-5-2 --effort medium
 | --- | --- | --- | --- |
 | `opus` | `claude` | raiz do repositório | `--model claude-opus-5-5 --effort medium --permission-mode dontAsk --add-dir <dir-do-agente> --allowedTools "Read Grep Glob WebSearch WebFetch Write(/<dir-do-agente>/**) Edit(/<dir-do-agente>/**)"` |
 | `sol` | `codex` | raiz do repositório | `-m gpt-6.1-sol -c model_reasoning_effort=medium --sandbox workspace-write -C <dir-do-agente> --ask-for-approval on-request --search` |
-| `argon` | `agy` | `<dir-do-agente>` | `--model gemini-4-argon --effort medium --mode accept-edits --sandbox` |
+| `argon` | `agy` | `<dir-do-agente>` | `--model gemini-4-argon --effort low --mode accept-edits --sandbox` |
 
 Inicie cada agente no seu pane:
 
@@ -97,6 +97,7 @@ herdr agent start <nome> --kind <kind> --pane <pane_id> --timeout 120000 -- <arg
   - O modo `accept-edits` aceita edições no workspace. `--sandbox` liga o sandbox do terminal.
   - A leitura do repositório fica fora do workspace e pode pedir uma aprovação. Leve esse diálogo ao humano.
   - O slug `gemini-4-argon` vem da issue 1228 de google-antigravity/antigravity-cli. Confira com o subcomando `agy models`.
+  - O esforço `low` está `não verificado`. A issue 1228 cita a variante `gemini-4-argon-low`, e o CHANGELOG cita os níveis `low`, `medium` e `high` do `/effort`. Confira com `agy --help`.
 
 ## Enviar uma rodada e esperar
 

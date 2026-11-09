@@ -26,7 +26,7 @@ Esta skill substitui `/alinhar`, `/prototipar` e `/especificar`. Depois do revie
 - **Trio:** os 3 agentes da configuração, cada um num pane do herdr. Padrão:
   - `opus`: Claude Code, Opus 5.5, `medium`.
   - `sol`: Codex, GPT-6.1 Sol, `medium`.
-  - `argon`: Antigravity CLI, Gemini 4 Argon, `medium`.
+  - `argon`: Antigravity CLI, Gemini 4 Argon, `low`.
 - **Nó:** uma decisão da árvore. Um nó filho abre só depois da decisão do nó pai.
 - **Fronteira:** os nós abertos cujos pais já têm decisão.
 - **Rodada:** um arquivo do Julgador e uma resposta de cada agente. As rodadas têm numeração global (`001`, `002`, ...). Uma rodada pode ter vários nós da fronteira. Cada nó conta as próprias rodadas.

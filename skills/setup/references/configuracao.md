@@ -100,7 +100,7 @@ Grave esta seção só quando a sessão roda no herdr ou quando o usuário pede.
 | --- | --- | --- | --- | --- |
 | opus | claude | raiz do repositório | `--model claude-opus-5-5 --effort medium --permission-mode dontAsk --add-dir <dir-do-agente> --allowedTools "Read Grep Glob WebSearch WebFetch Write(/<dir-do-agente>/**) Edit(/<dir-do-agente>/**)"` | {{`--help` executado em AAAA-MM-DD, ou pendência}} |
 | sol | codex | raiz do repositório | `-m gpt-6.1-sol -c model_reasoning_effort=medium --sandbox workspace-write -C <dir-do-agente> --ask-for-approval on-request --search` | {{estado}} |
-| argon | agy | `<dir-do-agente>` | `--model gemini-4-argon --effort medium --mode accept-edits --sandbox` | {{estado}} |
+| argon | agy | `<dir-do-agente>` | `--model gemini-4-argon --effort low --mode accept-edits --sandbox` | {{estado}} |
 ```
 
 `<dir-do-agente>` não é um marcador de template. `/alinhar-em-trio` troca esse texto pelo caminho absoluto do diretório do agente em cada sessão. Mantenha-o na configuração final.

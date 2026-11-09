@@ -120,10 +120,10 @@ Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/a
 `/alinhar-em-trio` roda só dentro de um pane do herdr (`HERDR_ENV=1`). Fora do herdr, a skill recusa a execução e recomenda `/alinhar`.
 
 - **Julgador:** a sessão do humano, de preferência Claude Code com Fable 5.2 e esforço `medium`. Ele orquestra o trio, modera, grava a ata e escreve a SPEC. Ele não vota. Inicie o Julgador num pane do herdr com `claude --model claude-fable-5-2 --effort medium` e depois digite `/alinhar-em-trio <ideia>`.
-- **Trio padrão:** cada agente roda no seu pane, com esforço `medium`:
-  - `opus`: Claude Code, Opus 5.5.
-  - `sol`: Codex, GPT-6.1 Sol.
-  - `argon`: Antigravity CLI, Gemini 4 Argon.
+- **Trio padrão:** cada agente roda no seu pane:
+  - `opus`: Claude Code, Opus 5.5, esforço `medium`.
+  - `sol`: Codex, GPT-6.1 Sol, esforço `medium`.
+  - `argon`: Antigravity CLI, Gemini 4 Argon, esforço `low`.
 - **Limites:** cada agente lê o repositório e pesquisa na web. Ele escreve só no seu diretório, fora do repositório. O Julgador nunca aprova um diálogo de permissão de um agente; ele mostra o diálogo ao humano.
 - **Pausa:** o humano pode responder a uma escalada mais tarde. Nesse caso, o Julgador publica a pergunta numa Issue com a label `aguardando-humano` e grava uma nota de `/pausar`. Sem acesso ao tracker, a pergunta fica só na nota. Para continuar, use `/alinhar-em-trio retomar <link da Issue>` ou `retomar <caminho da nota>`.
 
