@@ -125,7 +125,7 @@ Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/a
   - `sol`: Codex, GPT-6.1 Sol.
   - `argon`: Antigravity CLI, Gemini 4 Argon.
 - **Limites:** cada agente lê o repositório e pesquisa na web. Ele escreve só no seu diretório, fora do repositório. O Julgador nunca aprova um diálogo de permissão de um agente; ele mostra o diálogo ao humano.
-- **Pausa:** o humano pode responder a uma escalada mais tarde. Nesse caso, o Julgador publica a pergunta numa Issue com a label `aguardando-humano` e grava uma nota de `/pausar`. Para continuar, use `/alinhar-em-trio retomar <link>`.
+- **Pausa:** o humano pode responder a uma escalada mais tarde. Nesse caso, o Julgador publica a pergunta numa Issue com a label `aguardando-humano` e grava uma nota de `/pausar`. Sem acesso ao tracker, a pergunta fica só na nota. Para continuar, use `/alinhar-em-trio retomar <link da Issue>` ou `retomar <caminho da nota>`.
 
 Requisitos: herdr 0.9.5 ou mais novo e os 3 CLIs instalados e autenticados. Execute `/setup` dentro do herdr para gravar a seção `Trio de alinhamento`. O `/setup` confere as flags de cada CLI com o `--help`. A [referência de comandos](skills/alinhar-em-trio/references/herdr.md) mostra como cada flag foi verificada. A execução completa do trio ainda não está verificada.
 

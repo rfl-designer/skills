@@ -1,7 +1,7 @@
 ---
 name: alinhar-em-trio
 description: Só no herdr. O Julgador conduz 3 agentes de modelos diferentes pela árvore de decisão de uma ideia, com unanimidade em cada nó, condensa as decisões numa SPEC que o trio aprova e a publica para review-for-human. Substitui /alinhar, /prototipar e /especificar nesse fluxo. Use quando o usuário digitar /alinhar-em-trio.
-argument-hint: "<ideia> | retomar <link da Issue> | <link da SPEC publicada>"
+argument-hint: "<ideia> | retomar <link da Issue ou caminho da nota> | <link da SPEC publicada>"
 disable-model-invocation: true
 ---
 
@@ -53,7 +53,7 @@ Esta skill substitui `/alinhar`, `/prototipar` e `/especificar`. Depois do revie
 1. Execute a guarda do herdr.
 2. Leia a configuração e a seção `Trio de alinhamento`.
 3. Escolha o modo pelo argumento:
-   - `retomar <link>`: vá para 4.10.
+   - `retomar <link da Issue ou caminho da nota>`: vá para 4.10.
    - Link de uma SPEC publicada: vá para 4.11.
    - Sem argumento: peça ao humano a ideia, numa frase.
 4. Crie o diretório da sessão e a ata a partir de [assets/ata.md](assets/ata.md). Registre o Julgador esperado, o trio, a branch e o commit atual.
@@ -102,33 +102,34 @@ Envie todos os nós da fronteira na mesma rodada. Cada nó termina de forma inde
    - Uma mudança de posição vale só com o argumento e a origem. Sem esses registros, marque a concordância como recusada na ata e mantenha o nó aberto.
    - Uma afirmação sem evidência (`arquivo:linha`, URL ou protótipo) vai ao resumo como `sem evidência`.
 4. **Decisão.** Com 3 `CONCORDO` válidos, registre a decisão na ata. Depois, abra os nós filhos na fronteira.
-5. **Impasse.** Depois de 3 rodadas de crítica sem unanimidade, faça uma escalada (4.5) com as 3 posições.
-6. **Pergunta de negócio.** Um agente marca uma pergunta de negócio. Procure a resposta no código, na configuração e nos ADRs. Sem resposta, faça uma escalada. O nó espera, e os outros nós da fronteira continuam.
+5. **Impasse.** Depois de 3 rodadas de crítica sem unanimidade, o nó espera uma escalada (4.5) com as 3 posições.
+6. **Pergunta de negócio.** Um agente marca uma pergunta de negócio. Procure a resposta no código, na configuração e nos ADRs. Sem resposta, o nó espera uma escalada.
+7. **Nós que esperam.** Um nó que espera o humano sai da rodada. Os outros nós da fronteira continuam. Faça a escalada quando todos os nós abertos esperam o humano, ou quando a árvore não tem outro nó para debater.
 
 ### 4.5 Escalada ao humano
-Faça uma escalada nestes casos:
-- Uma pergunta de negócio sem resposta.
-- Um impasse.
-- A segunda falha de um agente.
-- Um diálogo de permissão.
-- Um achado de negócio do Leitor.
-- Duas rodadas de OK da SPEC sem unanimidade.
+Há 2 tipos de escalada:
+- **Escalada de nó:** uma pergunta de negócio sem resposta, um impasse, um achado `perguntar` do Leitor ou 2 rodadas de OK da SPEC sem unanimidade. Junte as escaladas de nó, como 4.4 manda, e faça todas as perguntas numa só mensagem.
+- **Escalada de agente:** um diálogo de permissão ou a segunda falha de um agente. A rodada não termina sem o agente. Por isso, faça esta escalada na hora.
 
 Passos:
 1. Atualize a ata: `Estado: aguardando humano`.
-2. No seu pane, mostre ao humano: o nó, a pergunta, as posições resumidas com neutralidade, as evidências e as opções. Não recomende uma opção.
-3. Se o humano responde agora, registre a resposta na ata. Uma decisão do humano recebe a origem `decidido pelo humano`. Envie a resposta ao trio na próxima rodada.
+2. No seu pane, mostre ao humano, para cada pergunta: o nó, a pergunta, as posições resumidas com neutralidade, as evidências e as opções. Não recomende uma opção.
+3. Se o humano responde agora, registre cada resposta na ata, em `Perguntas ao humano`. Depois:
+   - **Impasse:** a resposta decide o nó. A origem do nó é `decidido pelo humano`.
+   - **Pergunta de negócio:** a resposta é um fato, não a decisão do nó. Envie o fato ao trio na próxima rodada. O nó continua no protocolo de 4.4 até ter 3 `CONCORDO`.
+   - **Diálogo, falha ou OK da SPEC:** siga a instrução do humano e registre-a.
 4. Se o humano responde "depois":
-   1. Publique a pergunta numa Issue do GitHub do repositório, com o acesso ao tracker da configuração. A Issue tem:
+   1. Publique as perguntas numa Issue do tracker da configuração (GitHub por padrão). A Issue tem:
       - O título `[alinhar-em-trio] <ideia>: pergunta pendente`.
-      - A pergunta e as posições.
-      - A ata, num bloco `<details>`.
+      - As perguntas e as posições.
+      - A ata atualizada, num bloco `<details>`.
       - A label `aguardando-humano`.
    2. Se a label não existe, pergunte ao humano antes de criar a label.
-   3. A sessão tem no máximo uma Issue de escalada. Uma escalada nova vira um comentário nessa Issue.
-   4. Sem acesso ao GitHub, não crie a Issue. Registre o bloqueio.
-   5. Aplique `/pausar` com o foco "retomar `/alinhar-em-trio`". A nota cita a Issue, a ata, o diretório da sessão, a tab e os agentes.
-   6. Deixe os panes abertos e pare.
+   3. A sessão tem no máximo uma Issue de escalada. Uma escalada nova vira um comentário nessa Issue, também com a ata atualizada num bloco `<details>`.
+   4. Sem acesso ao tracker, não crie a Issue. As perguntas ficam na ata e na nota de `/pausar`. Registre o bloqueio na ata.
+   5. Aplique `/pausar` com o foco "retomar `/alinhar-em-trio`". A nota cita as perguntas, a Issue (quando existe), a ata, o diretório da sessão, a tab e os agentes.
+   6. Diga ao humano o comando de retomada: `/alinhar-em-trio retomar <link da Issue>`, ou `retomar <caminho da nota>` sem Issue.
+   7. Deixe os panes abertos e pare.
 
 ### 4.6 Falhas e diálogos
 1. Cada resposta tem um timeout de 15 minutos, ou o timeout da configuração.
@@ -152,16 +153,25 @@ Passos:
    - A seção Fora de Escopo.
 3. Cada decisão da SPEC vem de um nó da ata. A SPEC não acrescenta decisões.
 4. Prepare os termos do glossário e os ADRs no diretório da sessão. Um ADR só existe se a decisão passa nos 3 critérios de `/alinhar`. Esses arquivos entram no repositório só em 4.8.
-5. **Leitura Independente:** aplique `leitura-independente` no modo Spec. Nesta skill, o trio e o humano fazem o papel do usuário dessa skill:
-   - Achado de redação: o Julgador corrige.
-   - Achado que muda ou acrescenta uma decisão: o nó novo ou reaberto volta a 4.4.
-   - Achado de negócio: escalada.
-   - No máximo 2 leituras.
-6. **OK do trio:** grave uma rodada com o caminho da versão da SPEC, a ata e a Paráfrase do Leitor sem alteração. Cada agente escreve `OK` ou `RECUSA`. Cada recusa cita o nó e o trecho da SPEC, e tem um tipo:
-   - `fidelidade`: a SPEC omite, muda ou acrescenta uma decisão. Uma Paráfrase errada também é `fidelidade`. O Julgador corrige e grava uma versão nova.
+5. **Leitura Independente:** aplique `leitura-independente` no modo Spec. Passe ao Leitor também os rascunhos do glossário e dos ADRs: o glossário do repositório ainda não tem os termos novos. Nesta skill, o trio e o humano fazem o papel do usuário de `leitura-independente`. Dê a cada achado uma classe dessa skill:
+   - `corrigir`, sem mudar uma decisão da ata: o Julgador corrige o rascunho.
+   - `corrigir`, quando a correção muda ou acrescenta uma decisão: o nó novo ou reaberto volta a 4.4.
+   - `contestar`: só com a prova que o Leitor podia ler, como `leitura-independente` exige.
+   - `perguntar`: uma regra de negócio ou um fato fora do repositório vai a uma escalada. Uma decisão técnica vai a um nó, em 4.4.
+   - `mover para tickets`: registre o achado na ata. O fechamento envia o achado a `/planejar`.
+6. **OK do trio:** grave uma rodada com:
+   - O caminho da versão atual da SPEC.
+   - A ata.
+   - A Paráfrase da última leitura, sem alteração, e a versão da SPEC que o Leitor leu.
+
+   Cada agente escreve `OK` ou `RECUSA`. Cada recusa cita o nó e o trecho da SPEC, e tem um tipo:
+   - `fidelidade`: a SPEC omite, muda ou acrescenta uma decisão. Uma Paráfrase que não descreve a ata também é `fidelidade`. O Julgador corrige e grava uma versão nova.
    - `fato novo`: o agente quer reabrir um nó. A recusa vale só com código, fonte ou protótipo que a ata ainda não tem. Com o fato novo, o nó volta a 4.4. Sem o fato novo, o Julgador recusa o pedido e registra a recusa na ata.
-7. Depois de 2 rodadas de OK seguidas sem unanimidade e sem nó reaberto, faça uma escalada.
-8. Com OK unânime, vá para a publicação.
+7. **Segunda leitura:** faça a segunda leitura só quando a primeira teve um `[BLOCKER]` ou quando o trio recusou a Paráfrase. Use um Leitor novo, só com o rascunho corrigido. Depois, faça uma rodada de OK nova, com a Paráfrase nova.
+   - Depois da segunda leitura, um `[BLOCKER]` ou `[IMPORTANTE]` aberto vai a uma escalada. Pergunte uma vez: publicar com os achados abertos, ou reabrir os nós.
+   - Não faça uma terceira leitura.
+8. Depois de 2 rodadas de OK seguidas sem unanimidade e sem nó reaberto, faça uma escalada.
+9. Com OK unânime, vá para a publicação.
 
 ### 4.8 Publicação
 Executar `/alinhar-em-trio` autoriza a branch, o commit, o push, a Issue e o PR draft desta etapa. Nada além disso.
@@ -172,42 +182,50 @@ Executar `/alinhar-em-trio` autoriza a branch, o commit, o push, a Issue e o PR 
    - Se há uma Issue de escalada, troque o corpo dela pela SPEC. Depois, troque a label `aguardando-humano` por `review-for-human`.
    - Sem Issue de escalada, crie uma Issue com a SPEC e a label `review-for-human`.
    - Em outro tracker, use a operação equivalente da configuração. Registre na ata o que o tracker não suporta.
+   - **Destino Markdown com uma Issue de escalada:** depois do PR, comente na Issue o link do PR e tire a label `aguardando-humano`. Não feche a Issue. O humano fecha.
 4. **Arquivos do repositório** (o glossário, os ADRs e, com o destino Markdown, a SPEC):
    1. Crie uma worktree a partir da branch padrão atualizada, com a branch `alinhar/<slug>`. Não mude o checkout do humano.
    2. Grave os arquivos nos caminhos da configuração.
    3. Faça o commit com `ste100-clean-code`. O corpo diz por que mudou e como você provou: o OK unânime do trio e a linha `Leitura Independente:`.
-   4. Faça o push e abra um PR draft com a label `review-for-human`. Com uma Issue da SPEC, o corpo do PR tem o link para ela.
+   4. Faça o push e abra um PR draft com a label `review-for-human`. Com uma Issue da SPEC ou de escalada, o corpo do PR tem o link para ela, sem palavra que feche a Issue.
    5. Remova a worktree depois do push.
    6. Sem arquivo para gravar, não crie branch nem PR.
 5. Publique um comentário com o resumo da ata no PR. Sem PR, publique o comentário na Issue. O comentário tem:
    - Uma linha por nó: a decisão, o motivo principal, os agentes que mudaram de posição e a marca `decidido pelo humano`, quando ela existe.
    - O Julgador esperado e o trio, com os modelos e os esforços.
-   - A linha `Leitura Independente:`.
+   - A linha `Leitura Independente:`, com `Paráfrase confirmada pelo trio` quando o trio aceitou a Paráfrase.
+   - Os achados `mover para tickets`, quando existem.
 
 ### 4.9 Encerramento
 1. Feche a tab da sessão. Isso para os agentes.
-2. Apague as pastas `prototipos/`. Guarde a ata e o resto do diretório da sessão.
+2. Apague as pastas `prototipos/` e a pasta `spec/`. A SPEC publicada substitui o rascunho, como `leitura-independente` manda. Guarde a ata e o resto do diretório da sessão.
 3. Atualize a ata: `Estado: publicada`.
 4. Informe ao humano:
    - Os links da SPEC, do PR e do comentário.
    - O caminho da ata.
    - A linha `Leitura Independente:`.
+   - Os achados `mover para tickets`, para `/planejar`.
    - O próximo passo: depois do review, `/planejar`. Para mudar a SPEC, `/alinhar-em-trio` com o link da SPEC.
 
 ### 4.10 Retomada depois de uma pausa
 1. Execute a guarda do herdr.
-2. Leia a Issue de escalada. A resposta é o comentário do humano depois da última pergunta. Sem resposta, diga isso ao humano e pare.
-3. Leia a ata no diretório da sessão. Se o diretório não existe mais, use a ata da Issue e crie o diretório de novo.
+2. Leia a resposta do humano:
+   - Com uma Issue: a resposta é o comentário do humano depois da última pergunta. Sem resposta, diga isso ao humano e pare.
+   - Com uma nota de `/pausar`: leia a nota e faça as perguntas pendentes no seu pane.
+3. Leia a ata no diretório da sessão. Se o diretório não existe mais, use a ata do último comentário de escalada (ou do corpo da Issue) e crie o diretório de novo.
 4. Confira os agentes com `herdr agent list`. Reinicie, como a referência mostra, cada agente que não existe mais.
-5. Registre a resposta na ata e continue no passo que esperava: 4.4, 4.6 ou 4.7.
+5. Registre a resposta na ata, como 4.5 manda, e continue no passo que esperava: 4.4, 4.6 ou 4.7.
 
 ### 4.11 Revisão de uma SPEC publicada
 1. Leia a SPEC, os comentários do review e o comentário com o resumo da ata.
-2. Use a ata local quando ela existe. Senão, crie uma ata nova a partir do resumo publicado.
-3. Liste os nós que o pedido do review toca. Reabra só esses nós, com o protocolo de 4.4.
-4. Continue em 4.7 e 4.8:
+2. Use a ata local quando ela existe. Senão, crie uma ata nova a partir do resumo publicado. A ata cita a SPEC publicada.
+3. Faça 4.1.4 e 4.2: o diretório da sessão, a tab e o trio são novos, porque o encerramento fechou a tab anterior.
+4. Liste os nós que o pedido do review toca. Reabra só esses nós, com o protocolo de 4.4.
+5. Continue em 4.7 e 4.8:
+   - Com o destino GitHub, troque o corpo da mesma Issue pela SPEC nova. Não crie outra Issue.
    - Se o PR ainda está aberto, use a mesma branch.
    - Se o PR já foi integrado ou fechado, crie uma branch nova.
+   - Publique um comentário novo com o resumo dos nós reabertos.
 
 ## 5. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
@@ -228,7 +246,7 @@ Executar `/alinhar-em-trio` autoriza a branch, o commit, o push, a Issue e o PR 
 - `[measured]` A saída da guarda `HERDR_ENV`.
 - `[measured]` A ata com cada nó: as posições, as mudanças com o argumento, a decisão, a origem e os 3 `CONCORDO` (ou `decidido pelo humano`).
 - `[measured]` Cada escalada com a resposta do humano, ou a Issue com a label `aguardando-humano` e a nota de `/pausar`.
-- `[measured]` A Paráfrase do Leitor na rodada de OK e a linha `Leitura Independente:`.
+- `[measured]` A Paráfrase do Leitor na rodada de OK, cada achado do Leitor com a classe, no máximo 2 leituras e a linha `Leitura Independente:`.
 - `[measured]` O OK unânime do trio sobre a versão publicada da SPEC.
 - `[measured]` Os links da SPEC, do PR draft (quando há arquivos) e do comentário com o resumo da ata, com a label `review-for-human`.
-- `[measured]` A tab fechada e as pastas `prototipos/` removidas, com a ata preservada.
+- `[measured]` A tab fechada e as pastas `prototipos/` e `spec/` removidas, com a ata preservada.
