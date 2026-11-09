@@ -119,7 +119,7 @@ Copie [o template do mapeador](skills/mapear/assets/mapeador.md) para `.claude/a
 
 `/alinhar-em-trio` roda só dentro de um pane do herdr (`HERDR_ENV=1`). Fora do herdr, a skill recusa a execução e recomenda `/alinhar`.
 
-- **Julgador:** a sessão do humano, de preferência Claude Code com Opus 5.5 e esforço `xhigh`. Ele modera, grava a ata e escreve a SPEC. Ele não vota.
+- **Julgador:** a sessão do humano, de preferência Claude Code com Fable 5.2 e esforço `medium`. Ele orquestra o trio, modera, grava a ata e escreve a SPEC. Ele não vota. Inicie o Julgador num pane do herdr com `claude --model claude-fable-5-2 --effort medium` e depois digite `/alinhar-em-trio <ideia>`.
 - **Trio padrão:** cada agente roda no seu pane, com esforço `medium`:
   - `opus`: Claude Code, Opus 5.5.
   - `sol`: Codex, GPT-6.1 Sol.

@@ -22,7 +22,7 @@ Levar uma ideia ou melhoria até uma SPEC sem que o humano tome as decisões té
 Esta skill substitui `/alinhar`, `/prototipar` e `/especificar`. Depois do review humano, o próximo passo é `/planejar`.
 
 ## 2. Termos
-- **Julgador:** esta sessão, que o humano inicia. O Julgador esperado vem da configuração (padrão: Claude Code, Opus 5.5, esforço `xhigh`). Ele modera e não vota.
+- **Julgador:** esta sessão, que o humano inicia. O Julgador esperado vem da configuração (padrão: Claude Code, Fable 5.2, esforço `medium`). Ele modera, orquestra o trio e não vota.
 - **Trio:** os 3 agentes da configuração, cada um num pane do herdr. Padrão:
   - `opus`: Claude Code, Opus 5.5, `medium`.
   - `sol`: Codex, GPT-6.1 Sol, `medium`.

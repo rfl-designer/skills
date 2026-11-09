@@ -46,6 +46,17 @@ herdr pane split <segundo pane> --direction down --cwd "<cwd do terceiro agente>
 - A resposta tem `.result.pane.pane_id`.
 - No fim, feche só a tab que você criou: `herdr tab close <tab_id>`.
 
+## Julgador
+
+O humano inicia o Julgador num pane do herdr, antes de `/alinhar-em-trio`:
+
+```bash
+claude --model claude-fable-5-2 --effort medium
+```
+
+- `--model` aceita o nome completo do modelo, e `--effort` aceita `low`, `medium`, `high`, `xhigh` e `max` (`claude --help`, 2.1.319).
+- A skill não troca o modelo da sessão. Ela só registra na ata o Julgador esperado.
+
 ## Trio padrão
 
 `<sessao>` é o diretório da sessão. `<dir-do-agente>` é `<sessao>/<nome>`. Os dois caminhos são absolutos.
