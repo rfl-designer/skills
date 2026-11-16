@@ -30,7 +30,7 @@ docs/ensino/<tema>/
 - {Temas vizinhos que o usuário não quer agora}
 ```
 
-- **Prefira o concreto:** "Revisar PRs com Livewire sem ajuda" é melhor que "aprender Livewire".
+- **Prefira o concreto:** "Revisar PRs com consultas SQL sem ajuda" é melhor que "aprender SQL".
 - **Questione o vago:** Sem um motivo concreto, continue a entrevista. Uma Missão ruim é pior que nenhuma.
 - **Mantenha curta:** A Missão cabe numa tela.
 - **Atualize quando muda:** Confirme com o usuário e grave um Registro sobre a mudança.
@@ -43,8 +43,8 @@ docs/ensino/<tema>/
 ## Lições
 | # | Lição | Destino | Termos e ideias |
 |---|---|---|---|
-| 0001 | Eager loading no Eloquent | licoes/0001-eager-loading.html | eager loading, consulta N+1, `with()` |
-| 0002 | Lazy loading proibido | {link do artefato} | lazy loading, `preventLazyLoading()` |
+| 0001 | Consulta N+1 | licoes/0001-consulta-n-mais-1.html | consulta N+1, carregamento antecipado |
+| 0002 | Índice composto | {link do artefato} | índice composto, ordem das colunas |
 
 ## Registros
 
@@ -75,10 +75,10 @@ Evidência: primeira tentativa errada na questão 1 da Lição 0001.
 # Fontes: {Tema}
 
 ## Conhecimento
-- [Laravel 12.x: Eager Loading](https://laravel.com/docs/12.x/eloquent-relationships#eager-loading)
-  Série: 12.x; lockfile: 12.3.0. Use para: carregar relações sem N+1.
-- `vendor/laravel/framework/src/Illuminate/Database/Eloquent/Builder.php`
-  Versão: 12.3.0. Use para: mecanismo interno de `with()`.
+- [{Framework} {série}: {página}]({link da página oficial da série instalada})
+  Série: {série}; lockfile: {versão}. Use para: carregar relações sem N+1.
+- `{pasta de dependências}/{pacote}/{arquivo}`
+  Versão: {versão}. Use para: mecanismo interno do carregamento antecipado.
 
 ## Comunidades
 - {Nome e link da comunidade}

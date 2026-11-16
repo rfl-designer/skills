@@ -17,7 +17,8 @@ Use este formato em `docs/agents/projeto.md` ou no destino existente. Os marcado
 
 ## Execução e verificação
 - Diretório de execução: {{caminho relativo à raiz}}.
-- Executor: {{local, Herd, Sail ou outro}}.
+- Executor: {{local, contêiner, wrapper do projeto ou outro}}.
+- Perfis de stack: {{`laravel`, ou `nenhum`; as skills leem o perfil em `references/` só quando esta linha o registra}}.
 - URL local: {{URL existente, ou não aplicável}}.
 
 | Operação | Comando ou ferramenta | Estado da prova |
@@ -25,14 +26,16 @@ Use este formato em `docs/agents/projeto.md` ou no destino existente. Os marcado
 | Teste focado | {{comando; use <Teste> como parâmetro quando necessário}} | {{encontrado, executado ou pendente}} |
 | Suíte completa | {{comando}} | {{estado}} |
 | Análise estática | {{comando ou ausente}} | {{estado}} |
-| Formatação PHP/Blade | {{comando e como Blade é habilitado}} | {{estado}} |
+| Formatação | {{comando em modo de conferência; como os templates são cobertos}} | {{estado}} |
 | Build | {{comando ou não aplicável}} | {{estado}} |
 | Navegador | {{comando ou ferramenta disponível}} | {{estado}} |
-| Mutação | {{`pest --mutate --path=<arquivos>`, Infection com `--git-diff-filter=AM` ou ausente}} | {{estado}} |
-| Relatório Clover para CRAP | {{`pest --coverage-clover=<arquivo fora do repositório>` ou ausente}} | {{estado}} |
+| Mutação | {{comando da ferramenta de mutação, limitado aos arquivos do diff, ou ausente}} | {{estado}} |
+| Relatório Clover para CRAP | {{comando que grava o relatório fora do repositório, ou ausente}} | {{estado}} |
+| Probe | {{ferramenta de probe, ou ausente}} | {{estado}} |
 
-- Capacidades condicionais: {{Pest Agent, Browser, Blade no Pint, driver de cobertura (PCOV ou Xdebug); detectadas ou não disponíveis}}.
-- Ordem do portão: a de `laravel-verification`. Registre aqui só as exceções do projeto.
+- Capacidades condicionais: {{probe, teste de navegador, formatador de templates, medição de cobertura; detectadas ou não disponíveis}}.
+- Banco da condução: {{gravada por `/conduzir` depois da confirmação do usuário; sem credenciais}}.
+- Ordem do portão: a de `verification`. Registre aqui só as exceções do projeto.
 
 ## Destinos
 | Artefato | Tipo | Destino exato | Convenção |

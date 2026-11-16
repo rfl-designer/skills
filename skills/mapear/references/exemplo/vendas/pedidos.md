@@ -2,7 +2,7 @@
 
 O cliente monta o carrinho, finaliza o pedido, acompanha a lista de pedidos e cancela um pedido pendente. Toda noite, o sistema fecha o dia e envia um resumo ao administrador.
 
-Âncoras: `rota:pedidos.*`, `rota:carrinho`, `rota:checkout`, `livewire:carrinho`, `livewire:pedidos.tabela`, `comando:pedidos:fechar-dia`, `agenda:pedidos:fechar-dia`, `notificacao:PedidoConfirmado`, `notificacao:ResumoDoDia`, `flag:checkout-pix`
+Âncoras: `rota:pedidos.*`, `rota:carrinho`, `rota:checkout`, `componente:carrinho`, `componente:pedidos.tabela`, `comando:pedidos:fechar-dia`, `agenda:pedidos:fechar-dia`, `notificacao:PedidoConfirmado`, `notificacao:ResumoDoDia`, `flag:checkout-pix`
 Estado: conduzida em 2026-10-28, commit 3f9c2ab
 
 ## Sub-features

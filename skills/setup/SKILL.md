@@ -10,19 +10,21 @@ Prepare uma configuração persistente que as outras skills leem. Configure o pr
 ## 1. Descobrir o estado existente
 
 - Leia as instruções do projeto (`AGENTS.md`, `CLAUDE.md` ou arquivo nativo já usado). Siga o ponteiro de configuração existente; o destino padrão é `docs/agents/projeto.md`.
-- Inspecione manifests, lockfiles, scripts, configuração de testes e estrutura de código/documentação. Detecte tecnologias e versões sem presumir que Laravel, Livewire ou Pest estejam instalados.
+- Inspecione manifests, lockfiles, scripts, configuração de testes e estrutura de código/documentação. Detecte linguagem, framework, executor de testes e versões pelos arquivos do projeto; não presuma nenhuma stack.
 - Separe versão resolvida no lockfile, instalação confirmada, restrição declarada e tecnologia planejada. Sem prova da instalação/runtime, registre `não confirmado`; o lockfile sozinho não prova instalação.
-- Detecte executor (local, Herd, Sail ou outro), comandos de teste, análise estática, formatação, build e navegador. Reutilize scripts existentes e a URL local já definida. Não inicie servidor quando o ambiente já serve o app.
+- Detecte executor (local, contêiner, wrapper do projeto ou outro), comandos de teste, análise estática, formatação, build e navegador. Reutilize scripts existentes e a URL local já definida. Não inicie servidor quando o ambiente já serve o app.
 - Inspecione remotes para sugerir tracker, sem publicar nada. Detecte diretórios existentes de specs, tickets, glossário, ADRs, verificação e Mapa de Features antes de sugerir novos.
 - Execute `test "${HERDR_ENV:-}" = 1` para saber se a sessão roda no herdr. O resultado decide a categoria 5 da etapa 2.
 - Se houver mais de um app, identifique o escopo afetado. Guarde uma seção por escopo no mesmo arquivo; não aplique comandos de um app aos demais.
 
-Não leia nem copie credenciais para a configuração. Para capacidades condicionais, como Blade no Pint ou `--agent` no Pest, use lockfiles/help quando disponíveis; ausência da ferramenta é uma pendência, não autorização para instalá-la.
+Não leia nem copie credenciais para a configuração. Para capacidades condicionais, como o formatador de templates ou uma ferramenta de probe, use lockfiles/help quando disponíveis; ausência da ferramenta é uma pendência, não autorização para instalá-la.
 
-Para a qualidade dos testes de `laravel-verification`, detecte também:
-- O driver de cobertura: `php -m` mostra `pcov` ou `xdebug`.
-- A mutação: `--mutate` no help do Pest, ou `infection/infection` no `composer.lock`.
-- O `<source>` do `phpunit.xml`, que define os arquivos medidos.
+Para a qualidade dos testes de `verification`, detecte também:
+- A medição de cobertura da stack e o comando que gera um relatório Clover.
+- A ferramenta de mutação, no lockfile ou no help do executor de testes.
+- A lista de arquivos de origem na configuração de cobertura, que define os arquivos medidos.
+
+**Perfil de stack:** As skills deste pacote não assumem linguagem nem framework. Algumas trazem um perfil opcional em `references/` com os comandos de uma stack. Hoje há perfil para Laravel. Se a detecção mostra Laravel, leia [references/laravel.md](references/laravel.md) para os pontos de detecção dessa stack e registre `laravel` na linha `Perfis de stack`. Para outra stack, registre `nenhum`: a tabela `Execução e verificação` dá os comandos às skills.
 
 ## 2. Completar as escolhas
 
@@ -31,7 +33,7 @@ Apresente o que encontrou e a recomendação. Pergunte uma categoria por vez, ap
 1. **Tecnologias e execução:** confirme as tecnologias planejadas ou divergências relevantes. Registre comandos completos, diretório de execução e URL; não proponha trocar uma stack existente por padrão.
 2. **Specs:** Markdown local, GitHub, GitLab ou outro destino descrito pelo usuário. Prefira a convenção existente; sem convenção, sugira `docs/specs/`.
 3. **Tickets:** escolha independente da Spec. Para Markdown, sugira `docs/tickets/<spec>/`; para tracker, registre host e projeto/repositório exatos. Inclua convenção de nomes, vínculo com a Spec e representação das dependências.
-4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas de Actions/DTOs não são obrigatórias. Para Evidências, pergunte também a política de versionamento da [configuração](references/configuracao.md#política-de-evidências) e recomende `Fora do Git`.
+4. **Documentação e pastas:** proponha um único conjunto para glossário, ADRs, protocolos, evidências e Mapa de Features. Reutilize a organização do domínio e do código; pastas novas para Costuras ou contratos de dados não são obrigatórias. Para Evidências, pergunte também a política de versionamento da [configuração](references/configuracao.md#política-de-evidências) e recomende `Fora do Git`.
 5. **Trio de alinhamento:** ofereça esta categoria só quando a sessão roda no herdr ou quando o usuário pede. Ela configura `/alinhar-em-trio`.
    - Mostre o trio padrão da [configuração](references/configuracao.md#trio-de-alinhamento). Confirme o nome, o `--kind`, o modelo, o esforço e os argumentos de cada agente.
    - Para cada CLI do trio, execute `<cli> --help`. Confira cada flag dos argumentos e grave as flags reais. Para o Antigravity CLI, liste também os modelos com `agy models`.

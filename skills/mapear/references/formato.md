@@ -1,6 +1,6 @@
 # Formato do Mapa de Features
 
-O [exemplo](exemplo/README.md) mostra uma aplicação pequena com dois Domínios. Os nomes e comandos do exemplo são fictícios; copie a forma, não os valores.
+O [exemplo](exemplo/README.md) mostra uma aplicação pequena com dois Domínios. O exemplo usa uma stack Laravel só para ter comandos concretos. Os nomes e comandos são fictícios; copie a forma e use os comandos da stack do seu projeto.
 
 ## Estrutura de pastas
 
@@ -23,8 +23,8 @@ Comece com o título `# Mapa de Features de <App>` e um parágrafo sobre o uso d
 
 Depois, use estas H2. O conferidor exige todas:
 
-1. `Pré-condições base`: como iniciar o app, URL, dados de seed, autenticação na condução, e-mail, fila e isolamento. Inclua o **Diagnóstico**: os comandos que provam que a instância merece condução. Por exemplo, banco igual à linha `Banco da condução` da configuração, health check, migrations em dia, assets atualizados e commit sob prova.
-2. `Convenções de condução`: o comando base da ferramenta, seletores preferidos, espera pelo estado final, uso de `tinker` só para ler efeitos, ambiente permitido e flags.
+1. `Pré-condições base`: como iniciar o app, URL, dados de seed, autenticação na condução, e-mail, fila e isolamento. Inclua o **Diagnóstico**: os comandos que provam que a instância merece condução. Por exemplo, banco igual à linha `Banco da condução` da configuração, health check, migrações em dia, assets atualizados e commit sob prova.
+2. `Convenções de condução`: o comando base da ferramenta, seletores preferidos, espera pelo estado final, uso do console da aplicação só para ler efeitos, ambiente permitido e flags.
 3. `Prova e lacunas`: o padrão de prova e como registrar um caminho inalcançável.
 4. `Varredura completa`: a ordem de uma regressão ampla. Termine com o link para `jornadas.md`.
 5. `Domínios`: uma H3 por Domínio com uma linha por Feature, ou uma linha por Domínio na aplicação grande.
@@ -48,7 +48,7 @@ Comece com `# <Domínio>` e um parágrafo sobre a área de negócio. Depois, use
 
 <Um parágrafo: o comportamento visível, na voz do usuário.>
 
-Âncoras: `rota:pedidos.*`, `livewire:pedidos.tabela`, `comando:pedidos:fechar-dia`
+Âncoras: `rota:pedidos.*`, `componente:pedidos.tabela`, `comando:pedidos:fechar-dia`
 Estado: não conduzida em 2026-10-28, commit 3f9c2ab; receita derivada do código
 
 ## Sub-features
@@ -73,8 +73,8 @@ Pré-condições:
 ```
 
 - **Sub-features:** cada item começa com um ID `kebab-case` entre crases, com o nome da Feature como prefixo. O ID é único no mapa inteiro.
-- **Como chegar:** liste cada entrada do usuário: menu, botão, URL, atalho, comando Artisan, endpoint de API, link de e-mail e agenda. Uma entrada ausente aqui fica sem prova.
-- **Como conduzir:** comece com `Pré-condições:`. Cada item tem um rótulo e liga ação, comando e resultado. Use a ferramenta de navegador registrada na configuração. Inclua o caminho de sucesso, cancelamento, erro, vazio e persistência que existir. Termine com **Regressão** (testes Pest existentes) e **Prova** (o que capturar).
+- **Como chegar:** liste cada entrada do usuário: menu, botão, URL, atalho, comando de linha de comando, endpoint de API, link de e-mail e agenda. Uma entrada ausente aqui fica sem prova.
+- **Como conduzir:** comece com `Pré-condições:`. Cada item tem um rótulo e liga ação, comando e resultado. Use a ferramenta de navegador registrada na configuração. Inclua o caminho de sucesso, cancelamento, erro, vazio e persistência que existir. Termine com **Regressão** (testes existentes) e **Prova** (o que capturar).
 - **Armadilhas:** estado que o seed não cria, espera assíncrona, fuso horário, cache, fila, flag e caminho que exige ação manual.
 - **Divida** a Feature quando uma parte exige pré-condições próprias ou quando passa de 10 Sub-features.
 - **Junte** comportamentos pequenos e sem pré-condição própria num arquivo `outros.md` do Domínio.
@@ -83,18 +83,19 @@ Não escreva caminho de arquivo de produção, nome de classe interna ou passo a
 
 ## Âncoras
 
-Uma Âncora liga a Feature a um identificador estável do código. Com ela, um agente encontra a Feature de um diff: `rg 'livewire:pedidos.tabela' docs/features`. Cada Âncora pertence a uma só Feature ou à seção `Fora do mapa`.
+Uma Âncora liga a Feature a um identificador estável do código. Com ela, um agente encontra a Feature de um diff: `rg 'componente:pedidos.tabela' docs/features`. Cada Âncora pertence a uma só Feature ou à seção `Fora do mapa`.
 
 | Prefixo | Identificador | Fonte no inventário |
 | --- | --- | --- |
-| `rota:` | nome da rota; sem nome, `MÉTODO /uri` | `php artisan route:list` |
-| `livewire:` | nome do componente, como `pedidos.tabela` | componentes Livewire e Volt |
-| `comando:` | nome do comando Artisan, sem argumentos | comandos da aplicação |
-| `agenda:` | comando ou classe agendada | `php artisan schedule:list` |
-| `notificacao:` | nome curto da classe de Notification ou Mailable | notificações e e-mails |
-| `flag:` | nome da flag | definições de flag, como Laravel Pennant |
+| `rota:` | nome da rota; sem nome, `MÉTODO /uri` | listagem de rotas do framework |
+| `componente:` | nome estável do componente de UI, como `pedidos.tabela` | componentes com estado e ações próprias |
+| `comando:` | nome do comando, sem argumentos | comandos da aplicação |
+| `agenda:` | comando ou classe agendada | tarefas agendadas |
+| `notificacao:` | nome curto da notificação ou do e-mail | notificações e e-mails |
+| `flag:` | nome da flag | definições do sistema de flags |
 | `outro:` | descrição curta de outra entrada | registro manual; o conferidor não cruza com o inventário |
 
+- O conferidor ainda aceita o prefixo antigo `livewire:`. Em mapas novos, use `componente:`. Não misture os dois prefixos para o mesmo componente.
 - Um `*` no fim cobre todos os identificadores com o mesmo início: `rota:pedidos.*`.
 - Use o `*` só quando a Feature tem todas essas rotas. Uma rota de outra Feature com o mesmo início exige Âncoras exatas.
 
@@ -109,7 +110,7 @@ Uma Âncora liga a Feature a um identificador estável do código. Com ela, um a
 | `não conduzida` | A receita vem só da leitura do código. |
 | `bloqueada` | Um agente tentou e uma pré-condição impediu. O detalhe diz qual. |
 
-`/mapear` grava só `não conduzida`. `/conduzir` e `laravel-verification` gravam os outros valores depois de uma condução real.
+`/mapear` grava só `não conduzida`. `/conduzir` e `verification` gravam os outros valores depois de uma condução real.
 
 Um defeito do produto não muda o Estado. O agente o reporta ao usuário. O mapa continua com o comportamento esperado.
 
@@ -119,12 +120,12 @@ Comece com `# Jornadas entre Features` e um link para o README raiz. Use uma H2 
 
 ## Conferidor
 
-Rode o conferidor sobre a pasta do mapa. Ele exige PHP 8.1 ou mais novo:
+Rode o conferidor sobre a pasta do mapa. Ele exige Python 3:
 
 ```bash
-php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features
-php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features --ancoras=<inventario>.txt
-php <pasta-desta-skill>/scripts/conferir-mapa.php docs/features --evidencias=docs/verification/evidencias
+python3 <pasta-desta-skill>/scripts/conferir-mapa.py docs/features
+python3 <pasta-desta-skill>/scripts/conferir-mapa.py docs/features --ancoras=<inventario>.txt
+python3 <pasta-desta-skill>/scripts/conferir-mapa.py docs/features --evidencias=docs/verification/evidencias
 ```
 
 Ele confere links e arquivos fora do índice, as H2 e sua ordem, as linhas `Base:`, `Âncoras:` e `Estado:`, IDs únicos e Âncoras repetidas. Com `--ancoras`, ele também confere a cobertura do inventário e as Âncoras que não existem mais no código. O inventário tem uma Âncora por linha; linhas vazias e linhas com `#` no início ficam fora.

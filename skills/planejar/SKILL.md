@@ -7,13 +7,13 @@ disable-model-invocation: true
 # Planejar Grafo de Fatias Verticais (`/planejar`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Verticais (*Tracer Bullets*) com relações de bloqueio explícitas e um *Throughput Checkpoint* antes da execução.
 
 ## 2. Regras Inegociáveis
-- **Proíba fatiamento horizontal:** Nunca separe tarefas por camada técnica isolada (ex.: "Ticket 1: Criar todas as migrations", "Ticket 2: Criar todas as Actions"). Cada ticket deve entregar uma fatia vertical verificável de ponta a ponta.
+- **Proíba fatiamento horizontal:** Nunca separe tarefas por camada técnica isolada (ex.: "Ticket 1: Criar todas as migrações", "Ticket 2: Criar todas as Costuras"). Cada ticket deve entregar uma fatia vertical verificável de ponta a ponta.
 - **Use expand–contract para refactor amplo:** Uma mudança mecânica que quebra muitos pontos de chamada de uma vez (renomear coluna, mudar o tipo de um Enum ou DTO compartilhado) não cabe numa fatia vertical. Sequencie em 3 etapas:
   1. **Expand:** Adicione a forma nova ao lado da antiga. Nada quebra.
   2. **Migrate:** Migre os pontos de chamada em lotes (por módulo ou diretório). Cada lote é um ticket bloqueado pelo Expand e fica verde sozinho.
@@ -26,15 +26,15 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
 ## 3. Processo
 1. **Leitura da Spec:** Leia a Spec indicada; sem indicação, localize-a no destino de Specs configurado. Se houver candidatas ambíguas, peça apenas a identificação. Inspecione os arquivos afetados. Use também os achados `mover para tickets` da Leitura Independente da Spec, quando houver.
 2. **Throughput Checkpoint (4 itens obrigatórios):**
-   - **1. Fundação Bloqueante:** O que precisa existir antes de qualquer paralelismo (ex.: contrato compartilhado ou migration, somente quando necessários).
+   - **1. Fundação Bloqueante:** O que precisa existir antes de qualquer paralelismo (ex.: contrato compartilhado ou migração, somente quando necessários).
    - **2. Frentes Paralelizáveis:** Quais fatias verticais não disputam os mesmos arquivos e podem ser delegadas em paralelo.
-   - **3. Estado Mutável Compartilhado:** Arquivos que múltiplos tickets poderiam tocar (ex.: `routes/web.php`, componente Livewire pai) e como serializar a edição.
+   - **3. Estado Mutável Compartilhado:** Arquivos que múltiplos tickets poderiam tocar (ex.: o arquivo de rotas, um componente de UI pai) e como serializar a edição.
    - **4. Menor Decomposição Segura:** Quantidade mínima de tickets/commits verificáveis (~100 linhas por fatia).
 3. **Estrutura de Cada Ticket (Fatia Vertical):**
    - **Título e Objetivo Observável** (1 frase em voz ativa).
    - **Bloqueado por:** `#ID` ou `Nenhum`.
    - **Ponteiros de Contexto:** Caminhos exatos dos arquivos a criar ou modificar.
-   - **Critério de Aceite no Pest:** Qual teste da Costura escolhida e da Fronteira (`Livewire::test()` ou HTTP) comprovará a fatia.
+   - **Critério de Aceite em teste:** Qual teste da Costura escolhida e da Fronteira comprovará a fatia.
 4. **Leitura Independente:** Aplique `leitura-independente` no modo Tickets, com a Spec aprovada. Grave o rascunho dos tickets num arquivo temporário fora do repositório e delegue a leitura a um Leitor novo. Mostre a Paráfrase e os achados ao usuário. Continue só depois da resposta dele.
 5. **Destino e Gravação:** Use o destino de Tickets registrado, mantendo o vínculo com a Spec mesmo em sistemas diferentes. Só quando faltar escolha, pergunte entre:
    - **Opção 1:** Markdown local (ex.: `docs/tickets/<spec>/NN-slug.md`).
@@ -45,7 +45,7 @@ Transformar uma Especificação (Spec) aprovada em tickets pequenos de Fatias Ve
 ## 4. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
-| "Vou criar um ticket separado no final apenas para escrever os testes no Pest." | **Proibido.** Cada Fatia Vertical inclui seu próprio teste Pest executado via TDD. |
+| "Vou criar um ticket separado no final apenas para escrever os testes." | **Proibido.** Cada Fatia Vertical inclui seu próprio teste, escrito via TDD. |
 | "Vou colar o código inteiro dos arquivos dentro da descrição do ticket." | **Proibido.** Use apenas Ponteiros de Contexto (caminho do arquivo e linhas) e assinaturas de tipos. |
 | "Vou renomear a coluna e corrigir os 200 usos num ticket só." | **Proibido.** Use expand–contract. Cada lote de migração fica verde sozinho. |
 | "Não preciso mapear arquivos compartilhados entre tickets." | **Proibido.** Sem mapear o Estado Mutável Compartilhado, subagentes paralelos gerarão conflitos de merge. |

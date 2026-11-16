@@ -8,7 +8,9 @@ disable-model-invocation: true
 # Mapear Features da Aplicação (`/mapear`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
+**Perfil de stack:** Esta skill não assume linguagem nem framework. Se a configuração ou os manifests mostram Laravel, leia também o [inventário Laravel](references/inventario-laravel.md): ele dá o comando de cada fonte do inventário. Sem perfil para a stack do projeto, aplique cada regra com o mecanismo equivalente da stack.
 
 O destino do mapa vem da linha `Mapa de Features` na tabela de destinos. Sem essa linha, recomende `docs/features/` e confirme antes de gravar. Depois, acrescente a linha à configuração existente e preserve o resto.
 
@@ -21,19 +23,19 @@ Manter na aplicação um inventário de comportamento, do ponto de vista do usu�
 - **Arquivo de Feature:** o Markdown de uma Feature, na pasta do seu Domínio.
 - **Sub-feature:** um comportamento da Feature, com um ID único no mapa.
 - **Condução:** operação do app real pela tela, pelo comando ou pela rota que o usuário usa, com o resultado observado. Esta skill escreve a receita; `/conduzir` a executa.
-- **Âncora:** identificador estável do código que liga um diff à Feature: rota, componente Livewire, comando, agenda, notificação ou flag.
+- **Âncora:** identificador estável do código que liga um diff à Feature: rota, componente de UI, comando, agenda, notificação ou flag.
 - **Mapeador:** subagente que mapeia um Domínio.
 - **Deriva:** diferença entre o mapa e o comportamento real do app.
 
 ## 3. Regras Inegociáveis
-- **Siga o contrato:** Use o [formato](references/formato.md) em cada arquivo do mapa. Antes de entregar, rode o conferidor: `php <pasta-desta-skill>/scripts/conferir-mapa.php <destino> --ancoras="$INV/ancoras.txt"`.
+- **Siga o contrato:** Use o [formato](references/formato.md) em cada arquivo do mapa. Antes de entregar, rode o conferidor: `python3 <pasta-desta-skill>/scripts/conferir-mapa.py <destino> --ancoras="$INV/ancoras.txt"`.
 - **Descreva comportamento, não implementação:** Nomeie telas, botões, URLs, comandos e resultados visíveis. Caminhos de arquivo e classes internas ficam fora; as exceções são as Âncoras e os testes de regressão.
 - **Cubra cada entrada:** Cada Âncora do inventário pertence a uma Feature ou à seção `Fora do mapa`, com o motivo. Não omita uma entrada em silêncio.
-- **Não conduza o app:** Rode só os comandos de leitura do [inventário](references/inventario.md), o conferidor, `git` e `rg`. Seeders, migrations, filas, testes e navegador ficam com `/conduzir`.
+- **Não conduza o app:** Rode só os comandos de leitura do [inventário](references/inventario.md), o conferidor, `git` e `rg`. Seeds, migrações, filas, testes e navegador ficam com `/conduzir`.
 - **Grave só `não conduzida`:** Cada receita nova ou alterada recebe `Estado: não conduzida`. Preserve o Estado das receitas que não mudaram.
 - **Não altere o produto:** Escreva só no mapa e na linha de destino da configuração. Se o código contradiz o mapa, classifique a diferença: mapa errado é Deriva; código errado é defeito. Reporte o defeito; não ajuste o mapa para escondê-lo.
 - **Registre o estado que falta:** Se o seed não cria um estado que a receita exige, registre a falta em `Armadilhas`.
-- **Proteja dados:** Não copie segredos, senhas ou valores de `.env`.
+- **Proteja dados:** Não copie segredos, senhas ou valores de arquivos de ambiente.
 - **Use o glossário:** Nomeie Domínios e Features com os termos configurados. Use um termo para cada conceito.
 - **Faça commit só com autorização da sessão.**
 
@@ -93,10 +95,10 @@ Se o alcance toca 3 ou mais Domínios, delegue um Mapeador por Domínio afetado,
 ## 8. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
-| "Li o componente Livewire; posso marcar a receita `conduzida`." | **Proibido.** Esta skill grava só `não conduzida`. `/conduzir` prova a receita no app. |
+| "Li o código do componente; posso marcar a receita `conduzida`." | **Proibido.** Esta skill grava só `não conduzida`. `/conduzir` prova a receita no app. |
 | "Vou rodar o seed para conferir uma receita." | **Proibido.** Esta skill não grava no banco. Deixe a receita `não conduzida` e ofereça `/conduzir`. |
 | "O app é grande; vou mapear só os menus principais." | **Proibido.** Cada Âncora vai para uma Feature ou para `Fora do mapa`, com o motivo. |
-| "O botão sumiu da view; vou tirar a Sub-feature do mapa." | **Proibido.** Classifique primeiro. Sem commit, Spec ou pedido que explique a remoção, é defeito do produto. Reporte-o. |
+| "O botão sumiu do template; vou tirar a Sub-feature do mapa." | **Proibido.** Classifique primeiro. Sem commit, Spec ou pedido que explique a remoção, é defeito do produto. Reporte-o. |
 | "Vou pedir aos Mapeadores o conteúdo dos arquivos para revisar tudo." | **Proibido.** Peça o retorno curto. Leia por amostra e rode o conferidor. |
 | "O seed não cria pedido entregue; vou tirar esse passo da receita." | **Proibido.** Escreva o passo e registre a falta em `Armadilhas`. |
 | "Mudei uma rota; atualizo o mapa num PR depois." | **Proibido.** Atualize o Arquivo de Feature no mesmo diff. |

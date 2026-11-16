@@ -1,5 +1,7 @@
 # Probes com Pest Agent
 
+Esta referência pertence ao [perfil Laravel](laravel.md). Leia-a só em projetos com Pest.
+
 ## Detectar antes de usar
 Leia `composer.lock`, `tests/Pest.php` e execute `./vendor/bin/pest --version` e `./vendor/bin/pest --help`. O plugin `pestphp/pest-plugin-agent` fornece `--agent`; não assuma sua presença só porque Pest é versão 5. Se a opção estiver disponível numa versão compatível anterior, ela também pode ser usada.
 

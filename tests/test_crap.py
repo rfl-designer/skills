@@ -1,11 +1,11 @@
-import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "laravel-verification" / "scripts" / "crap.php"
+SCRIPT = ROOT / "skills" / "verification" / "scripts" / "crap.py"
 CLOVER = """<?xml version="1.0" encoding="UTF-8"?>
 <coverage generated="1">
   <project timestamp="1">
@@ -33,7 +33,6 @@ CLOVER = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-@unittest.skipUnless(shutil.which("php"), "php ausente")
 class CrapReportTest(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -43,7 +42,7 @@ class CrapReportTest(unittest.TestCase):
         self.clover.write_text(CLOVER.format(root=self.root))
 
     def run_script(self, *args):
-        return subprocess.run(["php", str(SCRIPT), *args], capture_output=True,
+        return subprocess.run([sys.executable, str(SCRIPT), *args], capture_output=True,
                               text=True, check=False, cwd=self.root)
 
     def test_lists_methods_at_or_above_limit_worst_first(self):
@@ -87,6 +86,25 @@ class CrapReportTest(unittest.TestCase):
         result = self.run_script(str(other))
         self.assertEqual(result.returncode, 2)
         self.assertIn("ilegível", result.stderr)
+
+    def test_computes_crap_when_report_has_only_complexity(self):
+        self.clover.write_text(f"""<coverage><project><file name="{self.root}/src/pedidos.ts">
+          <line num="3" type="method" signature="fechar()" complexity="4" count="1"/>
+          <line num="4" type="stmt" count="1"/>
+          <line num="5" type="stmt" count="0"/>
+          <line num="9" type="method" signature="total()" complexity="2" count="2"/>
+          <line num="10" type="stmt" count="2"/>
+        </file></project></coverage>""")
+        result = self.run_script(str(self.clover), "--limite=5")
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertEqual(result.stdout.splitlines(), ["CRAP 6  src/pedidos.ts:3  fechar()  complexidade 4"])
+        self.assertEqual(self.run_script(str(self.clover)).stdout.strip(), "OK: 2 métodos, nenhum com CRAP >= 10.")
+
+    def test_rejects_report_without_method_complexity(self):
+        self.clover.write_text('<coverage><project><file name="a.js"><line num="1" type="stmt" count="1"/></file></project></coverage>')
+        result = self.run_script(str(self.clover))
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("sem medida de CRAP", result.stderr)
 
 
 if __name__ == "__main__":

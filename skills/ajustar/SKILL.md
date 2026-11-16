@@ -8,7 +8,7 @@ disable-model-invocation: true
 # Corrigir os Achados da Revisão (`/ajustar`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal agrupa os achados em Lotes e delega cada Lote a um Ajustador. O Ajustador prova cada correção. O principal integra os Lotes, procura regressões nos valores alterados e verifica o estado integrado. Depois, o usuário roda `/revisar` para a rodada seguinte.
@@ -21,17 +21,17 @@ Corrigir os achados escolhidos do relatório de `/revisar`. O agente principal a
 - **Valor alterado:** o que a correção muda e outro código lê: chave, ID, coluna, status, flag, regra, assinatura ou formato de retorno. É a mesma lista de `/revisar`.
 
 ## 3. Regras Inegociáveis
-- **Carregue as disciplinas de modelo:** Aplique `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification` e `ste100-clean-code`.
+- **Carregue as disciplinas de modelo:** Aplique `deep-modules`, `tdd-seams`, `verification` e `ste100-clean-code`.
 - **Corrija os achados escolhidos:** O argumento ou a mensagem do usuário escolhe os achados ("corrija 2 e 5"). Sem escolha, use os achados do `Veredito:` do relatório: todos os `[BLOCKER]` e `[IMPORTANTE]`.
 - **Registre os achados aceitos:** Quando o usuário decide não corrigir um achado, ele o aceita. Registre o achado em `Aceitos:`, com o motivo do usuário. Sem motivo, pergunte o motivo. Um achado que o usuário não escolheu não está aceito: ele continua aberto.
 - **Leve o vaivém ao usuário:** Um achado com `(vaivém do achado N)` não entra num Lote antes da resposta do usuário. A Correção dele traz as duas direções e a pergunta.
-- **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Action ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/depurar`. Esses achados ficam fora dos Lotes.
+- **Mande cada achado à skill certa:** `/ajustar` corrige achados com correção localizada. O requisito faltante que pede uma Fatia nova (tela, rota, Costura ou tabela nova) vai para `/implementar`. O defeito sem causa localizada vai para `/depurar`. Esses achados ficam fora dos Lotes.
 - **Use o relatório como contrato:** A Correção do achado é o ponto de partida. O Ajustador pode aplicar uma correção menor que resolve o mesmo caso concreto. Uma correção que muda a Spec, muda um contrato externo ou exige escolha entre opções recebe o status `bloqueado`, com a pergunta para o usuário.
 - **Prove cada correção pelo tipo do achado:**
-  - **Com comportamento:** O caso concreto vira um teste Pest. Parta do arquivo de prova do achado, na pasta de `Provas:` do relatório. O teste falha antes da correção pelo motivo do achado (RED) e passa depois (GREEN).
+  - **Com comportamento:** O caso concreto vira um teste. Parta do arquivo de prova do achado, na pasta de `Provas:` do relatório. O teste falha antes da correção pelo motivo do achado (RED) e passa depois (GREEN).
   - **Teste ausente:** Escreva o teste. Quebre a lógica de propósito, veja o teste falhar e desfaça a quebra. Aqui, o teste verde na primeira execução é o resultado esperado.
-  - **Mapa desatualizado:** A prova é o conferidor de `/mapear` e a condução da entrada afetada, segundo `laravel-verification`.
-  - **Sem teste viável** (condição de corrida, carga): Registre o motivo e use a prova mais próxima, como a contagem de queries ou o índice único no schema. Marque a prova como `parcial`.
+  - **Mapa desatualizado:** A prova é o conferidor de `/mapear` e a condução da entrada afetada, segundo `verification`.
+  - **Sem teste viável** (condição de corrida, carga): Registre o motivo e use a prova mais próxima, como a contagem de consultas ou o índice único no schema. Marque a prova como `parcial`.
 - **Prove o `não reproduz`:** No achado com comportamento, o teste pode passar antes da correção. Antes de concluir, altere a linha do achado de propósito e veja o teste falhar; depois, desfaça a alteração. Com a falha, o teste executa o caso: registre `não reproduz` com o teste e as duas saídas, e mantenha a produção sem alteração. Sem a falha, o teste não executa o caso: reescreva-o para o caso concreto.
 - **Corrija em todos os locais:** Corrija cada local que o achado lista. Depois, busque com `rg` o mesmo padrão no repositório inteiro. Um local com o mesmo defeito e a mesma correção entra no achado. Um local que pede outra correção vira achado novo.
 - **Siga cada valor alterado:** Para cada valor que a correção altera, busque com `rg` todos os consumidores e confira cada um. Um consumidor quebrado pela correção é regressão do Lote. Nos arquivos do Lote, corrija-a. Fora deles, devolva o local ao principal, que atribui a regressão.
@@ -64,22 +64,22 @@ Avise cada Ajustador que há outros agentes no repositório: não reverta mudan�
 
 ## 5. Processo do Ajustador (por Lote)
 1. **Base:** Confirme o diretório, a base, o diff revisado e os achados do Lote. Não selecione outros achados.
-2. **Prova antes:** Escolha a prova de cada achado pela seção 3. No achado com comportamento, parta do arquivo de prova do achado e ponha o teste na Costura ou na Fronteira. Sem o arquivo, escreva o teste do caso concreto. Execute `./vendor/bin/pest --filter=<Teste>` e confirme a falha pelo motivo do achado.
+2. **Prova antes:** Escolha a prova de cada achado pela seção 3. No achado com comportamento, parta do arquivo de prova do achado e ponha o teste na Costura ou na Fronteira. Sem o arquivo, escreva o teste do caso concreto. Execute o teste focado, com o comando da configuração, e confirme a falha pelo motivo do achado.
 3. **Correção:** Aplique a menor correção que resolve o caso em todos os locais. Prefira a correção que apaga código.
-4. **Prova depois:** Execute a prova de cada achado até ela passar. Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `laravel-tdd-seams`. Se a premissa vem da Correção do achado, marque o achado `bloqueado`, com a premissa, a prova e a pergunta.
+4. **Prova depois:** Execute a prova de cada achado até ela passar. Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a premissa" de `tdd-seams`. Se a premissa vem da Correção do achado, marque o achado `bloqueado`, com a premissa, a prova e a pergunta.
 5. **Propagação:** Busque com `rg` o padrão corrigido e cada valor alterado. Confira cada consumidor. Trate a regressão e o defeito sem relação pela seção 3.
-6. **Portão:** Aplique o portão completo de `laravel-verification`.
-7. **Retorno:** Devolva neste formato, sem colar os arquivos:
+6. **Portão:** Aplique o portão completo de `verification`.
+7. **Retorno:** Devolva neste formato, sem colar os arquivos. Os nomes e caminhos do exemplo são ilustrativos:
 
 ```markdown
 Lote: A (achados 2, 5 e 6)
-Achado 2: corrigido. RED: `pest --filter=AgrupaItensPorChave` falhou com "esperado 3 itens, recebido 4". GREEN: passou. Locais: app/Actions/AgruparItens.php:31, resources/views/pdf/termos.blade.php:18, app/Jobs/EnviarResumo.php:19 (mesmo defeito, achado na busca).
-Achado 5: não reproduz. `pest --filter=ExigeAssinatura` passou antes da correção. Com app/Actions/ExigirAssinatura.php:12 alterada de propósito, o teste falhou; alteração desfeita. Produção sem alteração.
+Achado 2: corrigido. RED: o teste focado `agrupa itens por chave` falhou com "esperado 3 itens, recebido 4". GREEN: passou. Locais: pedidos/agrupar_itens:31, pdf/termos:18, jobs/enviar_resumo:19 (mesmo defeito, achado na busca).
+Achado 5: não reproduz. O teste focado `exige assinatura` passou antes da correção. Com pedidos/exigir_assinatura:12 alterada de propósito, o teste falhou; alteração desfeita. Produção sem alteração.
 Achado 6: bloqueado. Pergunta: nos pedidos já assinados, o PDF mostra a chave antiga ou a nova? A Spec não responde.
-Valores alterados: `AgruparItens::handle()` agora devolve `Collection<string, Item>`. Consumidores conferidos: app/Livewire/Pedido/Detalhe.php:44, app/Jobs/GerarPdf.php:27.
-Regressão fora do Lote: app/Exports/PedidosExport.php:52 lê o retorno antigo de `AgruparItens::handle()`.
-Achados novos: app/Http/Controllers/CupomController.php:30 aceita cupom vencido; caso: cupom vencido ontem dá desconto hoje.
-Portão: Pint ok, PHPStan ok, Pest 412 passed (suíte completa), diretório ../wt-lote-a, diff sem commit.
+Valores alterados: `agruparItens()` agora devolve um mapa de chave para Item. Consumidores conferidos: pedidos/detalhe:44, jobs/gerar_pdf:27.
+Regressão fora do Lote: exportacoes/pedidos:52 lê o retorno antigo de `agruparItens()`.
+Achados novos: cupons/aplicar:30 aceita cupom vencido; caso: cupom vencido ontem dá desconto hoje.
+Portão: formatação ok, análise estática ok, testes 412 aprovados (suíte completa), diretório ../wt-lote-a, diff sem commit.
 Pendências: achado 6.
 ```
 
@@ -88,8 +88,8 @@ Pendências: achado 6.
 2. **Bloqueados:** Termine os outros Lotes. Faça as perguntas dos achados `bloqueado` no relatório, sem parar a rodada. A resposta "fica como está", com o motivo, torna o achado `aceito`.
 3. **Integração:** Integre um Lote por vez, só com o delta do Lote. Um conflito que muda comportamento volta ao ciclo de prova do Lote afetado.
 4. **Regressões:** Junte os `Valores alterados` de todos os Lotes. No estado integrado, busque de novo com `rg` os consumidores de cada valor e confira cada um. Dois Lotes podem alterar o mesmo Fluxo de formas incompatíveis. Atribua cada regressão ao Lote dono do arquivo, ou a um Lote novo.
-5. **Portão:** Execute o portão completo de `laravel-verification` no estado integrado. A evidência de worktrees isolados não prova a combinação.
-6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A mensagem segue `ste100-clean-code` e cita os números dos achados. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `laravel-verification`. Depois, limpe só os worktrees criados por este fluxo. Antes de remover um worktree, confira com `git -C <worktree> status` e o diff que todo o delta dele está integrado. Um worktree com mudança não integrada espera a decisão do usuário.
+5. **Portão:** Execute o portão completo de `verification` no estado integrado. A evidência de worktrees isolados não prova a combinação.
+6. **Fechamento:** Com o portão aprovado e a autorização da sessão, faça um commit por Lote. A mensagem segue `ste100-clean-code` e cita os números dos achados. A evidência de um worktree é temporária. Grave na pasta de Evidências só os artefatos do estado integrado, segundo `verification`. Depois, limpe só os worktrees criados por este fluxo. Antes de remover um worktree, confira com `git -C <worktree> status` e o diff que todo o delta dele está integrado. Um worktree com mudança não integrada espera a decisão do usuário.
 7. **Relatório:**
    - 1 linha por achado: número, título, status (`corrigido`, `não reproduz`, `bloqueado` ou `desatualizado`) e prova.
    - Os achados enviados a `/implementar` ou `/depurar`, quando houver.
@@ -132,6 +132,6 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 - `[measured]` Seleção mostrada antes da delegação, com os achados enviados a outra skill à parte.
 - `[measured]` Cada achado com status e a prova do seu tipo, com comando e saída. O `não reproduz` traz também a falha com a linha alterada.
 - `[measured]` Busca do padrão e dos valores alterados citada para cada correção, no Lote e no estado integrado.
-- `[measured]` Portão completo de `laravel-verification` aprovado no estado integrado antes de qualquer commit, com comandos, escopos e resultados citados.
+- `[measured]` Portão completo de `verification` aprovado no estado integrado antes de qualquer commit, com comandos, escopos e resultados citados.
 - `[measured]` Vaivém perguntado ao usuário antes da delegação.
 - `[measured]` Relatório com `Valores alterados`, achados novos, perguntas dos bloqueados, `Aceitos:` com o motivo de cada achado e a indicação de `/revisar`.

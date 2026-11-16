@@ -8,7 +8,7 @@ disable-model-invocation: true
 # Pausar e Passar o Trabalho (`/pausar`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, sem o histórico do chat, lê a nota e continua do ponto exato. Ele não refaz investigação, teste ou decisão já concluída.
@@ -24,7 +24,7 @@ Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, 
 
 ## 3. Processo
 1. **Fronteira:** Conclua ou desfaça o passo atual. Remova a instrumentação temporária (`dd`, `dump`, `Log::debug`) ou registre na nota onde ela está.
-2. **Estado do repositório:** Execute `git status`, `git branch --show-current` e `git log --oneline -5`. Aplique o modo pausa de `laravel-verification`: registre resultados existentes e o estado que cobrem; marque os invalidados como `desatualizado`. Não execute a suíte completa apenas para pausar.
+2. **Estado do repositório:** Execute `git status`, `git branch --show-current` e `git log --oneline -5`. Aplique o modo pausa de `verification`: registre resultados existentes e o estado que cobrem; marque os invalidados como `desatualizado`. Não execute a suíte completa apenas para pausar.
 3. **Foco:** Se o usuário passou argumento, use-o como foco da próxima sessão e corte da nota o que não serve a esse foco.
 4. **Nota:** Normalize a branch para um nome de arquivo (troque `/` e caracteres especiais por `-`). Grave `$TMPDIR/handoff-<branch>-<AAAA-MM-DD>.md` com estas seções, nesta ordem:
    - **Objetivo:** O que o usuário quer, em 1 a 3 frases.
@@ -34,7 +34,7 @@ Parar o trabalho num ponto seguro e gravar uma nota de handoff. Um agente novo, 
    - **Pendências:** Perguntas abertas, riscos e aprovações que o usuário ainda não deu.
    - **Armadilhas:** O que o agente novo não descobre lendo o código: hipóteses refutadas, caminhos sem saída, convenções não escritas.
    - **Artefatos:** Caminhos e URLs da Spec, dos tickets, dos ADRs e de outros arquivos-chave. Um relatório de `/revisar` ou `/ajustar` que existe só no chat vai sem alteração para `$TMPDIR/relatorio-<skill>-<branch>-<AAAA-MM-DD>.md`; cite o caminho aqui. Cite também o rascunho de `leitura-independente` ainda não gravado no destino.
-   - **Skills sugeridas:** As skills que o agente novo deve carregar (por exemplo `/implementar` e `laravel-verification`).
+   - **Skills sugeridas:** As skills que o agente novo deve carregar (por exemplo `/implementar` e `verification`).
    - **Para retomar:** Copie as 4 instruções do passo 5.
 5. **Instruções de retomada (vão dentro da nota):**
    1. Leia esta nota e os artefatos citados antes de agir.

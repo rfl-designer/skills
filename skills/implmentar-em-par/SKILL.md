@@ -1,6 +1,6 @@
 ---
 name: implmentar-em-par
-description: Implementa uma Fatia Vertical Laravel ou Livewire em par com o usuário. Confirma e explica RED antes da produção; implementa um componente por etapa e aguarda revisão. Use quando o usuário pedir /implmentar-em-par ou implementação em par com essas pausas.
+description: Implementa uma Fatia Vertical em par com o usuário. Confirma e explica RED antes da produção; implementa um componente por etapa e aguarda revisão. Use quando o usuário pedir /implmentar-em-par ou implementação em par com essas pausas.
 ---
 
 # Implementar em par (`/implmentar-em-par`)
@@ -10,7 +10,7 @@ description: Implementa uma Fatia Vertical Laravel ou Livewire em par com o usu�
 Use a disciplina técnica de `/implementar` com revisão humana entre etapas. Conduza uma Fatia Vertical por vez na conversa principal.
 Não invoque `/implementar` como orquestrador nem delegue a implementação completa. Isso eliminaria as pausas combinadas.
 
-Carregue `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification` e `ste100-clean-code` antes de implementar.
+Carregue `deep-modules`, `tdd-seams`, `verification` e `ste100-clean-code` antes de implementar.
 Localize essas skills no ambiente; se alguma faltar, informe a dependência ausente antes do trabalho dependente.
 
 Leia a configuração indicada nas instruções do projeto. Sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório.
@@ -25,17 +25,17 @@ Sem configuração, pergunte apenas pelas escolhas necessárias ausentes. Ofere�
 4. Identifique os componentes existentes e aqueles que precisam mudar. Ordene as etapas pelas dependências de implementação.
 5. Apresente o plano antes de escrever o teste. Informe o escopo de cada etapa e o resultado esperado da fatia.
 
-Neste fluxo, **componente** é a unidade de pausa: Form Request, Policy, Model, Controller, Action, Blade ou outro elemento necessário.
+Neste fluxo, **componente** é a unidade de pausa: validação de entrada, regra de autorização, modelo, handler da Fronteira, Costura, template ou outro elemento necessário.
 Um componente pode envolver vários arquivos diretamente relacionados. Não agrupe componentes distintos para evitar revisões.
 
 A ordem da implementação pode diferir do percurso da requisição. Service Providers, middlewares e rotas só entram quando exigem alteração.
 Não imponha uma sequência fixa nem crie Action, Service ou DTO sem necessidade.
 Se o projeto não usa migrations, siga seu mecanismo de schema e banco de testes. Não introduza migrations por rotina.
-Para Livewire, respeite sua validação, autorização e Fronteira; não crie Controller ou Form Request artificial.
+Num componente de UI com estado no servidor, respeite a validação, a autorização e a Fronteira dele; não crie um handler ou uma camada de validação artificial.
 
 ## 3. Escrever, executar e explicar RED
 
-Escreva primeiro um teste Pest do comportamento escolhido. Use a Costura pública ou a Fronteira HTTP/Livewire conforme `laravel-tdd-seams`.
+Escreva primeiro um teste do comportamento escolhido. Use a Costura pública ou a Fronteira conforme `tdd-seams`.
 Teste resultados observáveis; não exija um teste isolado para cada componente.
 
 Execute o teste com o comando configurado antes de escrever produção. Confirme uma falha causada pelo comportamento ausente.
@@ -57,7 +57,7 @@ Depois de confirmar RED, explique:
 ## 4. Implementar um componente por etapa
 
 Após a revisão, implemente somente o próximo componente acordado. Preserve os contratos, a autorização e as convenções do projeto.
-Faça as verificações focadas úteis para a etapa, conforme `laravel-verification`.
+Faça as verificações focadas úteis para a etapa, conforme `verification`.
 Execute o teste da fatia quando a alteração permitir observar seu avanço. Registre quando ele ainda não foi executado novamente.
 
 O teste pode continuar vermelho enquanto faltam componentes. Confira a causa observada; diferencie incompletude prevista de regressão ou falha inesperada.
@@ -93,7 +93,7 @@ Se não houver ajustes, informe isso e siga com a verificação final.
 Refatorações que envolvam vários componentes devem ser divididas em etapas revisáveis, preservando o comportamento.
 Repita os testes afetados após refatorar.
 
-Antes de concluir a fatia ou fazer commit autorizado, aplique o portão completo de `laravel-verification` no estado atual.
+Antes de concluir a fatia ou fazer commit autorizado, aplique o portão completo de `verification` no estado atual.
 Inclua navegador quando o fluxo exigir. Reutilize evidências apenas enquanto elas ainda cobrirem o estado atual.
 Uma pausa intermediária pode manter testes vermelhos. Ela não conclui a fatia nem exige a suíte completa apenas para pausar.
 Não faça commit de etapa vermelha. Faça commits somente quando autorizados pela sessão e com o portão aprovado.

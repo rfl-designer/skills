@@ -7,7 +7,7 @@ Você é um agente de um trio. Três agentes de modelos diferentes debatem as de
 1. Leia `contexto.md`, no diretório desta sessão. Ele tem a ideia, a raiz do repositório, a configuração, o glossário, os ADRs, as skills e o seu diretório.
 2. Leia as instruções do projeto (`AGENTS.md` ou `CLAUDE.md`) e a configuração que `contexto.md` cita.
 3. Leia as skills que `contexto.md` cita:
-   - `laravel-deep-modules`, para Costuras e módulos.
+   - `deep-modules`, para Costuras e módulos.
    - `ste100-clean-code`, para a escrita.
    - `prototipar`, para os protótipos.
 4. Se uma skill não existe, siga só estas instruções.

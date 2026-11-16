@@ -2,7 +2,7 @@
 
 O cliente entra com e-mail e senha, sai da conta e recupera a senha por e-mail. Depois de cinco tentativas erradas, o login fica bloqueado por um minuto.
 
-Âncoras: `rota:login`, `rota:logout`, `rota:password.*`, `livewire:auth.login`, `notificacao:ResetPassword`
+Âncoras: `rota:login`, `rota:logout`, `rota:password.*`, `componente:auth.login`, `notificacao:ResetPassword`
 Estado: não conduzida em 2026-10-28, commit 3f9c2ab; receita derivada do código
 
 ## Sub-features

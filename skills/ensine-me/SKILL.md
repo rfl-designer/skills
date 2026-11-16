@@ -8,7 +8,7 @@ disable-model-invocation: true
 # Ensinar em Lições Curtas (`/ensine-me`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 Fazer o usuário entender e reter um tema ou um trecho do código. A unidade de ensino é a **Lição**: um HTML autocontido que ensina uma coisa só. O resultado é o entendimento do usuário, não uma mudança no código.
@@ -68,7 +68,7 @@ Fazer o usuário entender e reter um tema ou um trecho do código. A unidade de 
 ## 4. Racionalizações Proibidas (Anti-Atalho)
 | Desculpa do Agente | Regra Correta |
 |---|---|
-| "Conheço bem o Livewire; não preciso abrir a documentação." | **Proibido.** Detecte a versão instalada e cite a página oficial da série ou o código instalado. |
+| "Conheço bem o framework; não preciso abrir a documentação." | **Proibido.** Detecte a versão instalada e cite a página oficial da série ou o código instalado. |
 | "Vou gerar a Lição agora; o usuário escolhe o destino depois." | **Proibido.** Pergunte o destino antes de produzir a Lição. |
 | "O usuário pediu um conceito; vou entrevistá-lo sobre a Missão." | **Proibido.** Um conceito pontual usa o modo Explicar, sem entrevista. |
 | "Um diagrama completo no fim resume tudo." | **Proibido.** Um diagrama completo é referência. Monte a série, uma parte por figura. |

@@ -8,7 +8,7 @@ disable-model-invocation: true
 # Alinhar em Trio no herdr (`/alinhar-em-trio`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 Leia também a seção `Trio de alinhamento`. Sem essa seção, use o trio padrão de [references/herdr.md](references/herdr.md) e ofereça `/setup` uma vez.
 
@@ -65,7 +65,7 @@ Esta skill substitui `/alinhar`, `/prototipar` e `/especificar`. Depois do revie
    - A ideia.
    - A raiz do repositório e a configuração.
    - O glossário e a pasta de ADRs configurados.
-   - Os caminhos absolutos de `laravel-deep-modules`, `ste100-clean-code` e `prototipar`, quando estão instaladas.
+   - Os caminhos absolutos de `deep-modules`, `ste100-clean-code` e `prototipar`, quando estão instaladas.
    - O caminho da ata e o diretório de cada agente.
 4. Crie a tab `alinhar-<slug>` no workspace atual, com 3 panes. O diretório de cada pane é a raiz do repositório, exceto quando a referência indica outro diretório para o CLI.
 5. Inicie cada agente com o nome, o `--kind` e os argumentos da configuração. Os argumentos limitam a escrita ao diretório do agente.
@@ -73,10 +73,10 @@ Esta skill substitui `/alinhar`, `/prototipar` e `/especificar`. Depois do revie
 7. Registre na ata a tab, os panes e o estado de cada agente.
 
 ### 4.3 Árvore de decisão
-1. Inspecione o repositório em silêncio: Models, migrations, Enums, Actions, componentes Livewire, Policies, glossário e ADRs ligados à ideia. Não pergunte ao trio nem ao humano o que o código responde.
+1. Inspecione o repositório em silêncio: modelos, schema, enumerações, Costuras, componentes de UI, regras de autorização, glossário e ADRs ligados à ideia. Não pergunte ao trio nem ao humano o que o código responde.
 2. Monte a primeira árvore com os 5 eixos de `/alinhar`:
    - Domínio e Estado.
-   - Fronteira (Livewire / HTTP).
+   - Fronteira.
    - Autorização.
    - Costura pública.
    - Efeitos Colaterais.
