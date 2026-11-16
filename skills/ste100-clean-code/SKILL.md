@@ -1,6 +1,6 @@
 ---
 name: ste100-clean-code
-description: Disciplina de escrita técnica ASD-STE100 em português, remoção de comentários desnecessários (/no-comments) e eliminação de ruído textual de IA (/unslop). Use em todas as respostas, documentações, commits, PRs e código PHP/Blade.
+description: Disciplina de escrita técnica ASD-STE100 em português, remoção de comentários desnecessários (/no-comments) e eliminação de ruído textual de IA (/unslop). Use em todas as respostas, documentações, commits, PRs e código.
 ---
 
 # Escrita Técnica ASD-STE100 e Código Sem Ruído (`ste100-clean-code`)
@@ -14,13 +14,13 @@ Manter toda comunicação, documentação (`SPEC`, `GLOSSARY.md`, PRs) e código
 - **Mantenha frases curtas:** Limite instruções procedimentais a no máximo 20 palavras e explicações descritivas a no máximo 25 palavras.
 - **Dê uma instrução por frase:** Separe passos múltiplos em listas numeradas.
 - **Corte muletas de IA (`/unslop`):** Proíba expressões vazias como *"Certamente!"*, *"Vamos mergulhar nisso"*, *"É importante notar que"*, *"Robusto e escalável"*, *"Sem mais delongas"*. Vá direto ao fato técnico.
-- **Escreva o commit com a prova:** O título diz o que mudou. O corpo diz por que mudou e como você provou. A prova é o comando e o resultado `[measured]`, por exemplo `pest --filter=AprovaPedido: 3 passed`. Sem prova executada, escreva `não verificado` e o motivo.
+- **Escreva o commit com a prova:** O título diz o que mudou. O corpo diz por que mudou e como você provou. A prova é o comando e o resultado `[measured]`, por exemplo `<comando de teste focado> AprovaPedido: 3 aprovados`. Sem prova executada, escreva `não verificado` e o motivo.
 
 ## 3. Regras Inegociáveis de Código (`/no-comments`)
 - **Não narre o que o código já diz:** Remova todo comentário que apenas repete o nome do método ou variável (ex.: `// Busca o usuário pelo ID`).
 - **Codifique restrições na estrutura, não em comentários:** Se você sente vontade de escrever um comentário avisando sobre um tipo ou estado, substitua o comentário por um tipo estrito, um `enum`, um DTO `readonly` ou uma asserção.
 - **Quando um comentário é permitido:**
-  1. Anotações de tipo exigidas pelo Larastan/PHPStan (ex.: `/** @var Collection<int, Order> $orders */`).
+  1. Anotações de tipo exigidas pelo analisador estático do projeto.
   2. Explicação de um *porquê* não-óbvio (workaround de bug externo, link de RFC ou motivo de performance medido).
 - **Subtraia antes de adicionar:** Delete código comentado, métodos não chamados e imports órfãos no mesmo commit.
 

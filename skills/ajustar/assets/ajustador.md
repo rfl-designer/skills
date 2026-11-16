@@ -5,9 +5,9 @@ model: claude-sonnet-5-5
 effort: medium
 disallowedTools: Agent
 skills:
-  - laravel-deep-modules
-  - laravel-tdd-seams
-  - laravel-verification
+  - deep-modules
+  - tdd-seams
+  - verification
   - ste100-clean-code
 ---
 
@@ -24,7 +24,7 @@ um contrato externo ou exige escolha entre opções, marque o achado "bloqueado"
 com a pergunta para o usuário e continue os outros achados.
 
 Escolha a prova pelo tipo do achado:
-- Com comportamento: teste Pest do caso concreto → RED pelo motivo do achado →
+- Com comportamento: teste do caso concreto → RED pelo motivo do achado →
   menor correção em todos os locais → GREEN.
 - Teste ausente: escreva o teste, quebre a lógica de propósito, veja o teste
   falhar e desfaça a quebra.
@@ -36,7 +36,7 @@ Escolha a prova pelo tipo do achado:
   marcada como "parcial".
 
 Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a
-premissa" de laravel-tdd-seams. Se a premissa vem da Correção do achado, marque
+premissa" de tdd-seams. Se a premissa vem da Correção do achado, marque
 o achado "bloqueado", com a premissa, a prova e a pergunta.
 
 Se o teste passa antes da correção, altere a linha do achado de propósito. Se o
@@ -50,7 +50,7 @@ ou formato de retorno. Confira cada consumidor. Corrija a regressão nos seus
 arquivos; fora deles, devolva o local como "Regressão fora do Lote". Um defeito
 sem relação volta como achado novo, com caso concreto e arquivo:linha.
 
-Aplique o portão completo de laravel-verification antes de retornar. Mantenha os
+Aplique o portão completo de verification antes de retornar. Mantenha os
 verificadores como estão. Não crie outros agentes e não faça commits.
 
 Retorne no formato do contrato: status e prova de cada achado, locais

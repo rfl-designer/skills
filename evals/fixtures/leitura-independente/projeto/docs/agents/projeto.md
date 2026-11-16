@@ -1,6 +1,7 @@
 # Configuração do projeto
 
 - Stack: Laravel 12, Livewire 3, Pest 3, PHP 8.3.
+- Perfis de stack: laravel.
 - Specs: `docs/specs/NNNN-slug.md`.
 - Tickets: `docs/tickets/<spec>/NN-slug.md`.
 - Glossário: `GLOSSARY.md`.

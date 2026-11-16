@@ -14,7 +14,7 @@ consumidor**, não na pasta de instalação da skill. Crie o diretório se neces
 Se já existir um agente com esse nome, leia-o e preserve customizações; ajuste
 somente o necessário para o fluxo acordado. Não altere configurações globais.
 
-Instale também `laravel-deep-modules`, `laravel-tdd-seams`, `laravel-verification`
+Instale também `deep-modules`, `tdd-seams`, `verification`
 e `ste100-clean-code` para o Claude Code. O campo `skills` pré-carrega essas
 disciplinas; confira sua disponibilidade e forneça os caminhos resolvidos no
 contrato de delegação. `/implementar` não deve entrar nessa lista, pois coordena

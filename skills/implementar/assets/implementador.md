@@ -5,9 +5,9 @@ model: claude-sonnet-5-5
 effort: medium
 disallowedTools: Agent
 skills:
-  - laravel-deep-modules
-  - laravel-tdd-seams
-  - laravel-verification
+  - deep-modules
+  - tdd-seams
+  - verification
   - ste100-clean-code
 ---
 
@@ -21,12 +21,12 @@ responsabilidade, preserve alterações alheias e adapte-se ao trabalho integrad
 Confirme diretório e base antes de editar. Se faltar decisão, acesso, dependência
 ou mudança fora do escopo, reporte ao principal com o estado parcial preservado.
 
-Faça o ciclo completo: teste Pest na Costura/Fronteira → RED pelo motivo esperado
-→ implementação mínima → GREEN → refactor → portão de laravel-verification.
+Faça o ciclo completo: teste na Costura/Fronteira → RED pelo motivo esperado
+→ implementação mínima → GREEN → refactor → portão de verification.
 Use o executor e os comandos configurados. Isole recursos de teste ou respeite a
 serialização combinada. Não enfraqueça os verificadores para obter verde.
 Depois de 2 correções com a mesma premissa sem GREEN, aplique "Ataque a
-premissa" de laravel-tdd-seams. Se a premissa vem da Spec ou do ticket, pare e
+premissa" de tdd-seams. Se a premissa vem da Spec ou do ticket, pare e
 devolva a premissa e a prova ao principal.
 
 Não crie outros agentes. Faça commits somente se o principal transmitir a

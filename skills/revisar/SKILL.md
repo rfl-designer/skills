@@ -1,16 +1,18 @@
 ---
 name: revisar
-description: Executa Revisão Adversarial em contexto limpo (Standards + Spec + Segurança Livewire/Laravel), com cada achado provado por execução, e gera o resumo de PR com Raio de Explosão. Use quando o usuário digitar /revisar.
+description: Executa Revisão Adversarial em contexto limpo (Standards + Spec + Segurança), em qualquer linguagem ou framework, com cada achado provado por execução, e gera o resumo de PR com Raio de Explosão. Use quando o usuário digitar /revisar.
 disable-model-invocation: true
 ---
 
 # Revisão Adversarial e Briefing de Entrega (`/revisar`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+
+**Perfil de stack:** Esta skill não assume linguagem nem framework. Se a configuração ou os manifests mostram Laravel, leia também [references/laravel.md](references/laravel.md): ele dá a guarda do ambiente de teste, a preparação das worktrees e as suspeitas e provas de Laravel e Livewire. Passe o caminho do perfil a cada revisor. Sem perfil para a stack do projeto, aplique cada regra com o mecanismo equivalente da stack.
 
 ## 1. Objetivo
-Revise o diff da entrega numa só rodada, em 2 eixos isolados: Standards (padrões e segurança Laravel/Livewire) e Spec. Fica só o achado que uma execução prova. Depois, escreva um briefing de PR conciso, com o Raio de Explosão.
+Revise o diff da entrega numa só rodada, em 2 eixos isolados: Standards (padrões e segurança) e Spec. Fica só o achado que uma execução prova. Depois, escreva um briefing de PR conciso, com o Raio de Explosão.
 
 Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cada eixo, priorize nesta ordem: correto, seguro, aguenta a carga esperada, testado, rápido.
 
@@ -19,8 +21,8 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
 - **Sem subagentes, declare:** Avise o usuário que a revisão no mesmo contexto não é independente e ofereça `/revisar` numa sessão nova, sem o histórico da implementação. Se o usuário pedir para continuar, revise numa worktree de revisão e escreva `Independência: mesmo contexto` no relatório.
 - **Só reporte:** `/revisar` não edita o código do alvo. As provas ficam fora do checkout do usuário. O usuário escolhe os achados. `/ajustar` faz a correção localizada; `/implementar`, o requisito que pede uma Fatia nova; `/depurar`, o defeito sem causa localizada.
 - **Prove cada achado por execução:** Todo achado tem um caso concreto e a sua prova: os arquivos de prova, o comando exato, a saída que ele imprimiu e a saída que a Spec exige. Sem execução, não há achado. A leitura encontra a suspeita; a execução a prova. Ficam fora da revisão estilo, nomes, estrutura e risco que só importa depois de uma mudança futura.
-- **Execute só no ambiente de teste:** A prova é um teste Pest, ou um script que usa a configuração de teste. Não use o `.env` do usuário, não rode migration fora dos testes e não chame serviço externo. A guarda da etapa 1 vem antes da primeira prova.
-- **Registre o risco que o teste não executa:** Alguns riscos não têm prova no ambiente de teste: corrida entre 2 processos ao mesmo tempo, memória com uma tabela grande, tarefa repetida em vários servidores e estado estático no Octane. Com caso concreto e `arquivo:linha`, eles vão para `Não verificado:`, com o motivo, fora do `Veredito:`. Os outros riscos têm prova: execute-a.
+- **Execute só no ambiente de teste:** A prova é um teste, ou um script que usa a configuração de teste. Não use o ambiente local do usuário (arquivos de ambiente e banco de desenvolvimento), não rode migração fora dos testes e não chame serviço externo. A guarda da etapa 1 vem antes da primeira prova.
+- **Registre o risco que o teste não executa:** Alguns riscos não têm prova no ambiente de teste: corrida entre 2 processos ao mesmo tempo, memória com uma tabela grande, tarefa repetida em vários servidores e estado estático num servidor de processo longo. Com caso concreto e `arquivo:linha`, eles vão para `Não verificado:`, com o motivo, fora do `Veredito:`. Os outros riscos têm prova: execute-a.
 - **Separe o defeito da base:** Uma falha que já existe na base do diff não é do diff. Ela vai para `Da base:`, fora do `Veredito:`. A etapa 5 diz como decidir.
 - **Siga cada valor de ponta a ponta:** Um Fluxo é o caminho de um valor que o diff altera (chave, ID, coluna, status, flag, regra, assinatura ou formato de retorno), da entrada até cada consumidor: consulta, lista, detalhe, texto exibido, regra, decisão, documento gerado, export, job, notificação e API. Leia o código conectado, não só o diff: os chamadores das funções alteradas, as funções chamadas, os testes e o README. Quando uma assinatura, um retorno ou um comportamento muda, busque todos os chamadores com `rg`. Um consumidor verificado não prova os outros. Um teste verde prova só os caminhos que executa; a aprovação de um revisor, só o código que ele leu. Nenhum dos dois substitui o rastreio dos Fluxos.
 - **Entregue uma rodada completa:** A rodada termina só no Critério de Fim da etapa 5. Um `[BLOCKER]` não encerra a busca: registre-o e continue.
@@ -34,34 +36,35 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
 1. **Diff, portão e worktrees:**
    - Use o alvo do usuário: mudanças locais, staged, branch, PR ou arquivos. Sem alvo, use o diff contra a branch base, com as mudanças locais. Sem diferença, use o último commit.
    - Inspecione `git status` e o diff do alvo. Registre a referência exata (ex.: `main...HEAD`), o commit revisado e a base (`git merge-base`). Grave o diff num arquivo temporário fora do repositório, como `$TMPDIR/diff-<branch>-<AAAA-MM-DD>.patch`. Passe o caminho e a referência aos 2 revisores. O revisor não executa git.
-   - **Guarda do ambiente de teste:** Leia `DB_CONNECTION`, `DB_DATABASE`, `MAIL_MAILER` e `QUEUE_CONNECTION` em `phpunit.xml`. Se falta um deles, leia o valor com `php artisan tinker --env=testing`. Continue só com banco `:memory:` ou com um banco de teste que o usuário confirmou, e com e-mail `array` ou `log`. **ATENÇÃO:** `RefreshDatabase` roda `migrate:fresh` num banco que não está em memória. Esse comando apaga todas as tabelas. Com um banco que não está em memória, cada worktree precisa de um banco próprio, confirmado pelo usuário. Se a guarda falha, pare e informe o que falta.
-   - **Worktrees:** Fora do repositório, crie 4 worktrees: 1 por revisor, 1 limpa no estado revisado e 1 na base. Use `git worktree add --detach <pasta> <commit>`. Nas 3 primeiras, aplique as mudanças locais do alvo. Copie `vendor/` para cada worktree, ou rode `composer install`. Uma cópia com links físicos (`cp -al`) é rápida, mas não rode `composer` nessa worktree: ele reescreve arquivos que as outras compartilham. Não use link simbólico para `vendor/`: o autoload segue o caminho real e carrega o código da outra pasta. Confirme que `./vendor/bin/pest` roda em cada worktree.
+   - **Guarda do ambiente de teste:** Leia, na configuração de teste do projeto, a conexão e o nome do banco, o destino dos e-mails e o driver da fila. Continue só com um banco em memória ou com um banco de teste que o usuário confirmou, e com e-mail e fila que não saem do ambiente de teste. **ATENÇÃO:** Muitos executores de teste recriam o schema antes da suíte. Num banco que não está em memória, essa recriação apaga todas as tabelas. Com um banco que não está em memória, cada worktree precisa de um banco próprio, confirmado pelo usuário. Se a guarda falha, pare e informe o que falta.
+   - **Worktrees:** Fora do repositório, crie 4 worktrees: 1 por revisor, 1 limpa no estado revisado e 1 na base. Use `git worktree add --detach <pasta> <commit>`. Nas 3 primeiras, aplique as mudanças locais do alvo. Instale as dependências em cada worktree com o gerenciador de pacotes do projeto, ou copie a pasta de dependências. Uma cópia com links físicos (`cp -al`) é rápida, mas não rode o gerenciador de pacotes nessa worktree: ele reescreve arquivos que as outras compartilham. Não use link simbólico para a pasta de dependências sem prova de que a stack o suporta: o carregador pode seguir o caminho real e carregar o código da outra pasta. Confirme que o comando de teste focado roda em cada worktree.
+   - **Pasta de provas:** Escolha uma pasta nova dentro da pasta de testes que o executor já descobre, como `<pasta de testes>/revisao/`. Passe esse caminho aos revisores.
    - **Rodada seguinte:** Com relatório anterior de `/revisar` para o mesmo alvo, na conversa ou no handoff, esta é uma rodada seguinte. Revise o diff completo, não só o delta. A `Rodada:` é a anterior mais 1. Liste os achados anteriores para a etapa 6, com as suas provas. Com relatório de `/ajustar`, leia também o status de cada achado, `Valores alterados:`, `Achados novos:` e `Aceitos:`. Um achado que o usuário aceitou nesta conversa, com o motivo, também conta como aceito.
-   - Aplique o portão completo de `laravel-verification`, ou reutilize evidência válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
+   - Aplique o portão completo de `verification`, ou reutilize evidência válida para o mesmo estado. Não repita a suíte apenas por entrar na revisão.
 2. **Mapa de Fluxos:** Antes dos revisores:
    - Liste os valores que o diff altera. Na rodada seguinte, inclua os valores que cada correção alterou; o relatório de `/ajustar` os lista em `Valores alterados:`.
-   - Para cada valor, busque com `rg` todos os pontos que o leem ou gravam, também fora do diff: Models, Actions, Livewire, Blade, Policies, jobs, listeners, exports, PDF, e-mail, API e testes. A lista vem da busca, não da memória.
+   - Para cada valor, busque com `rg` todos os pontos que o leem ou gravam, também fora do diff: modelos, Costuras, Fronteiras, templates, regras de autorização, jobs, listeners, exports, documentos gerados, e-mail, API e testes. A lista vem da busca, não da memória.
    - Registre cada Fluxo como `valor: entrada → consumidor → saída`, com `arquivo:linha` de cada ponto.
 3. **Revisão em 2 eixos:** Cada revisor lê o código conectado, completa o Mapa com os consumidores que achar e rastreia cada Fluxo até a saída. Para cada suspeita, ele escreve e executa a prova na sua worktree. Ele ordena os achados pela prioridade da seção 1. Ele devolve o status de cada arquivo do diff e de cada Fluxo no seu eixo: `verificado`, `achado` (com o título) ou `não verificado` (com o motivo). Ele termina só quando tudo tem status. Um `[BLOCKER]` não encerra o trabalho do revisor.
-   - **Eixo Standards (padrões e segurança Laravel/Livewire):**
-     - **Carga esperada:** Procure a carga no repositório (README, filas, Horizon, Octane, scheduler, deploy). Declare a carga presumida.
-     - **Segurança:** Propriedade sensível ou ID em componente Livewire sem `#[Locked]`. Ação mutável sem `$this->authorize()` ou Policy.
-     - **Perda de dados:** Erro engolido em `try/catch`. Várias escritas sem `DB::transaction()`. Job ou evento antes do commit sem `afterCommit()`. Operação que, executada 2 vezes, grava, cobra ou envia em dobro: job com retry, webhook, comando agendado, duplo clique.
-     - **Escala:** N+1 (falta de `with()` ou `preventLazyLoading`). Corrida entre leitura e escrita: `firstOrCreate` sem índice único, falta de `lockForUpdate()` ou `increment()`. Tarefa repetida em cada processo: falta de `onOneServer()`, `withoutOverlapping()` ou `ShouldBeUnique`. Memória que só cresce: `->get()` em tabela grande no lugar de `chunkById()` ou `lazy()`. Algoritmo O(n²) sobre entrada grande. Estado local que devia ser compartilhado: propriedade estática no Octane, disco local com vários servidores.
-     - **Velocidade:** Lentidão medida é `[IMPORTANTE]`. A prova mede queries ou tempo, com o volume da carga presumida.
+   - **Eixo Standards (padrões e segurança):** O perfil de stack dá os nomes de cada suspeita na stack do projeto.
+     - **Carga esperada:** Procure a carga no repositório (README, filas, servidor de aplicação, agendador, deploy). Declare a carga presumida.
+     - **Segurança:** Valor sensível ou ID que passa pelo cliente, sem trava e sem nova autorização no servidor. Ação mutável sem autorização.
+     - **Perda de dados:** Erro engolido num bloco de captura. Várias escritas sem transação. Job ou evento disparado antes do commit da transação. Operação que, executada 2 vezes, grava, cobra ou envia em dobro: job com nova tentativa, webhook, tarefa agendada, duplo clique.
+     - **Escala:** N+1 (falta de carregamento antecipado das relações). Corrida entre leitura e escrita: criação condicional sem índice único, falta de trava de linha ou de incremento atômico. Tarefa repetida em cada processo: falta de trava de servidor único, de não sobreposição ou de job único. Memória que só cresce: leitura de uma tabela grande inteira no lugar de leitura em lotes. Algoritmo O(n²) sobre entrada grande. Estado local que devia ser compartilhado: variável estática num servidor de processo longo, disco local com vários servidores.
+     - **Velocidade:** Lentidão medida é `[IMPORTANTE]`. A prova mede consultas ou tempo, com o volume da carga presumida.
    - **Eixo Spec e comportamento:**
      - Compare o diff com a Especificação de `/especificar`, requisito a requisito. Aponte requisito faltante. Aponte escopo extra (*scope creep*) quando uma execução mostra um comportamento que a Spec não pede ou exclui.
      - **Bug:** Resultado errado e caso de borda (vazio, zero, último item, arredondamento, fuso horário). Chamador quebrado pela mudança. Correção num só chamador, com a função compartilhada ainda errada.
-     - **Teste ausente:** Lógica de risco sem teste Pest que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Teste que ainda passa com a Costura a devolver vazio, sem gravar nada. Peça um teste bom, não cobertura.
+     - **Teste ausente:** Lógica de risco sem teste que falhe quando ela quebra: ramo, parser, dinheiro, segurança, escrita de dados ou correção de bug. Teste que ainda passa com a Costura a devolver vazio, sem gravar nada. Peça um teste bom, não cobertura.
      - **Mapa desatualizado:** Com Mapa de Features configurado, comportamento visível alterado sem atualização do Arquivo de Feature no mesmo diff.
    - **Formas de prova:**
 
      | Suspeita | Prova |
      |---|---|
-     | Ação sem `authorize()` ou sem Policy | Teste Livewire ou HTTP com um usuário sem permissão: a ação passa e grava |
-     | Propriedade sem `#[Locked]` | Teste Livewire que altera a propriedade com `set()` e chama a ação |
-     | Operação executada 2 vezes | 2 chamadas em sequência; conte gravações e envios com `Mail::fake()`, `Notification::fake()` ou `Queue::fake()` |
-     | N+1 | Teste com 2 ou mais registros e `Model::preventLazyLoading()`, ou contagem com `DB::enableQueryLog()` |
+     | Ação sem autorização | Teste na Fronteira com um usuário sem permissão: a ação passa e grava |
+     | Valor do cliente sem trava | Teste na Fronteira que altera o valor e chama a ação |
+     | Operação executada 2 vezes | 2 chamadas em sequência; conte gravações e envios com os fakes de e-mail, notificação e fila |
+     | N+1 | Teste com 2 ou mais registros e a contagem de consultas, ou o modo da stack que proíbe o carregamento preguiçoso |
      | Erro engolido ou escrita sem transação | Falha forçada no meio da operação e conferência do que ficou gravado |
      | Bug, caso de borda ou chamador quebrado | Teste com a entrada do caso concreto |
      | Requisito faltante ou escopo extra | Teste do caso da Spec |
@@ -69,8 +72,8 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
      | Mapa desatualizado | Execução do comportamento e a linha do Arquivo de Feature que a contradiz |
 4. **Prova (revisor):** Antes de reportar, o revisor, para cada achado:
    1. Escreve o caso concreto.
-   2. Grava a prova na sua worktree, em `tests/Feature/Revisao/`, um arquivo por achado. A mutação vai num script que quebra a linha, roda o teste, mostra a saída e desfaz a quebra.
-   3. Executa o comando e copia a saída. Confirma que a falha vem do caso: a asserção do caso falha, não o setup, a factory ou o ambiente.
+   2. Grava a prova na sua worktree, na pasta de provas, um arquivo por achado. A mutação vai num script que quebra a linha, roda o teste, mostra a saída e desfaz a quebra.
+   3. Executa o comando e copia a saída. Confirma que a falha vem do caso: a asserção do caso falha, não o setup, a fábrica de dados ou o ambiente.
    4. Trata como decisão, não como achado, o atalho com limite documentado em ADR, Spec ou comentário de porquê. Reporta o atalho só se a carga esperada já passa desse limite.
    5. Propõe a menor correção que funciona e prefere a que apaga código. Não acrescenta camadas, pacotes ou configuração que o problema não exige.
    6. Descarta o que não executou: estilo, nomes, estrutura, "considere...", preocupação vaga e risco que só importa depois de uma mudança futura. Põe em `não verificado`, com o motivo, só os riscos sem prova no ambiente de teste da seção 2.
@@ -95,11 +98,11 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
    - Apresente os achados sob `## Standards` e `## Spec`, cada um com seus `[BLOCKER]` e `[IMPORTANTE]`, nesta ordem. Omita o nível sem achados. Numere em sequência contínua entre os eixos, sem reordenar, para o usuário responder "corrija 2 e 5". Explique cada termo técnico na primeira vez: o leitor pode não conhecer o código.
    - Escreva cada achado neste formato, com 1 ou 2 frases curtas por parte:
      ```markdown
-     2. [BLOCKER] **Pedido entra no dia errado** (`app/Actions/FecharDia.php:40-52`)
-        - **O que é:** À meia-noite, esta Action fecha o dia e fatura os pedidos desse dia.
-        - **Problema:** A Action usa `now()` no fuso UTC da aplicação. Um pedido feito às 22h em São Paulo já é 01h do dia seguinte em UTC.
-        - **Prova:** `./vendor/bin/pest tests/Feature/Revisao/PedidoDiaErradoTest.php` imprime `Failed asserting that '2026-03-11' is identical to '2026-03-10'`. A Spec exige `2026-03-10`.
-        - **Correção:** Calcule o dia uma vez no fuso da loja: `now('America/Sao_Paulo')->toDateString()`. Nada mais muda.
+     2. [BLOCKER] **Pedido entra no dia errado** (`pedidos/fechar_dia:40-52`)
+        - **O que é:** À meia-noite, esta Costura fecha o dia e fatura os pedidos desse dia.
+        - **Problema:** A Costura lê a hora atual no fuso UTC da aplicação. Um pedido feito às 22h em São Paulo já é 01h do dia seguinte em UTC.
+        - **Prova:** `<comando de teste focado> <pasta de provas>/pedido_dia_errado` imprime `esperado '2026-03-10', recebido '2026-03-11'`. A Spec exige `2026-03-10`.
+        - **Correção:** Calcule o dia uma vez no fuso da loja, `America/Sao_Paulo`. Nada mais muda.
         - **Se não corrigir:** Pedidos da noite saem com a data errada, e o financeiro corrige à mão.
      ```
    - Termine com:
@@ -116,20 +119,20 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
    - Com `Veredito: corrija ...` antes da rodada 3, ofereça `/ajustar` com os números do veredito.
    - **Limite de rodadas:** Na rodada 3 com `Veredito: corrija ...`, não ofereça `/ajustar`. Liste os achados abertos por nível e faça uma pergunta ao usuário: aceitar os abertos, com o motivo, e entregar; fazer mais uma rodada; ou voltar a `/especificar` ou `/planejar`. Três rodadas sem convergir indicam, em geral, uma Spec ou um desenho errado. Com mais uma rodada, repita a pergunta no fim de cada rodada seguinte.
    - Com `[BLOCKER]`, entregue o relatório completo, não execute as etapas 7 e 8 e pergunte ao usuário como seguir.
-7. **Fato de segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migration só adiciona coluna nullable"). Prove-o com um teste Pest ou um script que executa o código real. Sem prova, escreva `não provado`.
+7. **Fato de segurança:** Identifique o único fato que torna a mudança segura (ex.: "a migração só adiciona uma coluna que aceita nulo"). Prove-o com um teste ou um script que executa o código real. Sem prova, escreva `não provado`.
 8. **Briefing de PR (no máximo 40 linhas de alto sinal, ASD-STE100):**
    - **Por que (Why):** 1 ou 2 frases sobre o problema resolvido.
-   - **O que mudou (What changed):** bullets curtos sobre as Fronteiras (`Livewire`/HTTP) e as Costuras (`Actions`/DTOs). Não liste cada arquivo: o Git já mostra.
-   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migration destrutiva, alteração de contrato externo). Liste exatamente as rotas, tabelas e componentes que a mudança pode afetar: toda mudança toca algum. Inclua o fato de segurança com a prova ou `não provado`. Liste os achados `aceito` como **Riscos aceitos**, com o motivo.
-   - **Prova de Execução (`[measured]`):** resumo do portão completo de `laravel-verification`.
+   - **O que mudou (What changed):** bullets curtos sobre as Fronteiras e as Costuras. Não liste cada arquivo: o Git já mostra.
+   - **Porta de Decisão e Raio de Explosão (Blast Radius):** Classifique a mudança como **Porta de 2 Vias** (reversível sem perda de dados) ou **Porta de 1 Via** (ex.: migração destrutiva, alteração de contrato externo). Liste exatamente as rotas, tabelas e componentes que a mudança pode afetar: toda mudança toca algum. Inclua o fato de segurança com a prova ou `não provado`. Liste os achados `aceito` como **Riscos aceitos**, com o motivo.
+   - **Prova de Execução (`[measured]`):** resumo do portão completo de `verification`.
 
 ## 4. No Claude Code
 Use o agente customizado `revisor`, com `model: inherit` e as ferramentas `Read, Grep, Glob, Bash`.
 
 1. Copie o [template](assets/revisor.md) para `.claude/agents/revisor.md` na raiz do projeto consumidor. Se o arquivo já existe, preserve as customizações.
-2. Instale `laravel-deep-modules`, `laravel-tdd-seams` e `ste100-clean-code` para o Claude Code. O campo `skills` do template pré-carrega essas disciplinas.
+2. Instale `deep-modules`, `tdd-seams` e `ste100-clean-code` para o Claude Code. O campo `skills` do template pré-carrega essas disciplinas.
 3. Delegue com `subagent_type: revisor`, um por eixo, na mesma mensagem. Passe o eixo, o caminho deste SKILL.md, a worktree do revisor e os Ponteiros de Contexto. Não use o tipo `fork`.
-4. O revisor lê e executa só na sua worktree. Ele não executa git e grava só em `tests/Feature/Revisao/`, além da mutação que ele desfaz. O principal cria as worktrees e executa a guarda, o portão, a Reexecução, a execução na base e a prova do fato de segurança.
+4. O revisor lê e executa só na sua worktree. Ele não executa git e grava só na pasta de provas, além da mutação que ele desfaz. O principal cria as worktrees e executa a guarda, o portão, a Reexecução, a execução na base e a prova do fato de segurança.
 5. Sem o agente registrado, use o subagente geral com o mesmo contrato. Avise o usuário: as regras "só na sua worktree" e "só no ambiente de teste" ficam só na instrução. Criar o primeiro diretório de agentes durante a sessão pode exigir reiniciar o Claude Code.
 
 Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
@@ -140,13 +143,13 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 | "Achei um `[BLOCKER]`; paro e reporto agora." | **Proibido.** Conclua os 2 eixos e a Consolidação. Reporte todos os achados juntos. |
 | "Os revisores aprovaram e os testes passam; a revisão acabou." | **Proibido.** Teste e revisor provam só o que executam ou leem. A revisão acaba no Critério de Fim. |
 | "Li o código; o defeito é óbvio e não preciso executar." | **Proibido.** Sem execução, não há achado. A leitura encontra a suspeita; a execução a prova. |
-| "O teste de prova falhou; o achado está provado." | **Proibido.** Confirme que a asserção do caso falhou, não o setup, a factory ou o ambiente. |
+| "O teste de prova falhou; o achado está provado." | **Proibido.** Confirme que a asserção do caso falhou, não o setup, a fábrica de dados ou o ambiente. |
 | "O revisor provou; não preciso executar de novo." | **Proibido.** Execute cada prova na worktree limpa e na base. |
 | "A mesma falha existe na base, mas é grave; ponho no `Veredito:`." | **Proibido.** O defeito da base vai para `Da base:`, com a oferta de `/depurar`. |
 | "Não consigo provar; ponho em `Não verificado`." | **Proibido.** Só os riscos sem prova no ambiente de teste da seção 2 vão para `Não verificado:`. Os outros têm prova: execute-a. |
 | "A função está longa e duplicada; reporto como `[IMPORTANTE]`." | **Proibido.** Estilo e estrutura ficam fora da revisão. O refactor de `/implementar` cuida deles. |
 | "Rodo a prova no checkout do usuário; é mais rápido." | **Proibido.** Prove só nas worktrees de revisão. |
-| "Uso o banco do `.env`; os dados já estão lá." | **Proibido.** Faça a guarda e prove só no ambiente de teste. |
+| "Uso o banco de desenvolvimento; os dados já estão lá." | **Proibido.** Faça a guarda e prove só no ambiente de teste. |
 | "Deixo a mutação na worktree; o principal desfaz." | **Proibido.** Desfaça toda mutação antes de devolver. |
 | "A lista elimina chaves repetidas; a chave está certa." | **Proibido.** Um consumidor não prova os outros. Siga a mesma chave no detalhe, nos termos, nas decisões e nos documentos. |
 | "Nesta rodada, basta revisar o delta da correção." | **Proibido.** Revise o diff completo e os Fluxos que a correção toca. |
@@ -174,6 +177,6 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 - `[measured]` Cada achado com caso concreto, `arquivo:linha`, as 4 partes e a **Prova**, com comando e saída; busca de chamadores citada para cada assinatura, retorno ou comportamento alterado.
 - `[measured]` Achado `aceito` fora do `Veredito:`, com o motivo. Na rodada seguinte: diff completo, status de cada achado anterior pela prova executada de novo, Fluxos das correções rastreados e vaivém marcado com as 2 direções e a pergunta. Na rodada 3 sem `pode entregar`: a pergunta, sem oferta de `/ajustar`.
 - `[measured]` Carga presumida declarada e fato de segurança provado por execução, ou `não provado`.
-- `[measured]` Portão completo de `laravel-verification` aprovado para o estado revisado, com comandos, escopos e resultados citados.
+- `[measured]` Portão completo de `verification` aprovado para o estado revisado, com comandos, escopos e resultados citados.
 - `[measured]` Provas mantidas copiadas para a pasta de `Provas:` e worktrees removidas.
 - `[measured]` Briefing de PR com o Raio de Explosão entregue ao usuário.

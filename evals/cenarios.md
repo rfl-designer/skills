@@ -2,8 +2,13 @@
 
 Execute em sandbox, sem produção nem credenciais reais. Dê ao agente apenas o pedido, as skills e os artefatos da coluna Entrada. Mantenha os critérios de avaliação fora do contexto dele até terminar.
 
+As skills não assumem stack. Os casos com Laravel, Livewire ou Pest na Entrada exercitam o perfil Laravel: o projeto do caso tem a linha `Perfis de stack: laravel` ou os manifests dessa stack. Os 3 casos `Stack` conferem a neutralidade; eles ainda não têm execução registrada.
+
 | Caso | Entrada e pedido | Critério observável |
 |---|---|---|
+| Stack: projeto sem perfil | Projeto TypeScript com `package.json`, Vitest e ESLint; configuração com `Perfis de stack: nenhum` e a tabela de comandos. Spec e ticket prontos. “/implementar”. | Usa só os comandos da configuração; não invoca `pest`, `pint`, `phpstan` nem `artisan`; não lê `references/laravel.md`; aplica RED e GREEN na Costura e na Fronteira e nomeia o mecanismo da stack para cada regra |
+| Stack: perfil Laravel | Projeto Laravel com `composer.lock` e configuração com `Perfis de stack: laravel`. “/implementar”. | Lê o perfil Laravel de `deep-modules`, `tdd-seams` e `verification` antes de implementar; aplica `#[Locked]`, `Livewire::test()` e o portão Pint, PHPStan e Pest; os comandos da configuração prevalecem sobre os do perfil |
+| Stack: sem configuração e sem perfil | Projeto Python com `pyproject.toml` e pytest, sem `docs/agents/projeto.md`, sem formatador e sem mutação. “Verifique e entregue.” | Detecta os comandos nos manifests, sem inventar ferramenta; registra formatação, mutação e CRAP como `não verificado`, com o motivo; não instala nada; oferece `/setup` uma vez |
 | Setup com destinos distintos | Projeto com stack declarada, Spec local e tickets no GitLab. “/setup: altere só a pasta de Specs; preserve demais escolhas”. Repetir sem mudanças. | Mantém config/ponteiro e notas manuais; não migra documentos, publica issues ou instala dependências; reexecução sem duplicatas; `/especificar` e `/planejar` leem destinos distintos sem repetir perguntas |
 | Setup em monorepo | Dois apps com executores diferentes e escolhas de destino já fornecidas. “Configure ambos”. | Caminhos de artefatos relativos à raiz, diretório de execução por app, sem aplicar comandos de um app ao outro |
 | Trio: fora do herdr | Terminal comum, sem `HERDR_ENV`. Subagentes disponíveis. “/alinhar-em-trio permitir cancelar pedido pago”. | Executa a guarda antes de qualquer outro passo; diz que a sessão não está no herdr e recomenda `/alinhar`; não cria diretório da sessão, tab, pane nem subagente; não simula o trio |
@@ -60,7 +65,7 @@ Execute em sandbox, sem produção nem credenciais reais. Dê ao agente apenas o
 | Operação repetível | O webhook do gateway confirma o pagamento e cria a Fatura; o gateway reenvia o mesmo evento. “Implemente a confirmação.” | Um teste executa o webhook 2 vezes e confere uma só Fatura; a escrita usa índice único ou chave de idempotência; sem isso, `/revisar` aponta a Fatura em dobro com caso concreto |
 | Teste honesto impossível | Dois cliques simultâneos aprovam o mesmo Pedido. “Cubra a condição de corrida.” | Não escreve teste que não pode falhar; registra o motivo e a prova mais próxima (`lockForUpdate()` ou índice único), marcada `parcial` |
 | Commit com prova e worktrees | `/implementar` com commits autorizados e 2 worktrees: um com o delta integrado, outro com mudança não integrada. “Conclua.” | O corpo de cada commit tem o porquê e o comando com o resultado; remove só o worktree integrado; lista o outro e pergunta ao usuário |
-| Só documentação | Mudança de Markdown sem app PHP. “Valide e entregue.” | Valida o pacote, marca ferramentas PHP não aplicáveis e não instala framework |
+| Só documentação | Mudança de Markdown sem app. “Valide e entregue.” | Valida o pacote, marca as ferramentas de código como não aplicáveis e não instala framework |
 
 Para comparar versões, use o mesmo modelo, ferramentas, fixtures, pedido e orçamento, em contextos novos. Alterne a ordem das versões e use mais de uma execução quando possível. Registre commit/base, diff candidato, ações, comandos, resultados e artefatos; classifique cada critério como passou, falhou ou bloqueado. Não conte execução bloqueada como sucesso nem confunda análise de plano com execução real de aplicação.
 

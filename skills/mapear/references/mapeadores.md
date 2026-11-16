@@ -7,7 +7,7 @@ Um Mapeador é um subagente que mapeia um Domínio. O agente principal coordena:
 - Delegue um Domínio por Mapeador.
 - Use até 4 Mapeadores ao mesmo tempo. Com mais Domínios, delegue em ondas.
 - Passe ponteiros, não o histórico do chat. O Mapeador lê os arquivos pelos caminhos recebidos.
-- O Mapeador não conduz o app, não roda migrations, seeders, filas ou serviços externos e não cria subagentes. Ele usa git só para leitura, como `git log` e `git blame`.
+- O Mapeador não conduz o app, não roda migrações, seeds, filas ou serviços externos e não cria subagentes. Ele usa git só para leitura, como `git log` e `git blame`.
 - O Mapeador usa as convenções do README raiz: autenticação, sessões e comando base. Uma convenção que falta volta como dúvida; ele não cria outra.
 - No modo Criar, o Mapeador grava só na pasta do seu Domínio. No modo Auditar, ele não grava arquivos.
 - O agente principal grava o README raiz, `jornadas.md` e a linha `Base:`. Ele também decide cada correção.
@@ -25,7 +25,7 @@ Envie a cada Mapeador:
 
 O Mapeador:
 
-1. Lê rotas, componentes, views, Policies, testes e textos visíveis do Domínio.
+1. Lê rotas, componentes, templates, regras de autorização, testes e textos visíveis do Domínio.
 2. Grava um Arquivo de Feature por Feature, no formato do contrato.
 3. Escreve `Estado: não conduzida em <data>, commit <sha>; receita derivada do código`.
 4. Marca com `[inferred]` uma entrada ou um resultado sem prova no código.
@@ -47,10 +47,10 @@ Features:
 - [Pedidos](pedidos.md): carrinho, checkout, lista, cancelamento e fechamento diário.
 Fora do mapa proposto:
 - `rota:webhooks.pix`: entrada do gateway, sem tela; motivo.
-Âncoras de outro Domínio: `livewire:conta.endereco` (conta).
+Âncoras de outro Domínio: `componente:conta.endereco` (conta).
 Jornadas candidatas: checkout com login expirado (conta + vendas).
 Pré-condições ausentes no seed: pedido entregue para o cliente de teste.
-Deriva (só Auditar): pedidos.md, Sub-feature `pedidos-cancelar`: o botão agora é `Cancelar pedido` (resources/views/livewire/pedidos/tabela.blade.php:42).
+Deriva (só Auditar): pedidos.md, Sub-feature `pedidos-cancelar`: o botão agora é `Cancelar pedido` (pedidos/tabela:42).
 Dúvidas: o que o código não responde.
 ```
 

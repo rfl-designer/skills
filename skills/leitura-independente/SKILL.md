@@ -6,7 +6,7 @@ description: Um Leitor novo, sem o histórico do chat, lê o rascunho de uma Spe
 # Leitura Independente da Spec e dos Tickets (`leitura-independente`)
 
 ## Configuração do projeto
-Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo; os exemplos abaixo são fallback. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
+Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
 ## 1. Objetivo
 O implementador lê a Spec e o ticket sem o histórico do chat. Uma suposição que o documento não escreve vira uma decisão silenciosa dele. Antes da gravação, um Leitor novo lê o rascunho nas mesmas condições. Ele devolve a Paráfrase e os achados. O Autor resolve cada achado com o usuário.
@@ -30,7 +30,7 @@ O implementador lê a Spec e o ticket sem o histórico do chat. Uma suposição 
 - **Faça no máximo 2 leituras por documento:** Cada Leitor novo acha coisas diferentes. Zero achados não é o alvo.
 
 ## 4. Processo do Leitor
-Você não conhece este projeto. Você conhece Laravel, Livewire e PHP. Um termo geral dessas ferramentas não é achado.
+Você não conhece este projeto. Você conhece a linguagem e os frameworks que a configuração do projeto registra. Um termo geral dessas ferramentas não é achado.
 
 1. **Leitura:** Leia o rascunho inteiro, o glossário, a configuração e os ADRs citados. No modo Tickets, leia também a Spec aprovada.
 2. **Paráfrase:** Antes de procurar achados, escreva com suas palavras, em 2 a 5 frases por título:

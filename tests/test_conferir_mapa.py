@@ -1,11 +1,12 @@
 import shutil
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "skills" / "mapear" / "scripts" / "conferir-mapa.php"
+SCRIPT = ROOT / "skills" / "mapear" / "scripts" / "conferir-mapa.py"
 EXAMPLE = ROOT / "skills" / "mapear" / "references" / "exemplo"
 INVENTORY = """
 # rotas
@@ -17,9 +18,9 @@ rota:carrinho
 rota:checkout
 rota:POST /webhooks/gateway
 comando:inspire
-livewire:carrinho
-livewire:pedidos.tabela
-livewire:auth.login
+componente:carrinho
+componente:pedidos.tabela
+componente:auth.login
 comando:pedidos:fechar-dia
 comando:loja:limpar-miniaturas
 agenda:pedidos:fechar-dia
@@ -30,7 +31,6 @@ flag:checkout-pix
 """
 
 
-@unittest.skipUnless(shutil.which("php"), "php ausente")
 class FeatureMapCheckerTest(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -41,7 +41,7 @@ class FeatureMapCheckerTest(unittest.TestCase):
         self.inventory.write_text(INVENTORY)
 
     def run_checker(self, *extra):
-        return subprocess.run(["php", str(SCRIPT), str(self.map), *extra],
+        return subprocess.run([sys.executable, str(SCRIPT), str(self.map), *extra],
                               capture_output=True, text=True, check=False)
 
     def edit(self, relative, old, new):
@@ -83,7 +83,7 @@ class FeatureMapCheckerTest(unittest.TestCase):
     def test_rejects_feature_outside_index(self):
         (self.map / "vendas" / "devolucoes.md").write_text((self.map / "conta" / "acesso.md").read_text()
                                                            .replace("acesso-", "devolucoes-")
-                                                           .replace("`rota:login`, `rota:logout`, `rota:password.*`, `livewire:auth.login`, `notificacao:ResetPassword`",
+                                                           .replace("`rota:login`, `rota:logout`, `rota:password.*`, `componente:auth.login`, `notificacao:ResetPassword`",
                                                                     "`rota:devolucoes.index`"))
         self.assert_fails_with("vendas/devolucoes.md: arquivo fora do índice")
 
@@ -106,6 +106,12 @@ class FeatureMapCheckerTest(unittest.TestCase):
     def test_rejects_unknown_anchor_prefix(self):
         self.edit("conta/acesso.md", "`rota:logout`", "`tela:logout`")
         self.assert_fails_with("Âncora com prefixo inválido: tela:logout")
+
+    def test_accepts_legacy_livewire_prefix(self):
+        self.edit("conta/acesso.md", "`componente:auth.login`", "`livewire:auth.login`")
+        self.inventory.write_text(INVENTORY.replace("componente:auth.login", "livewire:auth.login"))
+        result = self.run_checker(f"--ancoras={self.inventory}")
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_requires_preconditions_in_conduction(self):
         self.edit("conta/acesso.md", "Pré-condições:\n", "Antes:\n")
@@ -161,7 +167,7 @@ class FeatureMapCheckerTest(unittest.TestCase):
         self.assertIn("Pasta de evidências não encontrada", result.stderr)
 
     def test_usage_error_without_folder(self):
-        result = subprocess.run(["php", str(SCRIPT)], capture_output=True, text=True, check=False)
+        result = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, check=False)
         self.assertEqual(result.returncode, 2)
         self.assertIn("Uso:", result.stderr)
 

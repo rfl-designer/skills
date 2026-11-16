@@ -1,6 +1,6 @@
 # Mapa de Features da Loja
 
-Inventário de comportamento da Loja, uma aplicação fictícia em Laravel e Livewire. Os agentes usam este mapa para escolher o que conduzir e que prova vale. As pessoas o usam como checklist de regressão.
+Inventário de comportamento da Loja, uma aplicação fictícia em Laravel e Livewire. Os comandos são os dessa stack; um mapa de outra stack usa os comandos dela. Os agentes usam este mapa para escolher o que conduzir e que prova vale. As pessoas o usam como checklist de regressão.
 
 Base: commit 3f9c2ab em 2026-10-28
 
@@ -76,4 +76,4 @@ Não descreva implementação. Nomeie só caminhos do usuário, identificadores 
 - Uma Âncora nova vai para uma Feature ou para `Fora do mapa`.
 - Depois de conduzir, atualize a linha `Estado:` com a data e o commit. `/conduzir` conduz uma Feature, um Domínio ou o mapa inteiro.
 - Só `/mapear` atualiza a linha `Base:`, depois de reconciliar todo o código até esse commit.
-- Antes de entregar, rode o `scripts/conferir-mapa.php` da skill `mapear` sobre esta pasta, com `--evidencias=docs/verification/evidencias` quando a pasta existe.
+- Antes de entregar, rode o `scripts/conferir-mapa.py` da skill `mapear` sobre esta pasta, com `--evidencias=docs/verification/evidencias` quando a pasta existe.

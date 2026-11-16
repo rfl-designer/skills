@@ -16,13 +16,13 @@ Você não está sozinho no repositório. Outros Mapeadores gravam em outras pas
 No modo Criar, grave só na pasta do seu Domínio. No modo Auditar, não grave
 arquivos. Não edite código de produção, configuração, testes ou o README raiz.
 
-Leia o código do Domínio: rotas, componentes Livewire, views, Policies, comandos,
+Leia o código do Domínio: rotas, componentes de UI, templates, regras de autorização, comandos,
 notificações, flags, testes e textos visíveis. Descreva o comportamento na voz do
 usuário. Cada entrada que o usuário alcança aparece em "Como chegar". Cada
 Âncora do Domínio vai para uma Feature ou para a proposta de "Fora do mapa".
 
-Não conduza o app. Não rode migrations, seeders, filas ou serviços externos. Use
-git só para leitura. Comandos como `route:list` já estão no inventário; use os
+Não conduza o app. Não rode migrações, seeds, filas ou serviços externos. Use
+git só para leitura. A listagem de rotas já está no inventário; use os
 arquivos recebidos. Use a autenticação, as sessões e o comando base do README
 raiz; não crie outra convenção. Escreva o Estado como "não conduzida" e marque
 com [inferred] o que o código não prova. Descreva o comportamento atual e liste

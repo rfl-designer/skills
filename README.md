@@ -1,8 +1,10 @@
 # Skills
 
-Pacote de skills para desenvolvimento com agentes de IA em PHP, Laravel e Livewire. O pacote funciona em Claude Code, Codex e Antigravity.
+Pacote de skills para desenvolvimento com agentes de IA. As skills não assumem linguagem nem framework: os princípios ficam no texto de cada skill, e os comandos vêm da configuração do projeto. O pacote funciona em Claude Code, Codex e Antigravity.
 
-O pacote adapta práticas de Addy Osmani (`agent-skills`), Matt Pocock (`skills`), Lauren Tan, poteto (`pstack`), e Robert C. Martin (`ub-mode`) para Laravel/Livewire. A estrutura do fluxo se aproxima sobretudo de Matt. A [matriz de referências](docs/referencias.md) distingue práticas compartilhadas, correspondências e escolhas locais; não presume consenso em cada regra.
+Um [perfil de stack](#perfis-de-stack) opcional traduz os princípios para uma stack. Hoje há perfil para Laravel, Livewire e Pest.
+
+O pacote adapta práticas de Addy Osmani (`agent-skills`), Matt Pocock (`skills`), Lauren Tan, poteto (`pstack`), e Robert C. Martin (`ub-mode`). A estrutura do fluxo se aproxima sobretudo de Matt. A [matriz de referências](docs/referencias.md) distingue práticas compartilhadas, correspondências e escolhas locais; não presume consenso em cada regra.
 
 ## Instalação
 
@@ -56,7 +58,7 @@ No [herdr](https://github.com/herdrdev/herdr), `/alinhar-em-trio` substitui as 3
 
 `/prototipar` é opcional: use-o quando uma pergunta de design trava a Especificação. Antes de gravar, `/especificar` e `/planejar` passam o rascunho por um Leitor novo, sem o histórico do chat, com `leitura-independente`. `/ajustar` corrige os achados escolhidos de `/revisar`; depois, `/revisar` faz a rodada seguinte. O usuário pode aceitar um achado, com o motivo. Na rodada 3 sem veredito `pode entregar`, `/revisar` para o ciclo e pergunta como seguir. `/pausar` vale em qualquer etapa, ao trocar de sessão ou de agente. `/ensine-me` também vale em qualquer etapa, para entender um tema ou o código. `/diagramar-slice` mostra a slice de uma branch antes de `/revisar` ou do PR.
 
-Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, receitas de condução e prova. `/mapear` lê o código e não opera o app. Execute `/conduzir` para provar as receitas no app local. Antes da primeira condução, `/conduzir` confirma que o app e o Pest usam o banco permitido. Depois, `laravel-verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o código.
+Execute `/mapear` depois do `/setup` para criar o Mapa de Features: um índice e um arquivo por Feature, com entradas do usuário, receitas de condução e prova. `/mapear` lê o código e não opera o app. Execute `/conduzir` para provar as receitas no app local. Antes da primeira condução, `/conduzir` confirma que o app e os testes usam o banco permitido. Depois, `verification` lê o Arquivo de Feature afetado e o atualiza no mesmo diff da mudança. Execute `/mapear` de novo para reconciliar mudanças acumuladas e `/mapear auditar` para comparar o mapa com o código.
 
 Use `/implmentar-em-par` no lugar de `/implementar` para revisar a implementação por componente. O agente explica RED e pausa antes da produção. Depois, implementa e explica um componente por vez, aguardando sua revisão. O teste pode continuar vermelho entre etapas; a Fatia Vertical termina com GREEN e verificação completa.
 
@@ -72,15 +74,15 @@ Use os comandos abaixo. `/setup` também pode ser solicitado em linguagem natura
 | `/prototipar` | Protótipo descartável (lógica em HTML único ou variantes de tela por `?variant=`) para responder uma pergunta de design. Entrega a decisão, não o código. |
 | `/especificar` | Escreve a Especificação com fronteiras, DTOs e Costuras, sem caminhos nem código. Um Leitor novo lê o rascunho e devolve a Paráfrase antes da gravação. Usa o destino configurado de Specs. |
 | `/planejar` | Divide a Especificação em fatias verticais (expand–contract para refactor amplo). Um Leitor novo aponta cada decisão de design deixada ao implementador antes da gravação. Usa o destino configurado de Tickets. |
-| `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura (Pest), Larastan e Pint; verifica a integração. |
+| `/implementar` | Implementa os tickets de `/planejar`; sem tickets, recomenda `/planejar`. Coordena subagentes por fatia com TDD na Costura e o portão de verificação; verifica a integração. |
 | `/implmentar-em-par` | Conduz TDD na conversa principal; pausa após RED e cada componente para explicação em português e revisão humana. |
-| `/depurar` | Reproduz o bug no Pest, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
+| `/depurar` | Reproduz o bug num teste, testa de 3 a 5 hipóteses e corrige na raiz. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
 | `/revisar` | Revisão adversarial (Standards, Spec e segurança) completa numa rodada: segue cada valor alterado até todos os consumidores e consolida os achados antes do relatório. Revisores novos, cada um na sua worktree, provam cada achado por execução; o principal reexecuta cada prova na head e na base, e o defeito da base sai do veredito. Estilo e estrutura ficam com `/implementar`. Sem subagentes, o relatório declara `Independência: mesmo contexto`. Achados aceitos ficam fora do veredito, e o ciclo com `/ajustar` para na rodada 3. Só relatório, prova do fato de segurança e resumo de PR. |
 | `/ajustar` | Corrige os achados escolhidos de `/revisar` com subagentes Ajustadores: Lotes por Fluxo, prova por tipo de achado (RED e GREEN quando há comportamento), busca dos consumidores de cada valor alterado e portão no estado integrado. Registra os achados aceitos e leva o vaivém ao usuário. Encaminha requisito de Fatia nova a `/implementar` e defeito sem causa a `/depurar`. |
 | `/pausar` | Para numa fronteira segura e grava uma nota de handoff fora do repositório, sem commit, com as instruções de retomada. |
 | `/ensine-me` | Ensina um tema ou explica código em Lições HTML curtas, em ASD-STE100, com fontes citadas e prática. Pergunta se a Lição vai para arquivo local ou artefato Claude. |
 | `/mapear` | Cria, atualiza e audita o Mapa de Features contra o código, sem operar o app. Em aplicações com vários Domínios, delega cada Domínio a um subagente Mapeador. |
-| `/conduzir` | Conduz as receitas do Mapa de Features no app local, em série. Antes, confirma que o app e o Pest usam o banco permitido. Atualiza a linha `Estado:` e separa Deriva, lacuna de condução e defeito do produto. |
+| `/conduzir` | Conduz as receitas do Mapa de Features no app local, em série. Antes, confirma que o app e os testes usam o banco permitido. Atualiza a linha `Estado:` e separa Deriva, lacuna de condução e defeito do produto. |
 | `/diagramar-slice` | Gera um diagrama HTML descartável da slice de uma branch: arquivos do diff `base...alvo` por camada, com o diff de cada arquivo num modal. Sem git, gera um artefato Claude a partir do diff colado. No fim, pergunta se pode apagar o HTML. |
 
 ### Implementação com subagentes no Claude Code
@@ -105,9 +107,9 @@ Copie [o template do leitor](skills/leitura-independente/assets/leitor.md) para 
 
 ### Revisores no Claude Code
 
-`/revisar` delega cada eixo a um revisor novo, com `model: inherit` e as ferramentas `Read, Grep, Glob, Bash`. Cada revisor trabalha numa worktree própria e executa só o Pest com a configuração de teste. O principal faz a guarda do ambiente de teste, cria as worktrees, executa o portão, reexecuta cada prova e prova o fato de segurança.
+`/revisar` delega cada eixo a um revisor novo, com `model: inherit` e as ferramentas `Read, Grep, Glob, Bash`. Cada revisor trabalha numa worktree própria e executa só os testes, com a configuração de teste. O principal faz a guarda do ambiente de teste, cria as worktrees, executa o portão, reexecuta cada prova e prova o fato de segurança.
 
-Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/agents/revisor.md` no projeto consumidor e instale `laravel-deep-modules`, `laravel-tdd-seams` e `ste100-clean-code`. Sem o agente registrado, `/revisar` usa o subagente geral, com as regras "só na sua worktree" e "só no ambiente de teste" só na instrução.
+Copie [o template do revisor](skills/revisar/assets/revisor.md) para `.claude/agents/revisor.md` no projeto consumidor e instale `deep-modules`, `tdd-seams` e `ste100-clean-code`. Sem o agente registrado, `/revisar` usa o subagente geral, com as regras "só na sua worktree" e "só no ambiente de teste" só na instrução.
 
 ### Mapeadores no Claude Code
 
@@ -135,9 +137,9 @@ O agente carrega estas skills quando a tarefa exige.
 
 | Skill | Função |
 | --- | --- |
-| `laravel-deep-modules` | Costuras existentes e módulos profundos; Action/DTO quando úteis, CRUD simples quando suficiente. Estado inválido impossível de escrever, validação só na entrada, operação repetível e um só escritor. |
-| `laravel-tdd-seams` | TDD com Pest nas Costuras, `Livewire::test()` e Arch Tests. Apaga o teste que passa com a Costura vazia. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
-| `laravel-verification` | Feedback rápido, portão completo antes da entrega, Blade habilitado no Pint e probes Pest Agent quando disponíveis. Mede mutação e CRAP < 10 nos arquivos do diff. É a única fonte da ordem do portão. Cada evidência tem destino e validade; o artefato tem nome estável e a condução nova o substitui. |
+| `deep-modules` | Costuras existentes e módulos profundos; Costura e contrato de dados novos quando úteis, CRUD simples quando suficiente. Estado inválido impossível de escrever, validação só na entrada, estado do cliente sem confiança, operação repetível e um só escritor. |
+| `tdd-seams` | TDD nas Costuras e nas Fronteiras, sem mocks da persistência, com testes de arquitetura quando a stack os tem. Apaga o teste que passa com a Costura vazia. Depois de 2 correções com a mesma premissa sem GREEN, prova a premissa antes da 3ª. |
+| `verification` | Feedback rápido e portão completo antes da entrega: formatação, análise estática, testes, qualidade dos testes e navegador. Mede mutação e CRAP < 10 nos arquivos do diff. É a única fonte da ordem do portão. Cada evidência tem destino e validade; o artefato tem nome estável e a condução nova o substitui. |
 | `leitura-independente` | Um Leitor novo lê o rascunho da Spec ou dos tickets antes da gravação: Paráfrase, Prontidão e resolução de cada achado com o usuário. |
 | `ste100-clean-code` | Escrita técnica ASD-STE100 em português, sem comentários narrativos. O corpo do commit diz por que mudou e como você provou. |
 
@@ -149,26 +151,53 @@ O registro inclui versões e fontes da detecção, executor, comandos, URL local
 
 As skills usam as escolhas salvas sem perguntar novamente. Sem configuração, continuam com seus defaults e oferecem `/setup`. Uma instrução explícita da sessão prevalece. Reexecutar o setup preserva conteúdo manual e atualiza apenas escolhas alteradas; configurar um tracker não publica issues nem instala tecnologias.
 
+## Perfis de stack
+
+O texto de cada skill usa só termos neutros: Costura, Fronteira, contrato de dados, teste focado e portão. Um perfil é um arquivo em `references/` que traduz esses termos para uma stack. O agente lê o perfil só quando a linha `Perfis de stack` da configuração, ou os manifests do projeto, mostram essa stack.
+
+| Skill | Perfil Laravel | Conteúdo |
+| --- | --- | --- |
+| `deep-modules` | [laravel.md](skills/deep-modules/references/laravel.md) | `strict_types`, Action e DTO, `#[Locked]`, PHPStan, idempotência e travas. |
+| `tdd-seams` | [laravel.md](skills/tdd-seams/references/laravel.md) | Pest, `Livewire::test()`, Factories, fakes e Arch Tests. |
+| `verification` | [laravel.md](skills/verification/references/laravel.md) | Pint com Blade, PHPStan, Pest, mutação, Clover e Pest Agent. |
+| `/revisar` | [laravel.md](skills/revisar/references/laravel.md) | Guarda do ambiente de teste, worktrees com `vendor/`, suspeitas e provas. |
+| `/conduzir` | [laravel.md](skills/conduzir/references/laravel.md) | Comandos da guarda do banco. |
+| `/mapear` | [inventario-laravel.md](skills/mapear/references/inventario-laravel.md) | Comando de cada fonte do inventário. |
+| `/setup` | [laravel.md](skills/setup/references/laravel.md) | Pontos de detecção da stack. |
+
+Numa stack sem perfil, `/setup` grava os comandos na tabela `Execução e verificação`, e cada skill aplica as regras com o mecanismo equivalente da stack. Para acrescentar um perfil, crie o arquivo `references/<stack>.md` em cada skill da tabela e cite-o no parágrafo `Perfil de stack` da skill.
+
 ## Requisitos do projeto
 
-- Pest
-- Larastan / PHPStan
-- Laravel Pint com `"Pint/laravel_blade": true` em `rules` do `pint.json` para cobrir Blade (ou `--blade` numa execução compatível). Preserve as demais regras.
-- Opcional, para a qualidade dos testes: driver de cobertura (PCOV ou Xdebug) e mutação (`--mutate` no `pest --help`, ou Infection). Sem eles, `laravel-verification` registra mutação e CRAP como `não verificado`.
-- Opcional: `pestphp/pest-plugin-agent`, detectado por `pest --help`. Pest 5 exige PHP 8.4+; não é atualizado automaticamente por estas skills.
-- Recomendado: `pestphp/pest-plugin-browser` (versão compatível com o Pest instalado) e Playwright (`npm install playwright@latest` e `npx playwright install`) para a verificação no navegador
+- Um executor de testes, com um comando de teste focado e um de suíte completa.
+- Recomendado: formatador e analisador estático. Sem eles, `verification` registra a etapa como `não verificado`.
+- Opcional, para a qualidade dos testes: medição de cobertura, ferramenta de mutação e um relatório Clover com complexidade por método. Sem eles, `verification` registra mutação e CRAP como `não verificado`.
+- Recomendado: uma ferramenta de navegador, como o Playwright, para a verificação da interface.
+- Python 3 para os scripts do pacote: o conferidor do mapa, o cálculo de CRAP e o diagrama de slice.
+
+Os requisitos de um projeto Laravel estão no [perfil de `verification`](skills/verification/references/laravel.md).
+
+## Migração da versão com Laravel no nome
+
+Esta versão muda nomes e formatos. Num projeto que usa a versão anterior:
+
+1. Reinstale as skills. `laravel-deep-modules`, `laravel-tdd-seams` e `laravel-verification` agora são `deep-modules`, `tdd-seams` e `verification`. Remova as 3 pastas antigas.
+2. Copie de novo os templates de agente para `.claude/agents/`, ou troque os 3 nomes no campo `skills` de cada arquivo.
+3. Em `docs/agents/projeto.md`, troque os 3 nomes e acrescente a linha `- Perfis de stack: laravel.` na seção `Execução e verificação`. `/setup` também faz essa mudança.
+4. Os scripts agora são Python 3: `scripts/crap.py` e `scripts/conferir-mapa.py`. Troque `php .../crap.php` e `php .../conferir-mapa.php` nas receitas e no README do Mapa de Features.
+5. A Âncora de componente agora usa o prefixo `componente:`. O conferidor ainda aceita `livewire:`. Para migrar um mapa, troque o prefixo nos Arquivos de Feature e gere o inventário de novo.
 
 ## Verificação e manutenção
 
-Durante a edição, execute testes focados e verificadores do escopo afetado. Antes de commit, PR ou entrega de código, aplique o portão completo de `laravel-verification`. Ao pausar, registre o estado das provas sem repetir a suíte por rotina. Mudanças só de documentação usam os verificadores do pacote.
+Durante a edição, execute testes focados e verificadores do escopo afetado. Antes de commit, PR ou entrega de código, aplique o portão completo de `verification`. Ao pausar, registre o estado das provas sem repetir a suíte por rotina. Mudanças só de documentação usam os verificadores do pacote.
 
-Valide o pacote com Python 3.10+, PHP 8.1+ e Node 18+. Sem PHP, o teste do conferidor do mapa fica pulado. Sem Node, o teste do núcleo do diagrama de `/diagramar-slice` fica pulado:
+Valide o pacote com Python 3.10+ e Node 18+. Sem Node, o teste do núcleo do diagrama de `/diagramar-slice` fica pulado:
 
 ```bash
 python3 -m pip install -r requirements-dev.txt
 python3 scripts/validate_skills.py
 python3 -m unittest discover -s tests -v
-php skills/mapear/scripts/conferir-mapa.php skills/mapear/references/exemplo
+python3 skills/mapear/scripts/conferir-mapa.py skills/mapear/references/exemplo
 ```
 
 Os [cenários de avaliação](evals/cenarios.md) verificam decisões do agente. Validação estrutural não comprova eficácia; registre execução e comparação com a versão anterior antes de alegar melhoria.
