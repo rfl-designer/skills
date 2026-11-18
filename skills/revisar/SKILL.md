@@ -9,7 +9,7 @@ disable-model-invocation: true
 ## Configuração do projeto
 Leia a configuração apontada nas instruções do projeto; sem ponteiro, procure `docs/agents/projeto.md` na raiz do repositório. Reutilize-a enquanto não mudar. Use seus caminhos, comandos e escopo. A sessão prevalece. Sem configuração, pergunte só pelas escolhas necessárias ausentes e ofereça `/setup` uma vez, sem bloquear a tarefa.
 
-**Perfil de stack:** Esta skill não assume linguagem nem framework. Se a configuração ou os manifests mostram Laravel, leia também [references/laravel.md](references/laravel.md): ele dá a guarda do ambiente de teste, a preparação das worktrees e as suspeitas e provas de Laravel e Livewire. Passe o caminho do perfil a cada revisor. Sem perfil para a stack do projeto, aplique cada regra com o mecanismo equivalente da stack.
+**Perfil de stack:** Esta skill não assume linguagem nem framework. Se a configuração ou os manifests mostram Laravel, leia também [references/laravel.md](references/laravel.md): ele dá a guarda do ambiente de teste, a preparação das worktrees, as suspeitas e provas de Laravel e Livewire e os mecanismos de `Regra:`. Passe o caminho do perfil a cada revisor. Sem perfil para a stack do projeto, aplique cada regra com o mecanismo equivalente da stack.
 
 ## 1. Objetivo
 Revise o diff da entrega numa só rodada, em 2 eixos isolados: Standards (padrões e segurança) e Spec. Fica só o achado que uma execução prova. Depois, escreva um briefing de PR conciso, com o Raio de Explosão.
@@ -52,6 +52,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
      - **Perda de dados:** Erro engolido num bloco de captura. Várias escritas sem transação. Job ou evento disparado antes do commit da transação. Operação que, executada 2 vezes, grava, cobra ou envia em dobro: job com nova tentativa, webhook, tarefa agendada, duplo clique.
      - **Escala:** N+1 (falta de carregamento antecipado das relações). Corrida entre leitura e escrita: criação condicional sem índice único, falta de trava de linha ou de incremento atômico. Tarefa repetida em cada processo: falta de trava de servidor único, de não sobreposição ou de job único. Memória que só cresce: leitura de uma tabela grande inteira no lugar de leitura em lotes. Algoritmo O(n²) sobre entrada grande. Estado local que devia ser compartilhado: variável estática num servidor de processo longo, disco local com vários servidores.
      - **Velocidade:** Lentidão medida é `[IMPORTANTE]`. A prova mede consultas ou tempo, com o volume da carga presumida.
+     - **Verificador enfraquecido:** Uma linha que o diff acrescenta com um marcador de exceção de um verificador: o comentário ou a chamada que manda a análise estática, o teste de arquitetura ou o lint ignorar um trecho.
    - **Eixo Spec e comportamento:**
      - Compare o diff com a Especificação de `/especificar`, requisito a requisito. Aponte requisito faltante. Aponte escopo extra (*scope creep*) quando uma execução mostra um comportamento que a Spec não pede ou exclui.
      - **Bug:** Resultado errado e caso de borda (vazio, zero, último item, arredondamento, fuso horário). Chamador quebrado pela mudança. Correção num só chamador, com a função compartilhada ainda errada.
@@ -70,11 +71,13 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
      | Requisito faltante ou escopo extra | Teste do caso da Spec |
      | Teste ausente ou que não prova | Mutação: quebre a linha de propósito, rode o teste e mostre que ele continua verde |
      | Mapa desatualizado | Execução do comportamento e a linha do Arquivo de Feature que a contradiz |
+     | Marcador de exceção novo | Mutação: remova o marcador, rode o verificador e mostre o erro que ele escondia; desfaça. Se o erro esconde um comportamento errado, prove-o também com um teste |
+     | Atalho com comentário de porquê novo | Teste do caso que o atalho deixa passar |
 4. **Prova (revisor):** Antes de reportar, o revisor, para cada achado:
    1. Escreve o caso concreto.
    2. Grava a prova na sua worktree, na pasta de provas, um arquivo por achado. A mutação vai num script que quebra a linha, roda o teste, mostra a saída e desfaz a quebra.
    3. Executa o comando e copia a saída. Confirma que a falha vem do caso: a asserção do caso falha, não o setup, a fábrica de dados ou o ambiente.
-   4. Trata como decisão, não como achado, o atalho com limite documentado em ADR, Spec ou comentário de porquê. Reporta o atalho só se a carga esperada já passa desse limite.
+   4. Trata como decisão, não como achado, o atalho com limite documentado em ADR, Spec ou num comentário de porquê que já existia na base. Reporta o atalho só se a carga esperada já passa desse limite. O comentário que o diff acrescenta para justificar um atalho é suspeita, não decisão: prove o atalho como as outras suspeitas. Um limite novo se documenta em ADR ou na Spec.
    5. Propõe a menor correção que funciona e prefere a que apaga código. Não acrescenta camadas, pacotes ou configuração que o problema não exige.
    6. Descarta o que não executou: estilo, nomes, estrutura, "considere...", preocupação vaga e risco que só importa depois de uma mudança futura. Põe em `não verificado`, com o motivo, só os riscos sem prova no ambiente de teste da seção 2.
    7. Marca como `candidato a Da base`, com a prova, a falha cuja linha de causa está fora do diff. O principal decide na etapa 5.
@@ -88,6 +91,12 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
    6. **Achados novos:** Aplique as etapas 4, 5.1 e 5.2 e ponha cada achado novo no eixo do seu tema. Na rodada seguinte, marque com `(perdido na rodada anterior)` o achado em código que a rodada anterior já revisava, e rastreie de novo o Fluxo inteiro desse valor. Confirme cada item de `Achados novos:` de `/ajustar` e numere o confirmado no eixo do seu tema.
    7. **Vaivém:** Na rodada seguinte, marque com `(vaivém do achado N)` o achado no trecho de uma correção de `/ajustar` que desfazer essa correção resolveria. Na **Correção**, escreva as 2 direções e a pergunta ao usuário.
    8. **Provas:** Copie as provas mantidas para `$TMPDIR/provas-<branch>-<AAAA-MM-DD>/`, com o mesmo caminho relativo. Remova as 4 worktrees com `git worktree remove --force`.
+   9. **Regra:** Para cada achado mantido, confira 3 condições:
+      1. O defeito é uma classe de erro que uma ferramenta determinística detecta sem executar o caso: trava do framework, teste de arquitetura, análise estática ou lint.
+      2. A regra não dá falso positivo no repositório depois da correção, até onde a busca com `rg` mostra: cada ponto que ela pegaria tem o mesmo defeito.
+      3. A mensagem da regra diz a correção, não só a proibição.
+
+      Com as 3, escreva no achado `- **Regra:** <mecanismo>, <o que proíbe>, <mensagem com a correção>`. Sem uma delas, não escreva o campo. O perfil de stack dá os mecanismos, em ordem de preferência. A regra é sobre a causa raiz, que só a Consolidação junta: o revisor não escreve o campo. Sem achado, não há `Regra:`; a estrutura sem prova por execução continua fora da revisão.
    - **Critério de Fim:** Todos os arquivos e Fluxos têm status nos 2 eixos, sem lacuna nem divergência aberta, e cada achado tem a Reexecução e a execução na base. Só então escreva o relatório.
 6. **Relatório:**
    - Comece com `Alvo:` (referência, branch e commit, ex.: `main...HEAD` em `feature/pedidos@3f9c2ab`). Na linha seguinte, escreva `Rodada: N`; a primeira é 1. Sem subagentes, escreva `Independência: mesmo contexto`. Depois, `O que a mudança faz:` em 2 ou 3 frases.
@@ -105,6 +114,7 @@ Revise como o desenvolvedor que recebe o alerta quando a mudança quebra. Em cad
         - **Correção:** Calcule o dia uma vez no fuso da loja, `America/Sao_Paulo`. Nada mais muda.
         - **Se não corrigir:** Pedidos da noite saem com a data errada, e o financeiro corrige à mão.
      ```
+   - O campo `Regra:` é opcional e vem depois de **Se não corrigir**, só no achado que cumpre as 3 condições da etapa 5.9. Exemplo do campo: `- **Regra:** trava de atributo descartado no início da aplicação, proíbe gravar um atributo que o modelo descarta em silêncio, mensagem "Acrescente <atributo> aos atributos graváveis de <modelo>".`
    - Termine com:
      - 1 linha por eixo: total por nível e o pior achado.
      - `Fluxos rastreados:` 1 linha por Fluxo, com os consumidores e o status.
@@ -160,6 +170,9 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 | "O raio de explosão está claro; não preciso rodar nada." | **Proibido.** Execute código que prove o fato de segurança, ou escreva `não provado`. |
 | "Escrevo um PR de 200 linhas com cada arquivo modificado." | **Proibido.** O briefing tem no máximo 40 linhas de alto sinal. |
 | "A correção certa é um Service, uma Interface e uma configuração nova." | **Proibido.** Proponha a menor correção. Prefira a que apaga código. |
+| "O diff explica o atalho num comentário; é uma decisão documentada." | **Proibido.** Só o comentário de porquê que já existia na base vale como decisão. O comentário novo é suspeita: prove o atalho. |
+| "O marcador desliga o verificador numa linha só; não é achado." | **Proibido.** O marcador novo é suspeita de verificador enfraquecido. Remova-o, rode o verificador e mostre o erro. |
+| "Esta correção vale uma regra rígida para sempre." | **Proibido** sem as 3 condições da etapa 5.9. Uma regra a mais trava código correto e vira ruído. |
 | "Não há subagente; reviso aqui e entrego como revisão normal." | **Proibido.** Avise, ofereça uma sessão nova e escreva `Independência: mesmo contexto`. |
 | "Uso um `fork` ou o revisor da rodada anterior; ele já conhece o código." | **Proibido.** Os dois herdam contexto. Use um revisor novo. |
 | "O revisor do eixo Spec falhou; o eixo está sem achados." | **Proibido.** Um revisor que falha não revisou. Dispare um novo; na segunda falha, marque `não verificado`. |
@@ -175,6 +188,7 @@ Fonte: [subagentes do Claude Code](https://code.claude.com/docs/en/sub-agents).
 - `[measured]` Consolidação concluída antes do relatório: cada prova reexecutada na worktree limpa e na base, lacunas devolvidas, achados propagados aos consumidores do mesmo valor e divergências resolvidas.
 - `[measured]` Um só relatório com todos os achados provados da rodada, também com `[BLOCKER]`, e com `Descartados:` e `Da base:`.
 - `[measured]` Cada achado com caso concreto, `arquivo:linha`, as 4 partes e a **Prova**, com comando e saída; busca de chamadores citada para cada assinatura, retorno ou comportamento alterado.
+- `[measured]` `Regra:` só no achado que cumpre as 3 condições da etapa 5.9, escrita pelo principal.
 - `[measured]` Achado `aceito` fora do `Veredito:`, com o motivo. Na rodada seguinte: diff completo, status de cada achado anterior pela prova executada de novo, Fluxos das correções rastreados e vaivém marcado com as 2 direções e a pergunta. Na rodada 3 sem `pode entregar`: a pergunta, sem oferta de `/ajustar`.
 - `[measured]` Carga presumida declarada e fato de segurança provado por execução, ou `não provado`.
 - `[measured]` Portão completo de `verification` aprovado para o estado revisado, com comandos, escopos e resultados citados.

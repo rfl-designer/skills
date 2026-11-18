@@ -1,0 +1,11 @@
+# A correção vira regra, e o diff não justifica o próprio atalho
+
+Em `/revisar`, o agente principal propõe uma regra determinística (`Regra:` no achado) quando o defeito provado é uma classe de erro que uma ferramenta detecta sem executar o caso, a regra não dá falso positivo no repositório depois da correção e a mensagem diz a correção. Em `/ajustar`, o Ajustador escreve a regra e a prova como um achado com comportamento: RED no código com o defeito, GREEN depois da correção, suíte completa verde. A regra que só fica verde com um verificador protegido ou com uma exceção vai para `Regras propostas:`, para o humano decidir. Também passou a valer: um comentário de porquê que o próprio diff acrescenta, ou um marcador de exceção novo (`->ignoring(`, `@pest-arch-ignore`, `@phpstan-ignore`), é suspeita, não decisão documentada. Escolhemos isso porque o agente copia o padrão que encontra no código: uma correção que não vira regra volta no próximo diff, e um atalho justificado num comentário se espalha. É a pirâmide da Lauren Tan (palestra "Todo código é uma porcaria (exceto o meu)", 2026): o código e as verificações determinísticas primeiro, a prosa por último.
+
+Rejeitamos 2 alternativas. A frequência ("regra só na 2ª ocorrência") exige um registro entre sessões que as skills não têm; quem tem esse registro é a forja. Abrir `/revisar` para achados de estrutura sem prova por execução traria de volta o ruído de estilo: a regra de arquitetura ("componente não usa o banco direto") nasce de uma decisão humana, pelo modo feedback de `/ajustar`.
+
+## Consequências
+
+- A regra é sobre a causa raiz, por isso o principal a escreve na Consolidação, e não o revisor.
+- O perfil Laravel prefere, nesta ordem: as travas do Eloquent no `AppServiceProvider` (`preventLazyLoading()` e afins), um teste Pest arch em `tests/Arch/` e uma opção do Larastan ou regra PHPStan com `tip()`. O Pest arch não aceita mensagem de falha customizada: a correção vai na descrição do `arch()`. `not->toUse` falha sem arquivo e linha: o `arquivo:linha` do RED vem do achado.
+- A etapa 4.4 de `/revisar` aceita como decisão só o comentário de porquê que já existia na base. Um projeto que documenta um limite novo o faz em ADR ou na Spec.

@@ -1,0 +1,51 @@
+diff --git a/docs/specs/0007-estorno-pela-lista.md b/docs/specs/0007-estorno-pela-lista.md
+new file mode 100644
+index 0000000..f3a4282
+--- /dev/null
++++ b/docs/specs/0007-estorno-pela-lista.md
+@@ -0,0 +1,18 @@
++# Spec 0007 — Estorno pela lista
++
++## 1. Problema e Comportamento Observável
++Hoje, o Gerente pede ao suporte para estornar um Pedido aprovado por engano, e o suporte corrige o banco à mão. Com esta entrega, o Gerente estorna um Pedido Aprovado na lista de pedidos. O estorno passa o Pedido a Cancelado e devolve o total ao Saldo do Cliente. As 2 escritas acontecem juntas ou nenhuma acontece.
++
++## 2. Vocabulário de Domínio
++- Termos do glossário: Pedido, Gerente, Saldo.
++- **Estorno:** passagem de um Pedido de Aprovado para Cancelado, com a devolução do total ao Saldo.
++
++## 3. Fronteiras do Sistema
++- **Lista de pedidos (Livewire, existente):** ganha a ação `estornar`, que recebe o ID do Pedido. Só o Gerente estorna, e só um Pedido Aprovado. Fora disso, a ação devolve 403.
++
++## 4. Plano de Testes (Pest)
++- Livewire: o Gerente estorna; o Pedido fica Cancelado e o Saldo sobe o total.
++- Livewire: o Cliente recebe 403.
++
++## 5. Fora de Escopo
++- Costura nova. O estorno fica no componente da lista nesta entrega. A Spec 0008 cria a Costura do estorno, com o financeiro.
+diff --git a/phpunit.xml b/phpunit.xml
+index 5974208..ab85d17 100644
+--- a/phpunit.xml
++++ b/phpunit.xml
+@@ -5,6 +5,9 @@
+          colors="true"
+ >
+     <testsuites>
++        <testsuite name="Arch">
++            <directory>tests/Arch</directory>
++        </testsuite>
+         <testsuite name="Feature">
+             <directory>tests/Feature</directory>
+         </testsuite>
+diff --git a/tests/Arch/ArchTest.php b/tests/Arch/ArchTest.php
+new file mode 100644
+index 0000000..12bb321
+--- /dev/null
++++ b/tests/Arch/ArchTest.php
+@@ -0,0 +1,7 @@
++<?php
++
++declare(strict_types=1);
++
++arch('os componentes Livewire não usam o facade DB: a escrita com transação vai numa Action de App\Actions')
++    ->expect('App\Livewire')
++    ->not->toUse('Illuminate\Support\Facades\DB');

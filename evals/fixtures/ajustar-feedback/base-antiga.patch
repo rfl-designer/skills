@@ -1,0 +1,69 @@
+diff --git a/app/Livewire/Clientes/Saldo.php b/app/Livewire/Clientes/Saldo.php
+new file mode 100644
+index 0000000..407037a
+--- /dev/null
++++ b/app/Livewire/Clientes/Saldo.php
+@@ -0,0 +1,28 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Livewire\Clientes;
++
++use App\Enums\StatusPedido;
++use Illuminate\Contracts\View\View;
++use Illuminate\Support\Facades\DB;
++use Livewire\Component;
++
++final class Saldo extends Component
++{
++    public function render(): View
++    {
++        $cliente = auth()->user()->cliente;
++
++        $aprovados = DB::table('pedidos')
++            ->where('cliente_id', $cliente->id)
++            ->where('status', StatusPedido::Aprovado->value)
++            ->sum('total_centavos');
++
++        return view('livewire.clientes.saldo', [
++            'saldo' => $cliente->saldo_centavos,
++            'aprovados' => (int) $aprovados,
++        ]);
++    }
++}
+diff --git a/resources/views/livewire/clientes/saldo.blade.php b/resources/views/livewire/clientes/saldo.blade.php
+new file mode 100644
+index 0000000..63e52ff
+--- /dev/null
++++ b/resources/views/livewire/clientes/saldo.blade.php
+@@ -0,0 +1,4 @@
++<div>
++    <p>Saldo: {{ number_format($saldo / 100, 2, ',', '.') }}</p>
++    <p>Pedidos aprovados: {{ number_format($aprovados / 100, 2, ',', '.') }}</p>
++</div>
+diff --git a/tests/Feature/SaldoClienteTest.php b/tests/Feature/SaldoClienteTest.php
+new file mode 100644
+index 0000000..b46d5b2
+--- /dev/null
++++ b/tests/Feature/SaldoClienteTest.php
+@@ -0,0 +1,19 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Livewire\Clientes\Saldo;
++use App\Models\Cliente;
++use App\Models\Pedido;
++use Livewire\Livewire;
++
++it('mostra ao Cliente o Saldo e o total dos Pedidos aprovados', function (): void {
++    $cliente = Cliente::factory()->create(['saldo_centavos' => 10_000]);
++    Pedido::factory()->for($cliente)->aprovado()->create(['total_centavos' => 2_500]);
++    Pedido::factory()->for($cliente)->create(['total_centavos' => 900]);
++
++    Livewire::actingAs($cliente->user)
++        ->test(Saldo::class)
++        ->assertSee('Saldo: 100,00')
++        ->assertSee('Pedidos aprovados: 25,00');
++});
