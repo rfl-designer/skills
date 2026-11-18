@@ -1,0 +1,53 @@
+diff --git a/app/Console/Commands/AprovarPedido.php b/app/Console/Commands/AprovarPedido.php
+index fb34870..bf2fb21 100644
+--- a/app/Console/Commands/AprovarPedido.php
++++ b/app/Console/Commands/AprovarPedido.php
+@@ -16,6 +16,7 @@ final class AprovarPedido extends Command
+ 
+     public function handle(): int
+     {
++        // Sem Policy: só o suporte roda este comando, no servidor, a pedido do Gerente.
+         $pedido = Pedido::findOrFail($this->argument('pedido'));
+ 
+         if ($pedido->status !== StatusPedido::Pendente) {
+diff --git a/app/Models/Pedido.php b/app/Models/Pedido.php
+index 38fdb9a..c98a0ea 100644
+--- a/app/Models/Pedido.php
++++ b/app/Models/Pedido.php
+@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
+ use Illuminate\Database\Eloquent\Model;
+ use Illuminate\Database\Eloquent\Relations\BelongsTo;
+ 
++/**
++ * @property StatusPedido $status
++ */
+ final class Pedido extends Model
+ {
+     /** @use HasFactory<PedidoFactory> */
+@@ -25,6 +28,7 @@ final class Pedido extends Model
+         ];
+     }
+ 
++    /** @return BelongsTo<Cliente, $this> */
+     public function cliente(): BelongsTo
+     {
+         return $this->belongsTo(Cliente::class);
+diff --git a/docs/agents/projeto.md b/docs/agents/projeto.md
+index 9c3a2c1..8c85805 100644
+--- a/docs/agents/projeto.md
++++ b/docs/agents/projeto.md
+@@ -1,12 +1,12 @@
+ # Configuração do projeto
+ 
+-- Stack: Laravel 12, Livewire 3, Pest 3, PHP 8.3.
++- Stack: Laravel 12, Livewire 3, Pest 3, Larastan 3 (nível 5), PHP 8.3.
+ - Perfis de stack: laravel.
+ - Specs: `docs/specs/NNNN-slug.md`.
+ - Tickets: `docs/tickets/<spec>/NN-slug.md`.
+ - Glossário: `GLOSSARY.md`.
+ - ADRs: `docs/adr/`.
+-- Comandos: `./vendor/bin/pint --test`, `./vendor/bin/pest`.
++- Comandos: `./vendor/bin/pint --test`, `./vendor/bin/phpstan analyse`, `./vendor/bin/pest`.
+ 
+ ## Execução e verificação
+ 

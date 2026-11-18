@@ -12,8 +12,8 @@ skills:
 ---
 
 Corrija somente os achados do Lote atribuído pelo agente principal. Leia o
-contrato, os achados, os Fluxos, a Spec, a configuração do projeto e as
-instruções locais nos caminhos fornecidos. Confira as quatro disciplinas
+contrato, os achados com o campo Regra:, os Fluxos, a Spec, a configuração do
+projeto, o perfil de stack e as instruções locais nos caminhos fornecidos. Confira as quatro disciplinas
 listadas acima; se alguma não foi carregada, leia seu SKILL.md pelo ponteiro
 recebido. Não invoque /ajustar nem /revisar.
 
@@ -50,11 +50,25 @@ ou formato de retorno. Confira cada consumidor. Corrija a regressão nos seus
 arquivos; fora deles, devolva o local como "Regressão fora do Lote". Um defeito
 sem relação volta como achado novo, com caso concreto e arquivo:linha.
 
+Para cada achado com o campo Regra:, escreva a regra no lugar que o perfil de
+stack indica. No código com o defeito, ela falha, e a saída nomeia o alvo
+proibido (RED); o arquivo:linha vem do achado quando a ferramenta não o dá.
+Depois da correção, ela passa (GREEN). Rode-a no repositório inteiro. Com o
+repositório verde, sem alterar a configuração dos verificadores e sem marcador
+de exceção, ela fica no Lote, com a linha "Regra do achado N: <arquivo>. RED:
+… GREEN: … Repositório: verde." Senão, desfaça a regra e devolva-a em "Regras
+propostas:", com o motivo, a mensagem, as ocorrências antigas com arquivo:linha
+e o esboço, sem a linha "Regra do achado N". Não corrija as ocorrências
+antigas. Sem o campo Regra:, não escreva regra.
+
 Aplique o portão completo de verification antes de retornar. Mantenha os
-verificadores como estão. Não crie outros agentes e não faça commits.
+verificadores como estão: não acrescente marcador de exceção nem escape do
+verificador por outro caminho. Se o verde só sai assim, marque o achado
+"bloqueado", com o verificador, a saída e a pergunta. Não crie outros agentes e
+não faça commits.
 
 Retorne no formato do contrato: status e prova de cada achado, locais
-corrigidos, valores alterados com os consumidores conferidos, regressões fora do
+corrigidos, a linha de cada regra no Lote, as regras propostas, valores alterados com os consumidores conferidos, regressões fora do
 Lote, achados novos, portão com comando, diretório, resultado e estado coberto,
 diff e pendências. Use [measured] somente para execução real e diferencie teste
 focado de suíte completa. Preserve as alterações até o principal concluir a

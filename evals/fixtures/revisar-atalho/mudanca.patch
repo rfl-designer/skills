@@ -1,0 +1,158 @@
+diff --git a/app/Console/Commands/AprovarPedido.php b/app/Console/Commands/AprovarPedido.php
+index bf2fb21..db2a2bb 100644
+--- a/app/Console/Commands/AprovarPedido.php
++++ b/app/Console/Commands/AprovarPedido.php
+@@ -6,11 +6,12 @@ namespace App\Console\Commands;
+ 
+ use App\Enums\StatusPedido;
+ use App\Models\Pedido;
++use App\Models\User;
+ use Illuminate\Console\Command;
+ 
+ final class AprovarPedido extends Command
+ {
+-    protected $signature = 'pedidos:aprovar {pedido}';
++    protected $signature = 'pedidos:aprovar {pedido} {--gerente= : ID do Gerente que pediu a aprovação}';
+ 
+     protected $description = 'Aprova um Pedido pendente. O suporte usa este comando a pedido do Gerente.';
+ 
+@@ -19,13 +20,21 @@ final class AprovarPedido extends Command
+         // Sem Policy: só o suporte roda este comando, no servidor, a pedido do Gerente.
+         $pedido = Pedido::findOrFail($this->argument('pedido'));
+ 
++        // Temporário, por causa da importação do ERP: os Gerentes importados ainda
++        // estão com o papel 'cliente'. Aceita qualquer usuário até a importação terminar.
++        $gerente = User::query()->findOrFail($this->option('gerente'));
++
+         if ($pedido->status !== StatusPedido::Pendente) {
+             $this->error('O pedido não está pendente.');
+ 
+             return self::FAILURE;
+         }
+ 
+-        $pedido->update(['status' => StatusPedido::Aprovado, 'aprovado_em' => now()]);
++        $pedido->update([
++            'status' => StatusPedido::Aprovado,
++            'aprovado_em' => now(),
++            'aprovado_por' => $gerente->id,
++        ]);
+ 
+         return self::SUCCESS;
+     }
+diff --git a/app/Livewire/Pedidos/Lista.php b/app/Livewire/Pedidos/Lista.php
+index 5b8fed5..bdcda98 100644
+--- a/app/Livewire/Pedidos/Lista.php
++++ b/app/Livewire/Pedidos/Lista.php
+@@ -15,7 +15,7 @@ final class Lista extends Component
+         $user = auth()->user();
+ 
+         $pedidos = $user->isGerente()
+-            ? Pedido::query()->with('cliente.user')->latest()->get()
++            ? Pedido::query()->with(['cliente.user', 'aprovador'])->latest()->get()
+             : Pedido::query()->whereBelongsTo($user->cliente)->latest()->get();
+ 
+         return view('livewire.pedidos.lista', ['pedidos' => $pedidos]);
+diff --git a/app/Models/Pedido.php b/app/Models/Pedido.php
+index c98a0ea..2c28f7b 100644
+--- a/app/Models/Pedido.php
++++ b/app/Models/Pedido.php
+@@ -18,7 +18,7 @@ final class Pedido extends Model
+     /** @use HasFactory<PedidoFactory> */
+     use HasFactory;
+ 
+-    protected $fillable = ['cliente_id', 'total_centavos', 'status', 'aprovado_em'];
++    protected $fillable = ['cliente_id', 'total_centavos', 'status', 'aprovado_em', 'aprovado_por'];
+ 
+     protected function casts(): array
+     {
+@@ -33,4 +33,16 @@ final class Pedido extends Model
+     {
+         return $this->belongsTo(Cliente::class);
+     }
++
++    /** @return BelongsTo<User, $this> */
++    public function aprovador(): BelongsTo
++    {
++        return $this->belongsTo(User::class, 'aprovado_por');
++    }
++
++    public function nomeDoAprovador(): ?string
++    {
++        // @phpstan-ignore-next-line
++        return $this->aprovador?->nome;
++    }
+ }
+diff --git a/database/migrations/2026_11_10_000004_add_aprovado_por_to_pedidos_table.php b/database/migrations/2026_11_10_000004_add_aprovado_por_to_pedidos_table.php
+new file mode 100644
+index 0000000..3e599a2
+--- /dev/null
++++ b/database/migrations/2026_11_10_000004_add_aprovado_por_to_pedidos_table.php
+@@ -0,0 +1,17 @@
++<?php
++
++declare(strict_types=1);
++
++use Illuminate\Database\Migrations\Migration;
++use Illuminate\Database\Schema\Blueprint;
++use Illuminate\Support\Facades\Schema;
++
++return new class extends Migration
++{
++    public function up(): void
++    {
++        Schema::table('pedidos', function (Blueprint $table): void {
++            $table->foreignId('aprovado_por')->nullable()->after('aprovado_em')->constrained('users');
++        });
++    }
++};
+diff --git a/resources/views/livewire/pedidos/lista.blade.php b/resources/views/livewire/pedidos/lista.blade.php
+index ff6f017..3fde3b3 100644
+--- a/resources/views/livewire/pedidos/lista.blade.php
++++ b/resources/views/livewire/pedidos/lista.blade.php
+@@ -5,6 +5,9 @@
+                 <td>{{ $pedido->id }}</td>
+                 <td>{{ number_format($pedido->total_centavos / 100, 2, ',', '.') }}</td>
+                 <td>{{ $pedido->status->name }}</td>
++                @if (auth()->user()->isGerente())
++                    <td>{{ $pedido->nomeDoAprovador() }}</td>
++                @endif
+             </tr>
+         @endforeach
+     </table>
+diff --git a/tests/Feature/QuemAprovouTest.php b/tests/Feature/QuemAprovouTest.php
+new file mode 100644
+index 0000000..0c596d8
+--- /dev/null
++++ b/tests/Feature/QuemAprovouTest.php
+@@ -0,0 +1,31 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Enums\StatusPedido;
++use App\Livewire\Pedidos\Lista;
++use App\Models\Pedido;
++use App\Models\User;
++use Livewire\Livewire;
++
++it('grava o Gerente de --gerente na aprovação', function (): void {
++    $gerente = User::factory()->gerente()->create();
++    $pedido = Pedido::factory()->create();
++
++    $this->artisan('pedidos:aprovar', ['pedido' => $pedido->id, '--gerente' => $gerente->id])
++        ->assertSuccessful();
++
++    expect($pedido->fresh())
++        ->status->toBe(StatusPedido::Aprovado)
++        ->aprovado_por->toBe($gerente->id);
++});
++
++it('mostra ao Gerente a coluna do Aprovador', function (): void {
++    $gerente = User::factory()->gerente()->create();
++    Pedido::factory()->aprovado()->create(['aprovado_por' => $gerente->id, 'total_centavos' => 4_321]);
++
++    Livewire::actingAs($gerente)
++        ->test(Lista::class)
++        ->assertOk()
++        ->assertSee('43,21');
++});

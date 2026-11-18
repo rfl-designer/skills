@@ -1,0 +1,83 @@
+diff --git a/app/Livewire/Pedidos/Lista.php b/app/Livewire/Pedidos/Lista.php
+index 5b8fed5..5a48995 100644
+--- a/app/Livewire/Pedidos/Lista.php
++++ b/app/Livewire/Pedidos/Lista.php
+@@ -4,12 +4,26 @@ declare(strict_types=1);
+ 
+ namespace App\Livewire\Pedidos;
+ 
++use App\Enums\StatusPedido;
+ use App\Models\Pedido;
+ use Illuminate\Contracts\View\View;
++use Illuminate\Support\Facades\DB;
+ use Livewire\Component;
+ 
+ final class Lista extends Component
+ {
++    public function estornar(int $pedidoId): void
++    {
++        $pedido = Pedido::findOrFail($pedidoId);
++
++        abort_unless(auth()->user()->isGerente() && $pedido->status === StatusPedido::Aprovado, 403);
++
++        DB::transaction(function () use ($pedido): void {
++            $pedido->update(['status' => StatusPedido::Cancelado]);
++            $pedido->cliente->increment('saldo_centavos', $pedido->total_centavos);
++        });
++    }
++
+     public function render(): View
+     {
+         $user = auth()->user();
+diff --git a/resources/views/livewire/pedidos/lista.blade.php b/resources/views/livewire/pedidos/lista.blade.php
+index ff6f017..f622e0a 100644
+--- a/resources/views/livewire/pedidos/lista.blade.php
++++ b/resources/views/livewire/pedidos/lista.blade.php
+@@ -5,6 +5,9 @@
+                 <td>{{ $pedido->id }}</td>
+                 <td>{{ number_format($pedido->total_centavos / 100, 2, ',', '.') }}</td>
+                 <td>{{ $pedido->status->name }}</td>
++                @if (auth()->user()->isGerente() && $pedido->status === \App\Enums\StatusPedido::Aprovado)
++                    <td><button wire:click="estornar({{ $pedido->id }})">Estornar</button></td>
++                @endif
+             </tr>
+         @endforeach
+     </table>
+diff --git a/tests/Feature/EstornoTest.php b/tests/Feature/EstornoTest.php
+new file mode 100644
+index 0000000..3a96d76
+--- /dev/null
++++ b/tests/Feature/EstornoTest.php
+@@ -0,0 +1,32 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Enums\StatusPedido;
++use App\Livewire\Pedidos\Lista;
++use App\Models\Cliente;
++use App\Models\Pedido;
++use App\Models\User;
++use Livewire\Livewire;
++
++it('o Gerente estorna o Pedido aprovado e o Saldo volta', function (): void {
++    $cliente = Cliente::factory()->create(['saldo_centavos' => 1_000]);
++    $pedido = Pedido::factory()->for($cliente)->aprovado()->create(['total_centavos' => 2_500]);
++
++    Livewire::actingAs(User::factory()->gerente()->create())
++        ->test(Lista::class)
++        ->call('estornar', $pedido->id);
++
++    expect($pedido->fresh()->status)->toBe(StatusPedido::Cancelado)
++        ->and($cliente->fresh()->saldo_centavos)->toBe(3_500);
++});
++
++it('o Cliente não estorna', function (): void {
++    $cliente = Cliente::factory()->create();
++    $pedido = Pedido::factory()->for($cliente)->aprovado()->create();
++
++    Livewire::actingAs($cliente->user)
++        ->test(Lista::class)
++        ->call('estornar', $pedido->id)
++        ->assertForbidden();
++});

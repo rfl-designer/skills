@@ -1,0 +1,25 @@
+diff --git a/docs/specs/0007-estorno-pela-lista.md b/docs/specs/0007-estorno-pela-lista.md
+new file mode 100644
+index 0000000..51f3b4f
+--- /dev/null
++++ b/docs/specs/0007-estorno-pela-lista.md
+@@ -0,0 +1,19 @@
++# Spec 0007 — Estorno pela lista
++
++## 1. Problema e Comportamento Observável
++Hoje, o Gerente pede ao suporte para estornar um Pedido aprovado por engano, e o suporte corrige o banco à mão. Com esta entrega, o Gerente estorna um Pedido Aprovado na lista de pedidos. O estorno passa o Pedido a Cancelado e devolve o total ao Saldo do Cliente. As 2 escritas acontecem juntas ou nenhuma acontece.
++
++## 2. Vocabulário de Domínio
++- Termos do glossário: Pedido, Gerente, Saldo.
++- **Estorno:** passagem de um Pedido de Aprovado para Cancelado, com a devolução do total ao Saldo.
++
++## 3. Fronteiras do Sistema
++- **Lista de pedidos (Livewire, existente):** ganha a ação `estornar`, que recebe o ID do Pedido. Só o Gerente estorna, e só um Pedido Aprovado. Fora disso, a ação devolve 403.
++
++## 4. Plano de Testes (Pest)
++- Livewire: o Gerente estorna; o Pedido fica Cancelado e o Saldo sobe o total.
++- Livewire: o Cliente recebe 403.
++
++## 5. Fora de Escopo
++- Estorno parcial.
++- Aviso por e-mail ao Cliente.

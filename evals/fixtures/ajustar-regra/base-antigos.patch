@@ -1,0 +1,161 @@
+diff --git a/app/Actions/ExportarPedidos.php b/app/Actions/ExportarPedidos.php
+new file mode 100644
+index 0000000..7c72fa9
+--- /dev/null
++++ b/app/Actions/ExportarPedidos.php
+@@ -0,0 +1,28 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Actions;
++
++use App\Models\Pedido;
++
++final class ExportarPedidos
++{
++    /**
++     * Uma linha por Pedido, no formato que o financeiro importa: `id;total;cliente`.
++     *
++     * @return list<string>
++     */
++    public function handle(): array
++    {
++        return Pedido::query()
++            ->orderBy('id')
++            ->get()
++            ->map(fn (Pedido $pedido): string => implode(';', [
++                $pedido->id,
++                $pedido->total_centavos,
++                $pedido->cliente->user_id,
++            ]))
++            ->all();
++    }
++}
+diff --git a/app/Actions/SaldosBaixos.php b/app/Actions/SaldosBaixos.php
+new file mode 100644
+index 0000000..0850129
+--- /dev/null
++++ b/app/Actions/SaldosBaixos.php
+@@ -0,0 +1,27 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Actions;
++
++use App\Models\User;
++
++final class SaldosBaixos
++{
++    /**
++     * Os e-mails dos Clientes com Saldo abaixo do limite, para o aviso de recarga.
++     *
++     * @return list<string>
++     */
++    public function handle(int $limiteCentavos): array
++    {
++        return User::query()
++            ->where('papel', 'cliente')
++            ->orderBy('id')
++            ->get()
++            ->filter(fn (User $user): bool => $user->cliente->saldo_centavos < $limiteCentavos)
++            ->pluck('email')
++            ->values()
++            ->all();
++    }
++}
+diff --git a/app/Console/Commands/ResumoClientes.php b/app/Console/Commands/ResumoClientes.php
+new file mode 100644
+index 0000000..9096581
+--- /dev/null
++++ b/app/Console/Commands/ResumoClientes.php
+@@ -0,0 +1,24 @@
++<?php
++
++declare(strict_types=1);
++
++namespace App\Console\Commands;
++
++use App\Models\Cliente;
++use Illuminate\Console\Command;
++
++final class ResumoClientes extends Command
++{
++    protected $signature = 'clientes:resumo';
++
++    protected $description = 'Lista o Saldo de cada Cliente. O suporte usa este comando no fim do mês.';
++
++    public function handle(): int
++    {
++        foreach (Cliente::query()->orderBy('id')->get() as $cliente) {
++            $this->line($cliente->user->name.': '.number_format($cliente->saldo_centavos / 100, 2, ',', '.'));
++        }
++
++        return self::SUCCESS;
++    }
++}
+diff --git a/tests/Feature/ExportarPedidosTest.php b/tests/Feature/ExportarPedidosTest.php
+new file mode 100644
+index 0000000..852583b
+--- /dev/null
++++ b/tests/Feature/ExportarPedidosTest.php
+@@ -0,0 +1,16 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Actions\ExportarPedidos;
++use App\Models\Pedido;
++
++it('exporta uma linha por Pedido', function (): void {
++    $primeiro = Pedido::factory()->create(['total_centavos' => 1_000]);
++    $segundo = Pedido::factory()->create(['total_centavos' => 2_000]);
++
++    expect(app(ExportarPedidos::class)->handle())->toBe([
++        "{$primeiro->id};1000;{$primeiro->cliente->user_id}",
++        "{$segundo->id};2000;{$segundo->cliente->user_id}",
++    ]);
++});
+diff --git a/tests/Feature/ResumoClientesTest.php b/tests/Feature/ResumoClientesTest.php
+new file mode 100644
+index 0000000..d2c0af6
+--- /dev/null
++++ b/tests/Feature/ResumoClientesTest.php
+@@ -0,0 +1,16 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Models\Cliente;
++use App\Models\User;
++
++it('lista o Saldo de cada Cliente', function (): void {
++    Cliente::factory()->for(User::factory()->create(['name' => 'Ana']))->create(['saldo_centavos' => 1_000]);
++    Cliente::factory()->for(User::factory()->create(['name' => 'Bruno']))->create(['saldo_centavos' => 2_550]);
++
++    $this->artisan('clientes:resumo')
++        ->expectsOutput('Ana: 10,00')
++        ->expectsOutput('Bruno: 25,50')
++        ->assertSuccessful();
++});
+diff --git a/tests/Feature/SaldosBaixosTest.php b/tests/Feature/SaldosBaixosTest.php
+new file mode 100644
+index 0000000..b1c5e29
+--- /dev/null
++++ b/tests/Feature/SaldosBaixosTest.php
+@@ -0,0 +1,14 @@
++<?php
++
++declare(strict_types=1);
++
++use App\Actions\SaldosBaixos;
++use App\Models\Cliente;
++use App\Models\User;
++
++it('lista os Clientes com Saldo abaixo do limite', function (): void {
++    Cliente::factory()->for(User::factory()->create(['email' => 'baixo@example.com']))->create(['saldo_centavos' => 500]);
++    Cliente::factory()->for(User::factory()->create(['email' => 'alto@example.com']))->create(['saldo_centavos' => 5_000]);
++
++    expect(app(SaldosBaixos::class)->handle(1_000))->toBe(['baixo@example.com']);
++});
